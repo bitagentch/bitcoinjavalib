@@ -6,7 +6,7 @@
 
     <groupId>ch.bitagent</groupId>
     <artifactId>bitcoinjavalib</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
 
     <properties>
         <java.version>11</java.version>
