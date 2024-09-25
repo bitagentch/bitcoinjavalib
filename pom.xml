@@ -6,7 +6,7 @@
 
     <groupId>ch.bitagent</groupId>
     <artifactId>bitcoinjavalib</artifactId>
-    <version>0.0.0-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
 
     <properties>
         <java.version>11</java.version>
@@ -71,6 +71,10 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <repositories>
+                <repository>
+                    <id>central</id>
+                    <url>https://repo1.maven.org/maven2</url>
+                </repository>
                 <repository>
                     <id>github</id>
                     <url>https://maven.pkg.github.com/bitagentch/bitcoinjavalib</url>
