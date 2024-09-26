@@ -8,21 +8,32 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * <p>GetDataMessage class.</p>
+ */
 public class GetDataMessage implements Message {
 
+    /** Constant <code>COMMAND="getdata"</code> */
     public static final String COMMAND = "getdata";
 
     private final List<GetDataType> data = new ArrayList<>();
 
+    /** {@inheritDoc} */
     @Override
     public byte[] getCommand() {
         return COMMAND.getBytes();
     }
 
+    /**
+     * <p>addData.</p>
+     *
+     * @param data a {@link ch.bitagent.bitcoin.java.network.GetDataType} object
+     */
     public void addData(GetDataType data) {
         this.data.add(data);
     }
 
+    /** {@inheritDoc} */
     @Override
     public byte[] serialize() {
         var result = new ByteArrayOutputStream();

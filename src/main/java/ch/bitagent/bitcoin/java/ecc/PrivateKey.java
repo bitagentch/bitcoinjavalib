@@ -14,11 +14,22 @@ public class PrivateKey {
     private final Int secret;
     private final S256Point point;
 
+    /**
+     * <p>Constructor for PrivateKey.</p>
+     *
+     * @param secret a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     */
     public PrivateKey(Int secret) {
         this.secret = secret;
         this.point = S256Point.getG().mul(secret);
     }
 
+    /**
+     * <p>sign.</p>
+     *
+     * @param z a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.Signature} object
+     */
     public Signature sign(Int z) {
         var k = this.deterministicK(z);
         // r is the x coordinate of the resulting point k*G
@@ -34,6 +45,12 @@ public class PrivateKey {
         return new Signature(r, s);
     }
 
+    /**
+     * <p>deterministicK.</p>
+     *
+     * @param z a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     */
     public Int deterministicK(Int z) {
         byte[] k = Bytes.initFill(32, (byte) 0x00);
         byte[] v = Bytes.initFill(32, (byte) 0x01);
@@ -82,6 +99,13 @@ public class PrivateKey {
         }
     }
 
+    /**
+     * <p>wif.</p>
+     *
+     * @param compressed a boolean
+     * @param testnet a boolean
+     * @return a {@link java.lang.String} object
+     */
     public String wif(boolean compressed, boolean testnet) {
         byte[] secretBytes = this.secret.toBytes(32);
         byte prefix;
@@ -97,6 +121,11 @@ public class PrivateKey {
         }
     }
 
+    /**
+     * <p>Getter for the field <code>point</code>.</p>
+     *
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.S256Point} object
+     */
     public S256Point getPoint() {
         return point;
     }

@@ -10,6 +10,9 @@ import java.io.ByteArrayOutputStream;
 import java.util.Objects;
 import java.util.logging.Logger;
 
+/**
+ * <p>TxIn class.</p>
+ */
 public class TxIn {
 
     private static final Logger log = Logger.getLogger(TxIn.class.getSimpleName());
@@ -20,6 +23,14 @@ public class TxIn {
     private Int sequence;
     private Script witness;
 
+    /**
+     * <p>Constructor for TxIn.</p>
+     *
+     * @param prevTx a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     * @param prevIndex a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     * @param scriptSig a {@link ch.bitagent.bitcoin.java.script.Script} object
+     * @param sequence a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     */
     public TxIn(Int prevTx, Int prevIndex, Script scriptSig, Int sequence) {
         this.prevTx = prevTx;
         this.prevIndex = prevIndex;
@@ -31,6 +42,9 @@ public class TxIn {
     /**
      * Takes a byte stream and parses the txInput at the start.
      * Returns a TxIn object.
+     *
+     * @param stream a {@link java.io.ByteArrayInputStream} object
+     * @return a {@link ch.bitagent.bitcoin.java.tx.TxIn} object
      */
     public static TxIn parse(ByteArrayInputStream stream) {
         var prevTx = Hex.parse(Bytes.changeOrder(Bytes.read(stream, 32)));
@@ -42,6 +56,8 @@ public class TxIn {
 
     /**
      * Returns the byte serialization of the transaction input
+     *
+     * @return an array of {@link byte} objects
      */
     public byte[] serialize() {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
@@ -59,6 +75,9 @@ public class TxIn {
     /**
      * Get the outpoint value by looking up the tx hash
      * Returns the amount in satoshi
+     *
+     * @param testnet a {@link java.lang.Boolean} object
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.Int} object
      */
     public Int value(Boolean testnet) {
         // use self.fetch_tx to get the transaction
@@ -71,6 +90,9 @@ public class TxIn {
     /**
      * Get the ScriptPubKey by looking up the tx hash
      * Returns a Script object
+     *
+     * @param testnet a {@link java.lang.Boolean} object
+     * @return a {@link ch.bitagent.bitcoin.java.script.Script} object
      */
     public Script scriptPubkey(Boolean testnet) {
         // use self.fetch_tx to get the transaction
@@ -80,35 +102,71 @@ public class TxIn {
         return tx.getTxOuts().get(this.prevIndex.intValue()).getScriptPubkey();
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         return String.format("txin %s:%s:%s:%s", prevTx, prevIndex, scriptSig, sequence);
     }
 
+    /**
+     * <p>Getter for the field <code>prevTx</code>.</p>
+     *
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     */
     public Int getPrevTx() {
         return prevTx;
     }
 
+    /**
+     * <p>Getter for the field <code>prevIndex</code>.</p>
+     *
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     */
     public Int getPrevIndex() {
         return prevIndex;
     }
 
+    /**
+     * <p>Getter for the field <code>scriptSig</code>.</p>
+     *
+     * @return a {@link ch.bitagent.bitcoin.java.script.Script} object
+     */
     public Script getScriptSig() {
         return scriptSig;
     }
 
+    /**
+     * <p>Setter for the field <code>scriptSig</code>.</p>
+     *
+     * @param scriptSig a {@link ch.bitagent.bitcoin.java.script.Script} object
+     */
     public void setScriptSig(Script scriptSig) {
         this.scriptSig = scriptSig;
     }
 
+    /**
+     * <p>Getter for the field <code>sequence</code>.</p>
+     *
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     */
     public Int getSequence() {
         return sequence;
     }
 
+    /**
+     * <p>Getter for the field <code>witness</code>.</p>
+     *
+     * @return a {@link ch.bitagent.bitcoin.java.script.Script} object
+     */
     public Script getWitness() {
         return witness;
     }
 
+    /**
+     * <p>Setter for the field <code>witness</code>.</p>
+     *
+     * @param witness a {@link ch.bitagent.bitcoin.java.script.Script} object
+     */
     public void setWitness(Script witness) {
         this.witness = witness;
     }

@@ -12,6 +12,9 @@ import java.io.ByteArrayOutputStream;
 import java.util.*;
 import java.util.logging.Logger;
 
+/**
+ * <p>Script class.</p>
+ */
 public class Script {
 
     private static final Logger log = Logger.getLogger(Script.class.getSimpleName());
@@ -20,6 +23,9 @@ public class Script {
 
     /**
      * Takes a hash160 and returns the p2pkh ScriptPubKey
+     *
+     * @param h160 an array of {@link byte} objects
+     * @return a {@link ch.bitagent.bitcoin.java.script.Script} object
      */
     public static Script p2pkhScript(byte[] h160) {
         return new Script(List.of(OpCodeNames.OP_118_DUP.toScriptCmd(), OpCodeNames.OP_169_HASH160.toScriptCmd(), new ScriptCmd(h160), OpCodeNames.OP_136_EQUALVERIFY.toScriptCmd(), OpCodeNames.OP_172_CHECKSIG.toScriptCmd()));
@@ -27,6 +33,9 @@ public class Script {
 
     /**
      * Takes a hash160 and returns the p2sh ScriptPubKey
+     *
+     * @param h160 an array of {@link byte} objects
+     * @return a {@link ch.bitagent.bitcoin.java.script.Script} object
      */
     public static Script p2shScript(byte[] h160) {
         return new Script(List.of(OpCodeNames.OP_169_HASH160.toScriptCmd(), new ScriptCmd(h160), OpCodeNames.OP_135_EQUAL.toScriptCmd()));
@@ -34,17 +43,31 @@ public class Script {
 
     /**
      * Takes a hash160 and returns the p2wpkh ScriptPubKey
+     *
+     * @param h160 an array of {@link byte} objects
+     * @return a {@link ch.bitagent.bitcoin.java.script.Script} object
      */
     public static Script p2wpkhScript(byte[] h160) {
         return new Script(List.of(OpCodeNames.OP_0.toScriptCmd(), new ScriptCmd(h160)));
     }
 
+    /**
+     * <p>Constructor for Script.</p>
+     *
+     * @param cmds a {@link java.util.List} object
+     */
     public Script(List<ScriptCmd> cmds) {
         if (cmds != null && !cmds.isEmpty()) {
             this.cmds = cmds;
         }
     }
 
+    /**
+     * <p>add.</p>
+     *
+     * @param other a {@link ch.bitagent.bitcoin.java.script.Script} object
+     * @return a {@link ch.bitagent.bitcoin.java.script.Script} object
+     */
     public Script add(Script other) {
         var cmdsAdd = new ArrayList<ScriptCmd>();
         cmdsAdd.addAll(this.cmds);
@@ -52,6 +75,12 @@ public class Script {
         return new Script(cmdsAdd);
     }
 
+    /**
+     * <p>parse.</p>
+     *
+     * @param stream a {@link java.io.ByteArrayInputStream} object
+     * @return a {@link ch.bitagent.bitcoin.java.script.Script} object
+     */
     public static Script parse(ByteArrayInputStream stream) {
         // get the length of the entire field
         Int length = Varint.read(stream);
@@ -136,6 +165,11 @@ public class Script {
         return result.toByteArray();
     }
 
+    /**
+     * <p>serialize.</p>
+     *
+     * @return an array of {@link byte} objects
+     */
     public byte[] serialize() {
         var result = this.rawSerialize();
         var total = Int.parse(result.length);
@@ -143,6 +177,13 @@ public class Script {
         return Bytes.add(totalVarint, result);
     }
 
+    /**
+     * <p>evaluate.</p>
+     *
+     * @param z a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     * @param witness a {@link ch.bitagent.bitcoin.java.script.Script} object
+     * @return a boolean
+     */
     public boolean evaluate(Int z, Script witness) {
         // create a copy as we may need to add to this list if we have a RedeemScript
         var _cmds = new ArrayList<>(this.cmds);
@@ -222,7 +263,9 @@ public class Script {
     }
 
     /**
-     * Returns whether this follows the OP_DUP OP_HASH160 <20 byte hash> OP_EQUALVERIFY OP_CHECKSIG pattern.
+     * Returns whether this follows the OP_DUP OP_HASH160 20 byte hash OP_EQUALVERIFY OP_CHECKSIG pattern.
+     *
+     * @return a boolean
      */
     public boolean isP2pkhScriptPubkey() {
         return cmds.size() == 5
@@ -234,7 +277,9 @@ public class Script {
     }
 
     /**
-     * Returns whether this follows the OP_HASH160 <20 byte hash> OP_EQUAL pattern.
+     * Returns whether this follows the OP_HASH160 20 byte hash OP_EQUAL pattern.
+     *
+     * @return a boolean
      */
     public boolean isP2shScriptPubkey() {
         return cmds.size() == 3
@@ -243,12 +288,23 @@ public class Script {
                 && OpCodeNames.OP_135_EQUAL.equals(cmds.get(2).getOpCode());
     }
 
+    /**
+     * <p>isP2wpkhScriptPubkey.</p>
+     *
+     * @return a boolean
+     */
     public boolean isP2wpkhScriptPubkey() {
         return cmds.size() == 2
                 && OpCodeNames.OP_0.equals(cmds.get(0).getOpCode())
                 && cmds.get(1).isElement() && cmds.get(1).getElement().length == 20;
     }
 
+    /**
+     * <p>isP2wpkhStack.</p>
+     *
+     * @param stack a {@link java.util.Deque} object
+     * @return a boolean
+     */
     public boolean isP2wpkhStack(Deque<byte[]> stack) {
         if (stack.size() == 2) {
             var stack1 = stack.pop();
@@ -262,12 +318,23 @@ public class Script {
         return false;
     }
 
+    /**
+     * <p>isP2wshScriptPubkey.</p>
+     *
+     * @return a boolean
+     */
     public boolean isP2wshScriptPubkey() {
         return cmds.size() == 2
                 && OpCodeNames.OP_0.equals(cmds.get(0).getOpCode())
                 && cmds.get(1).isElement() && cmds.get(1).getElement().length == 32;
     }
 
+    /**
+     * <p>isP2wshStack.</p>
+     *
+     * @param stack a {@link java.util.Deque} object
+     * @return a boolean
+     */
     public boolean isP2wshStack(Deque<byte[]> stack) {
         if (stack.size() == 2) {
             var stack1 = stack.pop();
@@ -283,6 +350,9 @@ public class Script {
 
     /**
      * Returns the address corresponding to the script
+     *
+     * @param testnet a {@link java.lang.Boolean} object
+     * @return a {@link java.lang.String} object
      */
     public String address(Boolean testnet) {
         testnet = Objects.requireNonNullElse(testnet, false);
@@ -303,6 +373,7 @@ public class Script {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         List<String> result = new ArrayList<>();
@@ -320,6 +391,11 @@ public class Script {
         return String.join(" ", result);
     }
 
+    /**
+     * <p>Getter for the field <code>cmds</code>.</p>
+     *
+     * @return a {@link java.util.List} object
+     */
     public List<ScriptCmd> getCmds() {
         return cmds;
     }

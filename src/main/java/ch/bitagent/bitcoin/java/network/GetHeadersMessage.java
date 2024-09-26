@@ -8,12 +8,17 @@ import java.io.ByteArrayOutputStream;
 import java.util.Objects;
 import java.util.logging.Logger;
 
+/**
+ * <p>GetHeadersMessage class.</p>
+ */
 public class GetHeadersMessage implements Message {
 
     private static final Logger log = Logger.getLogger(GetHeadersMessage.class.getSimpleName());
 
+    /** Constant <code>COMMAND="getheaders"</code> */
     public static final String COMMAND = "getheaders";
 
+    /** {@inheritDoc} */
     @Override
     public byte[] getCommand() {
         return COMMAND.getBytes();
@@ -24,6 +29,14 @@ public class GetHeadersMessage implements Message {
     private final byte[] startBlock;
     private final byte[] endBlock;
 
+    /**
+     * <p>Constructor for GetHeadersMessage.</p>
+     *
+     * @param version a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     * @param numHashes a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     * @param startBlock an array of {@link byte} objects
+     * @param endBlock an array of {@link byte} objects
+     */
     public GetHeadersMessage(Int version, Int numHashes, byte[] startBlock, byte[] endBlock) {
         this.version = Objects.requireNonNullElse(version, Int.parse(70015));
         this.numHashes = Objects.requireNonNullElse(numHashes, Int.parse(1));
@@ -36,6 +49,8 @@ public class GetHeadersMessage implements Message {
     }
 
     /**
+     * {@inheritDoc}
+     *
      * Serialize this message to send over the network
      */
     @Override

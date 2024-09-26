@@ -7,12 +7,25 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+/**
+ * <p>OpCodeFunctions class.</p>
+ */
 public class OpCodeFunctions {
 
     private static final Logger log = Logger.getLogger(OpCodeFunctions.class.getSimpleName());
 
     private OpCodeFunctions() {}
 
+    /**
+     * <p>op.</p>
+     *
+     * @param opCode a {@link ch.bitagent.bitcoin.java.script.OpCodeNames} object
+     * @param stack a {@link java.util.Deque} object
+     * @param altstack a {@link java.util.Deque} object
+     * @param cmds a {@link java.util.List} object
+     * @param z a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     * @return a boolean
+     */
     public static boolean op(OpCodeNames opCode, Deque<byte[]> stack, Deque<byte[]> altstack, List<ScriptCmd> cmds, Int z) {
         if (Set.of(OpCodeNames.OP_99_IF.getCode(), OpCodeNames.OP_100_NOTIF.getCode()).contains(opCode.getCode())) {
             // op_if/op_notif require the cmds array

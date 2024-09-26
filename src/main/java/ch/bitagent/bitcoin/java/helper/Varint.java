@@ -5,12 +5,18 @@ import ch.bitagent.bitcoin.java.ecc.Int;
 
 import java.io.ByteArrayInputStream;
 
+/**
+ * <p>Varint class.</p>
+ */
 public class Varint {
 
     private Varint() {}
 
     /**
      * Reads a variable integer from a stream
+     *
+     * @param stream a {@link java.io.ByteArrayInputStream} object
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.Int} object
      */
     public static Int read(ByteArrayInputStream stream) {
         byte bite = Bytes.read(stream, 1)[0];
@@ -31,6 +37,9 @@ public class Varint {
 
     /**
      * Encodes an integer as a varint
+     *
+     * @param i a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     * @return an array of {@link byte} objects
      */
     public static byte[] encode(Int i) {
         if (i.lt(Hex.parse("fd"))) {

@@ -7,12 +7,21 @@ import java.net.http.HttpResponse;
 import java.util.Base64;
 import java.util.logging.Logger;
 
+/**
+ * <p>Http class.</p>
+ */
 public class Http {
 
     private static final Logger log = Logger.getLogger(Http.class.getSimpleName());
 
     private Http() {}
 
+    /**
+     * <p>get.</p>
+     *
+     * @param url a {@link java.lang.String} object
+     * @return a {@link java.lang.String} object
+     */
     public static String get(String url) {
         try {
             HttpClient client = HttpClient.newHttpClient();
@@ -35,6 +44,12 @@ public class Http {
         }
     }
 
+    /**
+     * <p>postGetRawTransaction.</p>
+     *
+     * @param txId64 a {@link java.lang.String} object
+     * @return a {@link java.lang.String} object
+     */
     public static String postGetRawTransaction(String txId64) {
         try {
             String url = Properties.getBitcoinRpcUrl();

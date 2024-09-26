@@ -14,6 +14,14 @@ public class Point {
     private final PointOperators a;
     private final PointOperators b;
 
+    /**
+     * <p>Constructor for Point.</p>
+     *
+     * @param x a {@link ch.bitagent.bitcoin.java.ecc.PointOperators} object
+     * @param y a {@link ch.bitagent.bitcoin.java.ecc.PointOperators} object
+     * @param a a {@link ch.bitagent.bitcoin.java.ecc.PointOperators} object
+     * @param b a {@link ch.bitagent.bitcoin.java.ecc.PointOperators} object
+     */
     public Point(PointOperators x, PointOperators y, PointOperators a, PointOperators b) {
         this.x = x;
         this.y = y;
@@ -32,6 +40,14 @@ public class Point {
         }
     }
 
+    /**
+     * <p>Constructor for Point.</p>
+     *
+     * @param x a int
+     * @param y a int
+     * @param a a int
+     * @param b a int
+     */
     public Point(int x, int y, int a, int b) {
         this(Int.parse(x), Int.parse(y), Int.parse(a), Int.parse(b));
     }
@@ -40,6 +56,12 @@ public class Point {
         return this.y.pow(Int.parse(2)).eq(this.x.pow(Int.parse(3)).add(this.a.mul(this.x)).add(this.b));
     }
 
+    /**
+     * <p>eq.</p>
+     *
+     * @param other a {@link ch.bitagent.bitcoin.java.ecc.Point} object
+     * @return a boolean
+     */
     public boolean eq(Point other) {
         if (other == null) {
             return false;
@@ -55,10 +77,22 @@ public class Point {
         }
     }
 
+    /**
+     * <p>ne.</p>
+     *
+     * @param other a {@link ch.bitagent.bitcoin.java.ecc.Point} object
+     * @return a boolean
+     */
     public boolean ne(Point other) {
         return !this.eq(other);
     }
 
+    /**
+     * <p>add.</p>
+     *
+     * @param other a {@link ch.bitagent.bitcoin.java.ecc.Point} object
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.Point} object
+     */
     public Point add(Point other) {
         if (this.a.ne(other.a) || this.b.ne(other.b)) {
             String error = String.format("%s and %s are not on the same curve", this, other);
@@ -92,6 +126,12 @@ public class Point {
         throw new IllegalStateException();
     }
 
+    /**
+     * <p>mul.</p>
+     *
+     * @param coefficient a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.Point} object
+     */
     public Point mul(Int coefficient) {
         var coeff = coefficient;
         var zero = Int.parse(0);
@@ -107,6 +147,7 @@ public class Point {
         return result;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         if (this.x instanceof FieldElement && this.y instanceof FieldElement && this.a instanceof FieldElement && this.b instanceof FieldElement) {
@@ -120,18 +161,38 @@ public class Point {
         }
     }
 
+    /**
+     * <p>Getter for the field <code>x</code>.</p>
+     *
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.PointOperators} object
+     */
     public PointOperators getX() {
         return x;
     }
 
+    /**
+     * <p>Getter for the field <code>y</code>.</p>
+     *
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.PointOperators} object
+     */
     public PointOperators getY() {
         return y;
     }
 
+    /**
+     * <p>Getter for the field <code>a</code>.</p>
+     *
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.PointOperators} object
+     */
     public PointOperators getA() {
         return a;
     }
 
+    /**
+     * <p>Getter for the field <code>b</code>.</p>
+     *
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.PointOperators} object
+     */
     public PointOperators getB() {
         return b;
     }

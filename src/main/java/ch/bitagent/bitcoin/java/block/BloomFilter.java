@@ -10,8 +10,12 @@ import ch.bitagent.bitcoin.java.network.GenericMessage;
 import java.io.ByteArrayOutputStream;
 import java.util.Objects;
 
+/**
+ * <p>BloomFilter class.</p>
+ */
 public class BloomFilter {
 
+    /** Constant <code>BIP37_CONSTANT</code> */
     public static final Int BIP37_CONSTANT = Hex.parse("fba4c795");
 
     private final int size;
@@ -19,6 +23,13 @@ public class BloomFilter {
     private final int functionCount;
     private final int tweak;
 
+    /**
+     * <p>Constructor for BloomFilter.</p>
+     *
+     * @param size a int
+     * @param functionCount a int
+     * @param tweak a int
+     */
     public BloomFilter(int size, int functionCount, int tweak) {
         this.size = size;
         this.bitField = Bytes.initFill(this.size * 8, (byte) 0);
@@ -28,6 +39,8 @@ public class BloomFilter {
 
     /**
      * Add an item to the filter
+     *
+     * @param item an array of {@link byte} objects
      */
     public void add(byte[] item) {
         // iterate self.function_count number of times
@@ -43,12 +56,20 @@ public class BloomFilter {
         }
     }
 
+    /**
+     * <p>filterBytes.</p>
+     *
+     * @return an array of {@link byte} objects
+     */
     public byte[] filterBytes() {
         return Bytes.bitFieldToBytes(this.bitField);
     }
 
     /**
      * Return the filterload message
+     *
+     * @param flag a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     * @return a {@link ch.bitagent.bitcoin.java.network.GenericMessage} object
      */
     public GenericMessage filterload(Int flag) {
         flag = Objects.requireNonNullElse(flag, Int.parse(1));

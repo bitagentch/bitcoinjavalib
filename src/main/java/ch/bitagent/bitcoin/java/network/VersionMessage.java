@@ -8,10 +8,15 @@ import ch.bitagent.bitcoin.java.helper.Varint;
 import java.io.ByteArrayOutputStream;
 import java.util.Objects;
 
+/**
+ * <p>VersionMessage class.</p>
+ */
 public class VersionMessage implements Message {
 
+    /** Constant <code>COMMAND="version"</code> */
     public static final String COMMAND = "version";
 
+    /** {@inheritDoc} */
     @Override
     public byte[] getCommand() {
         return COMMAND.getBytes();
@@ -31,6 +36,9 @@ public class VersionMessage implements Message {
     private final Int latestBlock;
     private final Boolean relay;
 
+    /**
+     * <p>Constructor for VersionMessage.</p>
+     */
     public VersionMessage() {
         this(null, null, null,
                 null, null, null,
@@ -38,6 +46,23 @@ public class VersionMessage implements Message {
                 null, null, null, null);
     }
 
+    /**
+     * <p>Constructor for VersionMessage.</p>
+     *
+     * @param version a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     * @param services a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     * @param timestamp a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     * @param receiverServices a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     * @param receiverIp an array of {@link byte} objects
+     * @param receiverPort a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     * @param senderServices a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     * @param senderIp an array of {@link byte} objects
+     * @param senderPort a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     * @param nonce an array of {@link byte} objects
+     * @param userAgent a {@link java.lang.String} object
+     * @param latestBlock a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     * @param relay a {@link java.lang.Boolean} object
+     */
     public VersionMessage(Int version, Int services, Int timestamp,
                           Int receiverServices, byte[] receiverIp, Int receiverPort,
                           Int senderServices, byte[] senderIp, Int senderPort,
@@ -58,6 +83,8 @@ public class VersionMessage implements Message {
     }
 
     /**
+     * {@inheritDoc}
+     *
      * Serialize this message to send over the network
      */
     @Override

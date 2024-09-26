@@ -5,7 +5,9 @@ import java.util.Objects;
 
 import static java.lang.Integer.rotateLeft;
 
-/*
+/**
+ * <p>Ripemd160 class.</p>
+ *
  * Bitcoin cryptography library
  * Copyright (c) Project Nayuki
  *
@@ -55,7 +57,7 @@ public class Ripemd160 {
      *
      * @param msg the message to compute the hash of
      * @return a 20-byte array representing the message's RIPEMD-160 hash
-     * @throws NullPointerException if the message is {@code null}
+     * @throws java.lang.NullPointerException if the message is {@code null}
      */
     public static byte[] getHash(byte[] msg) {
         // Compress whole message blocks

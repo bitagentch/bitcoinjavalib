@@ -12,6 +12,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
+/**
+ * <p>TxFetcher class.</p>
+ */
 public class TxFetcher {
 
     private static final Logger log = Logger.getLogger(TxFetcher.class.getSimpleName());
@@ -22,6 +25,14 @@ public class TxFetcher {
 
     private TxFetcher() {}
 
+    /**
+     * <p>fetch.</p>
+     *
+     * @param txId a {@link java.lang.String} object
+     * @param testnet a {@link java.lang.Boolean} object
+     * @param fresh a boolean
+     * @return a {@link ch.bitagent.bitcoin.java.tx.Tx} object
+     */
     public static Tx fetch(String txId, Boolean testnet, boolean fresh) {
         String txId64 = Helper.zfill64(txId);
         var doFresh = fresh || Properties.getTxFresh();

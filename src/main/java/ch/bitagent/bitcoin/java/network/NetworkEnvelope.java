@@ -11,6 +11,9 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.logging.Logger;
 
+/**
+ * <p>NetworkEnvelope class.</p>
+ */
 public class NetworkEnvelope {
 
     private static final Logger log = Logger.getLogger(NetworkEnvelope.class.getSimpleName());
@@ -23,6 +26,13 @@ public class NetworkEnvelope {
     private final Boolean testnet;
     private final byte[] magic;
 
+    /**
+     * <p>Constructor for NetworkEnvelope.</p>
+     *
+     * @param command an array of {@link byte} objects
+     * @param payload an array of {@link byte} objects
+     * @param testnet a {@link java.lang.Boolean} object
+     */
     public NetworkEnvelope(byte[] command, byte[] payload, Boolean testnet) {
         this.command = command;
         this.payload = payload;
@@ -34,6 +44,12 @@ public class NetworkEnvelope {
         }
     }
 
+    /**
+     * <p>parseLength.</p>
+     *
+     * @param stream a {@link java.io.ByteArrayInputStream} object
+     * @return a int
+     */
     public static int parseLength(ByteArrayInputStream stream) {
         Bytes.read(stream, 4);
         Bytes.read(stream, 12);
@@ -43,6 +59,10 @@ public class NetworkEnvelope {
 
     /**
      * Takes a stream and creates a NetworkEnvelope
+     *
+     * @param stream a {@link java.io.ByteArrayInputStream} object
+     * @param testnet a {@link java.lang.Boolean} object
+     * @return a {@link ch.bitagent.bitcoin.java.network.NetworkEnvelope} object
      */
     public static NetworkEnvelope parse(ByteArrayInputStream stream, Boolean testnet) {
         // check the network magic
@@ -81,6 +101,8 @@ public class NetworkEnvelope {
 
     /**
      * Returns the byte serialization of the entire network message
+     *
+     * @return an array of {@link byte} objects
      */
     public byte[] serialize() {
         var result = new ByteArrayOutputStream();
@@ -99,10 +121,17 @@ public class NetworkEnvelope {
         return result.toByteArray();
     }
 
+    /**
+     * <p>isCommand.</p>
+     *
+     * @param command a {@link java.lang.String} object
+     * @return a boolean
+     */
     public boolean isCommand(String command) {
         return Arrays.equals(this.command, command.getBytes());
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         return "NetworkEnvelope{" +
@@ -113,18 +142,38 @@ public class NetworkEnvelope {
                 '}';
     }
 
+    /**
+     * <p>Getter for the field <code>command</code>.</p>
+     *
+     * @return an array of {@link byte} objects
+     */
     public byte[] getCommand() {
         return command;
     }
 
+    /**
+     * <p>Getter for the field <code>payload</code>.</p>
+     *
+     * @return an array of {@link byte} objects
+     */
     public byte[] getPayload() {
         return payload;
     }
 
+    /**
+     * <p>Getter for the field <code>testnet</code>.</p>
+     *
+     * @return a {@link java.lang.Boolean} object
+     */
     public Boolean getTestnet() {
         return testnet;
     }
 
+    /**
+     * <p>Getter for the field <code>magic</code>.</p>
+     *
+     * @return an array of {@link byte} objects
+     */
     public byte[] getMagic() {
         return magic;
     }

@@ -15,11 +15,22 @@ public class Signature {
     private final Int r;
     private final Int s;
 
+    /**
+     * <p>Constructor for Signature.</p>
+     *
+     * @param r a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     * @param s a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     */
     public Signature(Int r, Int s) {
         this.r = r;
         this.s = s;
     }
 
+    /**
+     * <p>der.</p>
+     *
+     * @return an array of {@link byte} objects
+     */
     public byte[] der() {
         var rBin = this.getR().toBytes(32);
         log.fine(String.format("rBin %s", Bytes.byteArrayToHexString(rBin)));
@@ -62,6 +73,12 @@ public class Signature {
         return der;
     }
 
+    /**
+     * <p>parse.</p>
+     *
+     * @param signatureBin an array of {@link byte} objects
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.Signature} object
+     */
     public static Signature parse(byte[] signatureBin) {
         var signatureStream = new ByteArrayInputStream(signatureBin);
         var compound = Hex.parse(Bytes.read(signatureStream, 1));
@@ -90,15 +107,26 @@ public class Signature {
         return new Signature(r, s);
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         return String.format("Signature(0x%s,0x%s)", this.r.toString(), this.s.toString());
     }
 
+    /**
+     * <p>Getter for the field <code>r</code>.</p>
+     *
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     */
     public Int getR() {
         return r;
     }
 
+    /**
+     * <p>Getter for the field <code>s</code>.</p>
+     *
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     */
     public Int getS() {
         return s;
     }

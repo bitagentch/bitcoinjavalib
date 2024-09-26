@@ -19,12 +19,17 @@ import java.util.Objects;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+/**
+ * <p>Tx class.</p>
+ */
 public class Tx implements Message {
 
     private static final Logger log = Logger.getLogger(Tx.class.getSimpleName());
 
+    /** Constant <code>COMMAND="tx"</code> */
     public static final String COMMAND = "tx";
 
+    /** {@inheritDoc} */
     @Override
     public byte[] getCommand() {
         return COMMAND.getBytes();
@@ -40,6 +45,16 @@ public class Tx implements Message {
     private byte[] _hashSequence = null;
     private byte[] _hashOutputs = null;
 
+    /**
+     * <p>Constructor for Tx.</p>
+     *
+     * @param version a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     * @param txIns a {@link java.util.List} object
+     * @param txOuts a {@link java.util.List} object
+     * @param locktime a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     * @param testnet a {@link java.lang.Boolean} object
+     * @param segwit a {@link java.lang.Boolean} object
+     */
     public Tx(Int version, List<TxIn> txIns, List<TxOut> txOuts, Int locktime, Boolean testnet, Boolean segwit) {
         this.version = version;
         this.txIns = txIns;
@@ -51,6 +66,8 @@ public class Tx implements Message {
 
     /**
      * Human-readable hexadecimal of the transaction hash
+     *
+     * @return a {@link java.lang.String} object
      */
     public String id() {
         return Bytes.byteArrayToHexString(this.hash());
@@ -58,11 +75,20 @@ public class Tx implements Message {
 
     /**
      * Binary hash of the legacy serialization
+     *
+     * @return an array of {@link byte} objects
      */
     public byte[] hash() {
         return Bytes.changeOrder(Helper.hash256(this.serializeLegacy()));
     }
 
+    /**
+     * <p>parse.</p>
+     *
+     * @param stream a {@link java.io.ByteArrayInputStream} object
+     * @param testnet a {@link java.lang.Boolean} object
+     * @return a {@link ch.bitagent.bitcoin.java.tx.Tx} object
+     */
     public static Tx parse(ByteArrayInputStream stream, Boolean testnet) {
         Bytes.read(stream, 4);
         var segwitMarker = Hex.parse(Bytes.read(stream, 1));
@@ -135,6 +161,11 @@ public class Tx implements Message {
         return new Tx(version, inputs, outputs, locktime, testnet, true);
     }
 
+    /**
+     * <p>serialize.</p>
+     *
+     * @return an array of {@link byte} objects
+     */
     public byte[] serialize() {
         if (Boolean.TRUE.equals(this.segwit)) {
             return serializeSegwit();
@@ -198,6 +229,8 @@ public class Tx implements Message {
 
     /**
      * Returns the fee of this transaction in satoshi
+     *
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.Int} object
      */
     public Int fee() {
         log.fine(String.format("txIns: %s, txOuts: %s", txIns.size(), txOuts.size()));
@@ -230,6 +263,10 @@ public class Tx implements Message {
 
     /**
      * Returns the integer representation of the hash that needs to get signed for index input_index
+     *
+     * @param inputIndex a int
+     * @param redeemScript a {@link ch.bitagent.bitcoin.java.script.Script} object
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.Int} object
      */
     public Int sigHash(int inputIndex, Script redeemScript) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -308,6 +345,11 @@ public class Tx implements Message {
 
     /**
      * Returns the integer representation of the hash that needs to get signed for index input_index
+     *
+     * @param inputIndex a int
+     * @param redeemScript a {@link ch.bitagent.bitcoin.java.script.Script} object
+     * @param witnessScript a {@link ch.bitagent.bitcoin.java.script.Script} object
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.Int} object
      */
     public Int sigHashBip143(int inputIndex, Script redeemScript, Script witnessScript) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -337,6 +379,9 @@ public class Tx implements Message {
 
     /**
      * Returns whether the input has a valid signature
+     *
+     * @param inputIndex a int
+     * @return a boolean
      */
     public boolean verifyInput(int inputIndex) {
         // get the relevant input
@@ -390,6 +435,8 @@ public class Tx implements Message {
 
     /**
      * Verify this transaction
+     *
+     * @return a boolean
      */
     public boolean verify() {
         // check that we're not creating money
@@ -409,6 +456,10 @@ public class Tx implements Message {
 
     /**
      * Signs the input using the private key
+     *
+     * @param inputIndex a int
+     * @param privateKey a {@link ch.bitagent.bitcoin.java.ecc.PrivateKey} object
+     * @return a boolean
      */
     public boolean signInput(int inputIndex, PrivateKey privateKey) {
         // get the signature hash (z)
@@ -429,6 +480,8 @@ public class Tx implements Message {
 
     /**
      * Returns whether this transaction is a coinbase transaction or not
+     *
+     * @return a boolean
      */
     public boolean isCoinbase() {
         // check that there is exactly 1 input
@@ -451,6 +504,8 @@ public class Tx implements Message {
     /**
      * Returns the height of the block this coinbase transaction is in
      * Returns None if this transaction is not a coinbase transaction
+     *
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.Int} object
      */
     public Int coinbaseHeight() {
         // if this is NOT a coinbase transaction, return None
@@ -463,6 +518,7 @@ public class Tx implements Message {
         return Hex.parse(Bytes.changeOrder(firstCmd.getElement()));
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         return String.format("tx %s:%s:\n%s:\n%s:%s",
@@ -473,30 +529,65 @@ public class Tx implements Message {
                 this.locktime);
     }
 
+    /**
+     * <p>Getter for the field <code>txOuts</code>.</p>
+     *
+     * @return a {@link java.util.List} object
+     */
     public List<TxOut> getTxOuts() {
         return txOuts;
     }
 
+    /**
+     * <p>Getter for the field <code>segwit</code>.</p>
+     *
+     * @return a {@link java.lang.Boolean} object
+     */
     public Boolean getSegwit() {
         return segwit;
     }
 
+    /**
+     * <p>Getter for the field <code>locktime</code>.</p>
+     *
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     */
     public Int getLocktime() {
         return locktime;
     }
 
+    /**
+     * <p>Setter for the field <code>locktime</code>.</p>
+     *
+     * @param locktime a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     */
     public void setLocktime(Int locktime) {
         this.locktime = locktime;
     }
 
+    /**
+     * <p>Getter for the field <code>txIns</code>.</p>
+     *
+     * @return a {@link java.util.List} object
+     */
     public List<TxIn> getTxIns() {
         return txIns;
     }
 
+    /**
+     * <p>Getter for the field <code>version</code>.</p>
+     *
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     */
     public Int getVersion() {
         return version;
     }
 
+    /**
+     * <p>Getter for the field <code>testnet</code>.</p>
+     *
+     * @return a {@link java.lang.Boolean} object
+     */
     public Boolean getTestnet() {
         return testnet;
     }

@@ -12,6 +12,9 @@ import java.util.Arrays;
 import java.util.Deque;
 import java.util.logging.Logger;
 
+/**
+ * <p>Op class.</p>
+ */
 public class Op {
 
     private static final Logger log = Logger.getLogger(Op.class.getSimpleName());
@@ -71,30 +74,60 @@ public class Op {
         }
     }
 
+    /**
+     * <p>op0.</p>
+     *
+     * @param stack a {@link java.util.Deque} object
+     * @return a boolean
+     */
     public static boolean op0(Deque<byte[]> stack) {
         stack.push(encodeNum(0));
         log.fine(String.format("%s", printStack(stack)));
         return true;
     }
 
+    /**
+     * <p>op1.</p>
+     *
+     * @param stack a {@link java.util.Deque} object
+     * @return a boolean
+     */
     public static boolean op1(Deque<byte[]> stack) {
         stack.push(encodeNum(1));
         log.fine(String.format("%s", printStack(stack)));
         return true;
     }
 
+    /**
+     * <p>op2.</p>
+     *
+     * @param stack a {@link java.util.Deque} object
+     * @return a boolean
+     */
     public static boolean op2(Deque<byte[]> stack) {
         stack.push(encodeNum(2));
         log.fine(String.format("%s", printStack(stack)));
         return true;
     }
 
+    /**
+     * <p>op6.</p>
+     *
+     * @param stack a {@link java.util.Deque} object
+     * @return a boolean
+     */
     public static boolean op6(Deque<byte[]> stack) {
         stack.push(encodeNum(6));
         log.fine(String.format("%s", printStack(stack)));
         return true;
     }
 
+    /**
+     * <p>op105Verify.</p>
+     *
+     * @param stack a {@link java.util.Deque} object
+     * @return a boolean
+     */
     public static boolean op105Verify(Deque<byte[]> stack) {
         if (stack.isEmpty()) {
             return false;
@@ -107,6 +140,12 @@ public class Op {
         return true;
     }
 
+    /**
+     * <p>op1102Dup.</p>
+     *
+     * @param stack a {@link java.util.Deque} object
+     * @return a boolean
+     */
     public static boolean op1102Dup(Deque<byte[]> stack) {
         if (stack.size() < 2) {
             return false;
@@ -132,6 +171,12 @@ public class Op {
         return true;
     }
 
+    /**
+     * <p>op124Swap.</p>
+     *
+     * @param stack a {@link java.util.Deque} object
+     * @return a boolean
+     */
     public static boolean op124Swap(Deque<byte[]> stack) {
         if (stack.size() < 2) {
             return false;
@@ -144,6 +189,12 @@ public class Op {
         return true;
     }
 
+    /**
+     * <p>op135Equal.</p>
+     *
+     * @param stack a {@link java.util.Deque} object
+     * @return a boolean
+     */
     public static boolean op135Equal(Deque<byte[]> stack) {
         if (stack.size() < 2) {
             return false;
@@ -159,10 +210,22 @@ public class Op {
         return true;
     }
 
+    /**
+     * <p>op136EqualVerify.</p>
+     *
+     * @param stack a {@link java.util.Deque} object
+     * @return a boolean
+     */
     public static boolean op136EqualVerify(Deque<byte[]> stack) {
         return op135Equal(stack) && op105Verify(stack);
     }
 
+    /**
+     * <p>op145Not.</p>
+     *
+     * @param stack a {@link java.util.Deque} object
+     * @return a boolean
+     */
     public static boolean op145Not(Deque<byte[]> stack) {
         if (stack.isEmpty()) {
             return false;
@@ -177,6 +240,12 @@ public class Op {
         return true;
     }
 
+    /**
+     * <p>op147Add.</p>
+     *
+     * @param stack a {@link java.util.Deque} object
+     * @return a boolean
+     */
     public static boolean op147Add(Deque<byte[]> stack) {
         if (stack.size() < 2) {
             return false;
@@ -307,6 +376,12 @@ public class Op {
         return true;
     }
 
+    /**
+     * <p>printStack.</p>
+     *
+     * @param stack a {@link java.util.Deque} object
+     * @return a {@link java.lang.String} object
+     */
     public static String printStack(Deque<byte[]> stack) {
         StringBuilder stackBuilder = new StringBuilder();
         stackBuilder.append("[");

@@ -10,6 +10,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
+/**
+ * <p>Bytes class.</p>
+ */
 public class Bytes {
 
     private static final Logger log = Logger.getLogger(Bytes.class.getSimpleName());
@@ -18,6 +21,10 @@ public class Bytes {
 
     /**
      * Strip leading
+     *
+     * @param bytes an array of {@link byte} objects
+     * @param bite a byte
+     * @return an array of {@link byte} objects
      */
     public static byte[] lstrip(byte[] bytes, byte bite) {
         int i = 0;
@@ -29,6 +36,10 @@ public class Bytes {
 
     /**
      * Strip trailing
+     *
+     * @param bytes an array of {@link byte} objects
+     * @param bite a byte
+     * @return an array of {@link byte} objects
      */
     public static byte[] strip(byte[] bytes, byte bite) {
         var setyb = Bytes.changeOrder(bytes);
@@ -39,12 +50,26 @@ public class Bytes {
         return Arrays.copyOfRange(bytes, 0, bytes.length-i);
     }
 
+    /**
+     * <p>initFill.</p>
+     *
+     * @param length a int
+     * @param filler a byte
+     * @return an array of {@link byte} objects
+     */
     public static byte[] initFill(int length, byte filler) {
         var init = new byte[length];
         Arrays.fill(init, filler);
         return init;
     }
 
+    /**
+     * <p>add.</p>
+     *
+     * @param a an array of {@link byte} objects
+     * @param b an array of {@link byte} objects
+     * @return an array of {@link byte} objects
+     */
     public static byte[] add(byte[] a, byte[] b) {
         var z = new byte[a.length + b.length];
         System.arraycopy(a, 0, z, 0, a.length);
@@ -52,6 +77,12 @@ public class Bytes {
         return z;
     }
 
+    /**
+     * <p>add.</p>
+     *
+     * @param bytesArray an array of {@link byte} objects
+     * @return an array of {@link byte} objects
+     */
     public static byte[] add(byte[][] bytesArray) {
         int lengthAdded = 0;
         for (byte[] bytes : bytesArray) {
@@ -68,6 +99,9 @@ public class Bytes {
 
     /**
      * Change the order from big to little endian and vice versa
+     *
+     * @param bytes an array of {@link byte} objects
+     * @return an array of {@link byte} objects
      */
     public static byte[] changeOrder(byte[] bytes) {
         byte[] destBytes = Arrays.copyOf(bytes, bytes.length);
@@ -79,6 +113,13 @@ public class Bytes {
         return destBytes;
     }
 
+    /**
+     * <p>read.</p>
+     *
+     * @param stream a {@link java.io.ByteArrayInputStream} object
+     * @param len a int
+     * @return an array of {@link byte} objects
+     */
     public static byte[] read(ByteArrayInputStream stream, int len) {
         try {
             return stream.readNBytes(len);
@@ -87,6 +128,12 @@ public class Bytes {
         }
     }
 
+    /**
+     * <p>hexStringToByteArray.</p>
+     *
+     * @param s a {@link java.lang.String} object
+     * @return an array of {@link byte} objects
+     */
     public static byte[] hexStringToByteArray(String s) {
         int len = s.length();
         byte[] data = new byte[len / 2];
@@ -98,6 +145,12 @@ public class Bytes {
 
     private static final byte[] HEX_ARRAY = "0123456789abcdef".getBytes();
 
+    /**
+     * <p>byteArrayToHexString.</p>
+     *
+     * @param bytes an array of {@link byte} objects
+     * @return a {@link java.lang.String} object
+     */
     public static String byteArrayToHexString(byte[] bytes) {
         byte[] hexChars = new byte[bytes.length * 2];
         for (int j = 0; j < bytes.length; j++) {
@@ -108,12 +161,21 @@ public class Bytes {
         return new String(hexChars);
     }
 
+    /**
+     * <p>byteArrayToString.</p>
+     *
+     * @param bytes an array of {@link byte} objects
+     * @return a {@link java.lang.String} object
+     */
     public static String byteArrayToString(byte[] bytes) {
         return new String(bytes);
     }
 
     /**
      * Turns bits into a target (large 256-bit integer)
+     *
+     * @param bits an array of {@link byte} objects
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.Int} object
      */
     public static Int bitsToTarget(byte[] bits) {
         var bitsLen = bits.length;
@@ -127,6 +189,9 @@ public class Bytes {
 
     /**
      * Turns a target integer back into bits, which is 4 bytes
+     *
+     * @param target a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     * @return an array of {@link byte} objects
      */
     public static byte[] targetToBits(Int target) {
         var rawBytes = target.toBytes(32);
@@ -151,6 +216,10 @@ public class Bytes {
 
     /**
      * Calculates the new bits given a 2016-block time differential and the previous bits
+     *
+     * @param previousBits an array of {@link byte} objects
+     * @param timeDifferential a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     * @return an array of {@link byte} objects
      */
     public static byte[] calculateNewBits(byte[] previousBits, Int timeDifferential) {
         // if the time differential is greater than 8 weeks, set to 8 weeks
@@ -171,6 +240,12 @@ public class Bytes {
         return targetToBits(newTarget);
     }
 
+    /**
+     * <p>bitFieldToBytes.</p>
+     *
+     * @param bitField an array of {@link byte} objects
+     * @return an array of {@link byte} objects
+     */
     public static byte[] bitFieldToBytes(byte[] bitField) {
         if (bitField.length % 8 != 0) {
             throw new IllegalArgumentException("bit_field does not have a length that is divisible by 8");
@@ -186,6 +261,12 @@ public class Bytes {
         return result;
     }
 
+    /**
+     * <p>bytesToBitField.</p>
+     *
+     * @param someBytes an array of {@link byte} objects
+     * @return an array of {@link byte} objects
+     */
     public static byte[] bytesToBitField(byte[] someBytes) {
         List<Byte> flagBits = new ArrayList<>();
         // iterate over each byte of flags
@@ -206,7 +287,11 @@ public class Bytes {
     }
 
     /**
+     * <p>log.</p>
+     *
      * @deprecated temp use only
+     * @param bytes an array of {@link byte} objects
+     * @return an array of {@link byte} objects
      */
     @Deprecated(since = "0")
     public static byte[] log(byte[] bytes) {

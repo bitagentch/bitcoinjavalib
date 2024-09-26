@@ -86,6 +86,13 @@ public class Murmur3 {
     return hash;
   }
 
+  /**
+   * <p>hash32.</p>
+   *
+   * @param data an array of {@link byte} objects
+   * @param seed a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+   * @return a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+   */
   public static Int hash32(byte[] data, Int seed) {
     var hash = hash32(data, seed.intValue());
     return Int.parse(toUnsignedInt(hash));

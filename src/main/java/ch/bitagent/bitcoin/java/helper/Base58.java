@@ -7,12 +7,21 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Objects;
 
+/**
+ * <p>Base58 class.</p>
+ */
 public class Base58 {
 
     private static final String BASE58_ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
     private Base58() {}
 
+    /**
+     * <p>encode.</p>
+     *
+     * @param s an array of {@link byte} objects
+     * @return a {@link java.lang.String} object
+     */
     public static String encode(byte[] s) {
         int count = 0;
         for (byte c : s) {
@@ -34,10 +43,22 @@ public class Base58 {
         return prefix + result;
     }
 
+    /**
+     * <p>encodeChecksum.</p>
+     *
+     * @param b an array of {@link byte} objects
+     * @return a {@link java.lang.String} object
+     */
     public static String encodeChecksum(byte[] b) {
         return Base58.encode(Bytes.add(b, Arrays.copyOfRange(Helper.hash256(b), 0, 4)));
     }
 
+    /**
+     * <p>decode.</p>
+     *
+     * @param s a {@link java.lang.String} object
+     * @return an array of {@link byte} objects
+     */
     public static byte[] decode(String s) {
         var fiveEight = Int.parse(58);
         var num = Int.parse(0);
@@ -57,6 +78,13 @@ public class Base58 {
         return Arrays.copyOfRange(combined, 1, combined.length - 4);
     }
 
+    /**
+     * <p>h160toP2pkhAddress.</p>
+     *
+     * @param h160 an array of {@link byte} objects
+     * @param testnet a {@link java.lang.Boolean} object
+     * @return a {@link java.lang.String} object
+     */
     public static String h160toP2pkhAddress(byte[] h160, Boolean testnet) {
         testnet = Objects.requireNonNullElse(testnet, false);
         byte[] prefix;
@@ -68,6 +96,13 @@ public class Base58 {
         return encodeChecksum(Bytes.add(prefix, h160));
     }
 
+    /**
+     * <p>h160toP2shAddress.</p>
+     *
+     * @param h160 an array of {@link byte} objects
+     * @param testnet a {@link java.lang.Boolean} object
+     * @return a {@link java.lang.String} object
+     */
     public static String h160toP2shAddress(byte[] h160, Boolean testnet) {
         testnet = Objects.requireNonNullElse(testnet, false);
         byte[] prefix;

@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+/**
+ * <p>Merkle class.</p>
+ */
 public class Merkle {
 
     private static final Logger log = Logger.getLogger(Merkle.class.getSimpleName());
@@ -12,6 +15,10 @@ public class Merkle {
 
     /**
      * Takes the binary hashes and calculates the hash256
+     *
+     * @param hash0 an array of {@link byte} objects
+     * @param hash1 an array of {@link byte} objects
+     * @return an array of {@link byte} objects
      */
     public static byte[] merkleParent(byte[] hash0, byte[] hash1) {
         // return the hash256 of hash1 + hash2
@@ -20,6 +27,9 @@ public class Merkle {
 
     /**
      * Takes a list of binary hashes and returns a list that's half the length
+     *
+     * @param hashes a {@link java.util.List} object
+     * @return a {@link java.util.List} object
      */
     public static List<byte[]> merkleParentLevel(List<byte[]> hashes) {
         // if the list has exactly 1 element raise an error
@@ -48,6 +58,9 @@ public class Merkle {
 
     /**
      * Takes a list of binary hashes and returns the merkle root
+     *
+     * @param hashes a {@link java.util.List} object
+     * @return an array of {@link byte} objects
      */
     public static byte[] merkleRoot(List<byte[]> hashes) {
         // current level starts as hashes

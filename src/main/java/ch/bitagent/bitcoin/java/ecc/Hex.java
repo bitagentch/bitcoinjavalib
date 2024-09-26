@@ -11,6 +11,12 @@ public class Hex extends Int {
         super(s, 16);
     }
 
+    /**
+     * <p>parse.</p>
+     *
+     * @param s a {@link java.lang.String} object
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.Hex} object
+     */
     public static Hex parse(String s) {
         return new Hex(s);
     }
@@ -19,10 +25,17 @@ public class Hex extends Int {
         super(new BigInteger(1, bytes));
     }
 
+    /**
+     * <p>parse.</p>
+     *
+     * @param bytes an array of {@link byte} objects
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.Hex} object
+     */
     public static Hex parse(byte[] bytes) {
         return new Hex(bytes);
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();

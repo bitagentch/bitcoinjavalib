@@ -10,6 +10,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
 
+/**
+ * <p>SimpleNode class.</p>
+ */
 public class SimpleNode {
 
     private static final Logger log = Logger.getLogger(SimpleNode.class.getSimpleName());
@@ -20,6 +23,14 @@ public class SimpleNode {
     private final boolean logging;
     private final SocketChannel socketChannel;
 
+    /**
+     * <p>Constructor for SimpleNode.</p>
+     *
+     * @param host a {@link java.lang.String} object
+     * @param port a {@link java.lang.Integer} object
+     * @param testnet a {@link java.lang.Boolean} object
+     * @param logging a {@link java.lang.Boolean} object
+     */
     public SimpleNode(String host, Integer port, Boolean testnet, Boolean logging) {
         this.host = Objects.requireNonNullElse(host, "localhost");
         this.port = Objects.requireNonNullElseGet(port, () -> {
@@ -41,6 +52,9 @@ public class SimpleNode {
         }
     }
 
+    /**
+     * <p>close.</p>
+     */
     public void close() {
         try {
             this.socketChannel.close();
@@ -52,6 +66,8 @@ public class SimpleNode {
     /**
      * Do a handshake with the other node.
      * Handshake is sending a version message and getting a verack back.
+     *
+     * @return an array of {@link byte} objects
      */
     public byte[] handshake() {
         // create a version message
@@ -69,6 +85,8 @@ public class SimpleNode {
 
     /**
      * Send a message to the connected node
+     *
+     * @param message a {@link ch.bitagent.bitcoin.java.network.Message} object
      */
     public void send(Message message) {
         // create a network envelope
@@ -87,6 +105,8 @@ public class SimpleNode {
 
     /**
      * Read a message from the socket
+     *
+     * @return a {@link ch.bitagent.bitcoin.java.network.NetworkEnvelope} object
      */
     public NetworkEnvelope read() {
         try {
@@ -131,6 +151,9 @@ public class SimpleNode {
 
     /**
      * Wait for one of the messages in the list
+     *
+     * @param commands a {@link java.util.Set} object
+     * @return a {@link ch.bitagent.bitcoin.java.network.NetworkEnvelope} object
      */
     public NetworkEnvelope waitFor(Set<String> commands) {
         try {

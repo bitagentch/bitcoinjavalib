@@ -12,10 +12,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * <p>MerkleBlock class.</p>
+ */
 public class MerkleBlock implements Message {
 
+    /** Constant <code>COMMAND="merkleblock"</code> */
     public static final String COMMAND = "merkleblock";
 
+    /** {@inheritDoc} */
     @Override
     public byte[] getCommand() {
         return COMMAND.getBytes();
@@ -31,6 +36,19 @@ public class MerkleBlock implements Message {
     private final List<byte[]> hashes;
     private final byte[] flags;
 
+    /**
+     * <p>Constructor for MerkleBlock.</p>
+     *
+     * @param version a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     * @param prevBlock an array of {@link byte} objects
+     * @param merkleRoot an array of {@link byte} objects
+     * @param timestamp a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     * @param bits an array of {@link byte} objects
+     * @param nonce an array of {@link byte} objects
+     * @param total a int
+     * @param hashes a {@link java.util.List} object
+     * @param flags an array of {@link byte} objects
+     */
     public MerkleBlock(Int version, byte[] prevBlock, byte[] merkleRoot, Int timestamp, byte[] bits, byte[] nonce, int total, List<byte[]> hashes, byte[] flags) {
         this.version = version;
         this.prevBlock = prevBlock;
@@ -45,6 +63,9 @@ public class MerkleBlock implements Message {
 
     /**
      * Takes a byte stream and parses a merkle block. Returns a Merkle Block object
+     *
+     * @param stream a {@link java.io.ByteArrayInputStream} object
+     * @return a {@link ch.bitagent.bitcoin.java.block.MerkleBlock} object
      */
     public static MerkleBlock parse(ByteArrayInputStream stream) {
         // version - 4 bytes, Little-Endian integer
@@ -78,6 +99,8 @@ public class MerkleBlock implements Message {
 
     /**
      * Verifies whether the merkle tree information validates to the merkle root
+     *
+     * @return a boolean
      */
     public boolean isValid() {
         // convert the flags field to a bit field
@@ -92,43 +115,89 @@ public class MerkleBlock implements Message {
         return Arrays.equals(Bytes.changeOrder(merkleTree.root()), this.merkleRoot);
     }
 
+    /** {@inheritDoc} */
     @Override
     public byte[] serialize() {
         return new byte[0];
     }
 
+    /**
+     * <p>Getter for the field <code>version</code>.</p>
+     *
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     */
     public Int getVersion() {
         return version;
     }
 
+    /**
+     * <p>Getter for the field <code>merkleRoot</code>.</p>
+     *
+     * @return an array of {@link byte} objects
+     */
     public byte[] getMerkleRoot() {
         return merkleRoot;
     }
 
+    /**
+     * <p>Getter for the field <code>prevBlock</code>.</p>
+     *
+     * @return an array of {@link byte} objects
+     */
     public byte[] getPrevBlock() {
         return prevBlock;
     }
 
+    /**
+     * <p>Getter for the field <code>timestamp</code>.</p>
+     *
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     */
     public Int getTimestamp() {
         return timestamp;
     }
 
+    /**
+     * <p>Getter for the field <code>bits</code>.</p>
+     *
+     * @return an array of {@link byte} objects
+     */
     public byte[] getBits() {
         return bits;
     }
 
+    /**
+     * <p>Getter for the field <code>nonce</code>.</p>
+     *
+     * @return an array of {@link byte} objects
+     */
     public byte[] getNonce() {
         return nonce;
     }
 
+    /**
+     * <p>Getter for the field <code>total</code>.</p>
+     *
+     * @return a int
+     */
     public int getTotal() {
         return total;
     }
 
+    /**
+     * <p>Getter for the field <code>hashes</code>.</p>
+     *
+     * @return a {@link java.util.List} object
+     */
     public List<byte[]> getHashes() {
         return hashes;
     }
 
+    /**
+     * <p>Getter for the field <code>flags</code>.</p>
+     *
+     * @return an array of {@link byte} objects
+     */
     public byte[] getFlags() {
         return flags;
     }

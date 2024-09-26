@@ -12,10 +12,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * <p>Block class.</p>
+ */
 public class Block {
 
+    /** Constant <code>GENESIS_BLOCK</code> */
     public static final Int GENESIS_BLOCK = Hex.parse("0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c");
+    /** Constant <code>TESTNET_GENESIS_BLOCK</code> */
     public static final Int TESTNET_GENESIS_BLOCK = Hex.parse("0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4adae5494dffff001d1aa4ae18");
+    /** Constant <code>LOWEST_BITS</code> */
     public static final Int LOWEST_BITS = Hex.parse("ffff001d");
 
     private final Int version;
@@ -26,6 +32,16 @@ public class Block {
     private final byte[] nonce;
     private List<byte[]> txHashes;
 
+    /**
+     * <p>Constructor for Block.</p>
+     *
+     * @param version a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     * @param prevBlock an array of {@link byte} objects
+     * @param merkleRoot an array of {@link byte} objects
+     * @param timestamp a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     * @param bits an array of {@link byte} objects
+     * @param nonce an array of {@link byte} objects
+     */
     public Block(Int version, byte[] prevBlock, byte[] merkleRoot, Int timestamp, byte[] bits, byte[] nonce) {
         this.version = version;
         this.prevBlock = prevBlock;
@@ -37,6 +53,9 @@ public class Block {
 
     /**
      * Takes a byte stream and parses a block. Returns a Block object
+     *
+     * @param stream a {@link java.io.ByteArrayInputStream} object
+     * @return a {@link ch.bitagent.bitcoin.java.block.Block} object
      */
     public static Block parse(ByteArrayInputStream stream) {
         // s.read(n) will read n bytes from the stream
@@ -58,6 +77,8 @@ public class Block {
 
     /**
      * Returns the 80 byte block header
+     *
+     * @return an array of {@link byte} objects
      */
     public byte[] serialize() {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
@@ -78,6 +99,8 @@ public class Block {
 
     /**
      * Returns the hash256 interpreted little endian of the block
+     *
+     * @return an array of {@link byte} objects
      */
     public byte[] hash() {
         // serialize
@@ -90,6 +113,8 @@ public class Block {
 
     /**
      * Returns whether this block is signaling readiness for BIP9
+     *
+     * @return a boolean
      */
     public boolean isBip9() {
         // BIP9 is signalled if the top 3 bits are 001
@@ -99,6 +124,8 @@ public class Block {
 
     /**
      * Returns whether this block is signaling readiness for BIP91
+     *
+     * @return a boolean
      */
     public boolean isBip91() {
         // BIP91 is signalled if the 5th bit from the right is 1
@@ -108,6 +135,8 @@ public class Block {
 
     /**
      * Returns whether this block is signaling readiness for BIP141
+     *
+     * @return a boolean
      */
     public boolean isBip141() {
         // BIP91 is signalled if the 2nd bit from the right is 1
@@ -117,6 +146,8 @@ public class Block {
 
     /**
      * Returns the proof-of-work target based on the bits
+     *
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.Int} object
      */
     public Int target() {
         return Bytes.bitsToTarget(this.bits);
@@ -124,6 +155,8 @@ public class Block {
 
     /**
      * Returns the block difficulty based on the bits
+     *
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.Int} object
      */
     public Int difficulty() {
         // note difficulty is (target of lowest difficulty) / (self's target)
@@ -132,6 +165,11 @@ public class Block {
         return lowest.div(this.target());
     }
 
+    /**
+     * <p>proof.</p>
+     *
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     */
     public Int proof() {
         // get the hash256 of the serialization of this block
         var h256 = Helper.hash256(this.serialize());
@@ -141,6 +179,8 @@ public class Block {
 
     /**
      * Returns whether this block satisfies proof of work
+     *
+     * @return a boolean
      */
     public boolean checkPow() {
         //  return whether this integer is less than the target
@@ -149,6 +189,8 @@ public class Block {
 
     /**
      * Gets the merkle root of the tx_hashes and checks that it's the same as the merkle root of this block.
+     *
+     * @return a boolean
      */
     public boolean validateMerkleRoot() {
         // reverse each item in self.tx_hashes
@@ -159,30 +201,65 @@ public class Block {
         return Arrays.equals(this.merkleRoot, root);
     }
 
+    /**
+     * <p>Getter for the field <code>version</code>.</p>
+     *
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     */
     public Int getVersion() {
         return version;
     }
 
+    /**
+     * <p>Getter for the field <code>timestamp</code>.</p>
+     *
+     * @return a {@link ch.bitagent.bitcoin.java.ecc.Int} object
+     */
     public Int getTimestamp() {
         return timestamp;
     }
 
+    /**
+     * <p>Getter for the field <code>prevBlock</code>.</p>
+     *
+     * @return an array of {@link byte} objects
+     */
     public byte[] getPrevBlock() {
         return prevBlock;
     }
 
+    /**
+     * <p>Getter for the field <code>merkleRoot</code>.</p>
+     *
+     * @return an array of {@link byte} objects
+     */
     public byte[] getMerkleRoot() {
         return merkleRoot;
     }
 
+    /**
+     * <p>Getter for the field <code>bits</code>.</p>
+     *
+     * @return an array of {@link byte} objects
+     */
     public byte[] getBits() {
         return bits;
     }
 
+    /**
+     * <p>Getter for the field <code>nonce</code>.</p>
+     *
+     * @return an array of {@link byte} objects
+     */
     public byte[] getNonce() {
         return nonce;
     }
 
+    /**
+     * <p>Setter for the field <code>txHashes</code>.</p>
+     *
+     * @param txHashes a {@link java.util.List} object
+     */
     public void setTxHashes(List<byte[]> txHashes) {
         this.txHashes = txHashes;
     }

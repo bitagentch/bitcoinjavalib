@@ -9,6 +9,9 @@ import java.util.Deque;
 import java.util.List;
 import java.util.logging.Logger;
 
+/**
+ * <p>MerkleTree class.</p>
+ */
 public class MerkleTree {
 
     Logger log = Logger.getLogger(MerkleTree.class.getSimpleName());
@@ -19,6 +22,11 @@ public class MerkleTree {
     private int currentDepth;
     private int currentIndex;
 
+    /**
+     * <p>Constructor for MerkleTree.</p>
+     *
+     * @param total a int
+     */
     public MerkleTree(int total) {
         this.total = total;
         // compute max depth math.ceil(math.log(self.total, 2))
@@ -40,52 +48,102 @@ public class MerkleTree {
         currentIndex = 0;
     }
 
+    /**
+     * <p>up.</p>
+     */
     public void up() {
         // reduce depth by 1 and halve the index
         this.currentDepth -= 1;
         this.currentIndex /= 2;
     }
 
+    /**
+     * <p>left.</p>
+     */
     public void left() {
         // increase depth by 1 and double the index
         this.currentDepth += 1;
         this.currentIndex *= 2;
     }
 
+    /**
+     * <p>right.</p>
+     */
     public void right() {
         // increase depth by 1 and double the index + 1
         this.currentDepth += 1;
         this.currentIndex = this.currentIndex * 2 + 1;
     }
 
+    /**
+     * <p>root.</p>
+     *
+     * @return an array of {@link byte} objects
+     */
     public byte[] root() {
         return this.nodes.get(0).getItems().get(0);
     }
 
+    /**
+     * <p>setCurrentNode.</p>
+     *
+     * @param value an array of {@link byte} objects
+     */
     public void setCurrentNode(byte[] value) {
         this.getNodes().get(this.currentDepth).getItems().set(this.currentIndex, value);
     }
 
+    /**
+     * <p>getCurrentNode.</p>
+     *
+     * @return an array of {@link byte} objects
+     */
     public byte[] getCurrentNode() {
         return this.getNodes().get(this.currentDepth).getItems().get(this.currentIndex);
     }
 
+    /**
+     * <p>getLeftNode.</p>
+     *
+     * @return an array of {@link byte} objects
+     */
     public byte[] getLeftNode() {
         return this.getNodes().get(this.currentDepth + 1).getItems().get(this.currentIndex * 2);
     }
 
+    /**
+     * <p>getRightNode.</p>
+     *
+     * @return an array of {@link byte} objects
+     */
     public byte[] getRightNode() {
         return this.getNodes().get(this.currentDepth + 1).getItems().get(this.currentIndex * 2 + 1);
     }
 
+    /**
+     * <p>isLeaf.</p>
+     *
+     * @return a boolean
+     */
     public boolean isLeaf() {
         return this.currentDepth == this.maxDepth;
     }
 
+    /**
+     * <p>rightExists.</p>
+     *
+     * @return a boolean
+     */
     public boolean rightExists() {
         return this.getNodes().get(this.currentDepth + 1).getItems().size() > this.currentIndex * 2 + 1;
     }
 
+    /**
+     * <p>populateTree.</p>
+     *
+     * @param flagBits an array of {@link byte} objects
+     * @param hashes a {@link java.util.List} object
+     */
     public void populateTree(byte[] flagBits, List<byte[]> hashes) {
         Deque<Byte> flagBitsQueue = new ArrayDeque<>();
         for (int i = flagBits.length - 1; i >= 0; i--) {
@@ -152,6 +210,7 @@ public class MerkleTree {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         return "MerkleTree{" +
@@ -163,6 +222,11 @@ public class MerkleTree {
                 '}';
     }
 
+    /**
+     * <p>Getter for the field <code>nodes</code>.</p>
+     *
+     * @return a {@link java.util.List} object
+     */
     public List<MerkleTreeLevel> getNodes() {
         return nodes;
     }
