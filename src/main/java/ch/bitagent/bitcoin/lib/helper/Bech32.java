@@ -329,7 +329,7 @@ public class Bech32 {
      * @param pad .
      * @return .
      */
-    public static byte[] convertBits(final byte[] bytes, final int fromBits, final int toBits, final boolean pad) {
+    static byte[] convertBits(final byte[] bytes, final int fromBits, final int toBits, final boolean pad) {
         int acc = 0;
         int bits = 0;
         ByteArrayOutputStream out = new ByteArrayOutputStream(64);
