@@ -8,12 +8,26 @@ import java.util.logging.Logger;
  * <p>Bech32</p>
  *
  * <a href="https://github.com/bitcoin/bips/blob/master/bip-0173.mediawiki">BIP-0173</a>
+ * <a href="https://github.com/bitcoin/bips/blob/master/bip-0350.mediawiki">BIP-0350</a>
  */
 public class Bech32 {
 
     private Bech32() {}
 
     private static final Logger log = Logger.getLogger(Bech32.class.getSimpleName());
+
+    private static final int BECH32_CONST = 0x01;
+    private static final int BECH32M_CONST = 0x2bc830a3;
+
+    /**
+     * Bech32 Encoding
+     */
+    public enum Encoding {
+        /** bech32 */
+        BECH32,
+        /** bech32m */
+        BECH32M
+    }
 
     /** The Bech32 and Bech32m character set for encoding. */
     private static final String BECH32_ALPHABET = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
@@ -101,15 +115,21 @@ public class Bech32 {
         return hrpExpanded;
     }
 
-    private static boolean verifyChecksum(String hrp, byte[] bytes) {
+    private static Encoding verifyChecksum(String hrp, byte[] bytes) {
         var hrpExpanded = hrpExpand(hrp);
         var polymod = polymod(Bytes.add(hrpExpanded, bytes));
-        return polymod == 1;
+        if (polymod == BECH32_CONST) {
+            return Encoding.BECH32;
+        } else if (polymod == BECH32M_CONST) {
+            return Encoding.BECH32M;
+        } else {
+            return null;
+        }
     }
 
-    private static byte[] createChecksum(String hrp, byte[] bytes) {
+    private static byte[] createChecksum(String hrp, byte[] bytes, Encoding encoding) {
         var values = Bytes.add(hrpExpand(hrp), bytes);
-        var polymod = polymod(Bytes.add(values, new byte[]{0, 0, 0, 0, 0, 0})) ^ 1;
+        var polymod = polymod(Bytes.add(values, new byte[]{0, 0, 0, 0, 0, 0})) ^ (encoding.equals(Encoding.BECH32) ? BECH32_CONST : BECH32M_CONST);
         var checksum = new byte[6];
         for (int i = 0; i < 6; i++) {
             checksum[i] = (byte) ((polymod >> (5 * (5 - i))) & 31);
@@ -123,7 +143,7 @@ public class Bech32 {
      * @param bech32 .
      * @return .
      */
-    public static boolean verify(String bech32) {
+    public static Encoding verify(String bech32) {
         try {
             var bech32Low = bech32.toLowerCase();
             if (bech32Low.length() > 90) {
@@ -148,13 +168,13 @@ public class Bech32 {
                 throw new IllegalArgumentException(String.format("Too short checksum %s", rawData.length()));
             }
             var verify = verifyChecksum(hrp, getBech32AlphabetIndex(rawData));
-            if (!verify) {
+            if (verify == null) {
                 throw new IllegalArgumentException(String.format("Bech32 checksum not valid %s", bech32));
             }
-            return true;
+            return verify;
         } catch (Exception e) {
             log.fine(e.getMessage());
-            return false;
+            return null;
         }
     }
 
@@ -164,6 +184,7 @@ public class Bech32 {
     public static class Bech32Data {
         private String hrp;
         private byte[] dataBytes;
+        private Encoding encoding;
 
         /**
          * Getter
@@ -200,6 +221,24 @@ public class Bech32 {
         public void setDataBytes(byte[] dataBytes) {
             this.dataBytes = dataBytes;
         }
+
+        /**
+         * Getter
+         *
+         * @return .
+         */
+        public Encoding getEncoding() {
+            return encoding;
+        }
+
+        /**
+         * Setter
+         *
+         * @param encoding .
+         */
+        public void setEncoding(Encoding encoding) {
+            this.encoding = encoding;
+        }
     }
 
     /**
@@ -209,7 +248,8 @@ public class Bech32 {
      * @return .
      */
     public static Bech32Data decode(String bech32) {
-        if (!verify(bech32)) {
+        var verify = verify(bech32);
+        if (verify == null) {
             throw new IllegalArgumentException(String.format("bad bech32 %s", bech32));
         }
         var bech32Low = bech32.toLowerCase();
@@ -221,9 +261,13 @@ public class Bech32 {
         var hrp = bech32Low.substring(0, lastIndex);
         var rawData = bech32Low.substring(lastIndex + 1);
         var dataBytes = getBech32AlphabetDecodingValue(rawData.substring(0, rawData.length() - 6));
+        if (dataBytes.length == 0) {
+            throw new IllegalArgumentException("Empty data section");
+        }
         var bech32Data = new Bech32Data();
         bech32Data.setHrp(hrp);
         bech32Data.setDataBytes(dataBytes);
+        bech32Data.setEncoding(verify);
         return bech32Data;
     }
 
@@ -232,10 +276,11 @@ public class Bech32 {
      *
      * @param hrp .
      * @param bytes .
+     * @param encoding .
      * @return .
      */
-    public static String encode(String hrp, byte[] bytes) {
-        var checksum = createChecksum(hrp, bytes);
+    public static String encode(String hrp, byte[] bytes, Encoding encoding) {
+        var checksum = createChecksum(hrp, bytes, encoding);
         var data = Bytes.add(bytes, checksum);
         var value = Bytes.byteArrayToString(getBech32AlphabetValue(data));
         return String.format("%s1%s", hrp, value);
@@ -252,12 +297,14 @@ public class Bech32 {
         if (!decoded.getHrp().equals("bc") && !decoded.getHrp().equals("tb")) {
             throw new IllegalArgumentException(String.format("invalid HRP %s", decoded.getHrp()));
         }
-        if (decoded.getDataBytes().length == 0) {
-            throw new IllegalArgumentException("Empty data section");
-        }
         var version = decoded.getDataBytes()[0];
         if (version < 0 || version > 16) {
             throw new IllegalArgumentException(String.format("invalid version %s", version));
+        }
+        if (version == 0 && decoded.getEncoding().equals(Encoding.BECH32M)) {
+            throw new IllegalArgumentException(String.format("invalid checksum (Bech32m instead of Bech32) %s", bech32));
+        } else if (version > 0 && decoded.getEncoding().equals(Encoding.BECH32)) {
+            throw new IllegalArgumentException(String.format("invalid checksum (Bech32 instead of Bech32m) %s", bech32));
         }
         var program5 = Arrays.copyOfRange(decoded.getDataBytes(), 1, decoded.getDataBytes().length);
         var program8 = Bech32.convertBits(program5, 5, 8, false);
@@ -290,7 +337,7 @@ public class Bech32 {
         var version = scriptPubkeyBytes[0];
         var program8 = Arrays.copyOfRange(scriptPubkeyBytes, 2, scriptPubkeyBytes.length);
         var program5 = convertBits(program8, 8, 5, true);
-        return encode(hrp, Bytes.add(new byte[]{version}, program5));
+        return encode(hrp, Bytes.add(new byte[]{version}, program5), version == 0 ? Encoding.BECH32 : Encoding.BECH32M);
     }
 
     /**
@@ -316,7 +363,7 @@ public class Bech32 {
     public static String encodeNostr(String hrp, String hexString) {
         var bytes8 = Bytes.hexStringToByteArray(hexString);
         var bytes5 = convertBits(bytes8, 8, 5, true);
-        return encode(hrp, bytes5);
+        return encode(hrp, bytes5, Encoding.BECH32);
     }
 
     /**
