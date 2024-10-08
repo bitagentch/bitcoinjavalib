@@ -23,7 +23,7 @@ public class AddressUtil {
         } else if (isP2shAddress(address)) {
             return true;
         } else {
-            return isSegwitAddress(address);
+            return isBech32Address(address);
         }
     }
 
@@ -72,13 +72,13 @@ public class AddressUtil {
     }
 
     /**
-     * <p>Is it a segwit address?</p>
+     * <p>Is it a bech32 address?</p>
      * <a href="https://en.bitcoin.it/wiki/Bech32">Bech32</a>
      *
      * @param address .
      * @return .
      */
-    public static boolean isSegwitAddress(String address) {
+    public static boolean isBech32Address(String address) {
         if (isNotInvoiceAddressLength(address)) {
             return false;
         }

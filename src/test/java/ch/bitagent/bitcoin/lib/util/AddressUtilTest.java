@@ -12,6 +12,7 @@ class AddressUtilTest {
         assertTrue(AddressUtil.isInvoiceAddress("1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2"));
         assertTrue(AddressUtil.isInvoiceAddress("3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy"));
         assertTrue(AddressUtil.isInvoiceAddress("bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq"));
+        assertTrue(AddressUtil.isInvoiceAddress("bc1p5d7rjq7g6rdk2yhzks9smlaqtedr4dekq08ge8ztwac72sfr9rusxg3297"));
     }
 
     @Test
@@ -35,9 +36,9 @@ class AddressUtilTest {
     }
 
     @Test
-    void isSegwitAddress() {
-        assertTrue(AddressUtil.isSegwitAddress("bc1qc7slrfxkknqcq2jevvvkdgvrt8080852dfjewde450xdlk4ugp7szw5tk9"));
-        assertTrue(AddressUtil.isSegwitAddress("bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4"));
+    void isBech32Address() {
+        assertTrue(AddressUtil.isBech32Address("bc1qc7slrfxkknqcq2jevvvkdgvrt8080852dfjewde450xdlk4ugp7szw5tk9"));
+        assertTrue(AddressUtil.isBech32Address("bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4"));
     }
 
     @Test
