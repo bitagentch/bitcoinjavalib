@@ -142,7 +142,7 @@ public class Point {
                 result = result.add(current);
             }
             current = current.add(current);
-            coeff = new Int(coeff.bigInt().shiftRight(1));
+            coeff = Int.parse(coeff.bigInt().shiftRight(1));
         }
         return result;
     }

@@ -37,7 +37,7 @@ public class Base58 {
         StringBuilder result = new StringBuilder();
         while (num.gt(zero)) {
             BigInteger[] numMod = num.bigInt().divideAndRemainder(BigInteger.valueOf(58));
-            num = new Int(numMod[0]);
+            num = Int.parse(numMod[0]);
             result.insert(0, BASE58_ALPHABET.charAt(numMod[1].intValue()));
         }
         return prefix + result;
