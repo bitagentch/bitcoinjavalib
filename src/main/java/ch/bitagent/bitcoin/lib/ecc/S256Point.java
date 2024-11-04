@@ -48,8 +48,11 @@ public class S256Point extends Point {
     @Override
     public S256Point add(Point other) {
         Point point = super.add(other);
-        var x = new S256Field(((FieldElement) point.getX()).num);
-        var y = new S256Field(((FieldElement) point.getY()).num);
+        if (point.getX() == null) {
+            return null;
+        }
+        var x = new S256Field(getNum(point.getX()));
+        var y = new S256Field(getNum(point.getY()));
         return new S256Point(x, y);
     }
 
@@ -61,8 +64,8 @@ public class S256Point extends Point {
         if (point.getX() == null && point.getY() == null) {
             return new S256Point(null, null);
         } else if (point.getX() != null) {
-            var x = new S256Field(((FieldElement) point.getX()).num);
-            var y = new S256Field(((FieldElement) point.getY()).num);
+            var x = new S256Field(getNum(point.getX()));
+            var y = new S256Field(getNum(point.getY()));
             return new S256Point(x, y);
         } else {
             throw new IllegalStateException();
@@ -168,7 +171,7 @@ public class S256Point extends Point {
     @Override
     public String toString() {
         if (this.getX() instanceof FieldElement && this.getY() instanceof FieldElement && this.getA() instanceof FieldElement && this.getB() instanceof FieldElement) {
-            return String.format("S256Point(0x%s,0x%s)", ((FieldElement) this.getX()).getNum().toHex(), ((FieldElement) this.getY()).getNum().toHex());
+            return String.format("S256Point(0x%s,0x%s)", getNum(this.getX()).toHex(), getNum(this.getY()).toHex());
         } else if (this.getX() == null && this.getY() == null && this.getA() instanceof FieldElement && this.getB() instanceof FieldElement) {
             return "S256Point(infinity)";
         } else {

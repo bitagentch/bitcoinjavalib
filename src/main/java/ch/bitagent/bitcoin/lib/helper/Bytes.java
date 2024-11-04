@@ -287,6 +287,26 @@ public class Bytes {
     }
 
     /**
+     * <p>xor.</p>
+     *
+     * @param b0 a byte array
+     * @param b1 a byte array
+     * @return an byte array
+     */
+    public static byte[] xor(byte[] b0, byte[] b1) {
+        if(b0.length != b1.length)   {
+            return new byte[0];
+        }
+        byte[] ret = new byte[b0.length];
+        int i = 0;
+        for (byte b : b0)   {
+            ret[i] = (byte)(b ^ b1[i]);
+            i++;
+        }
+        return ret;
+    }
+
+    /**
      * <p>log.</p>
      *
      * @deprecated temp use only

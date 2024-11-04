@@ -142,7 +142,7 @@ public class Point {
                 result = result.add(current);
             }
             current = current.add(current);
-            coeff = new Int(coeff.bigInt().shiftRight(1));
+            coeff = Int.parse(coeff.bigInt().shiftRight(1));
         }
         return result;
     }
@@ -151,7 +151,7 @@ public class Point {
     @Override
     public String toString() {
         if (this.x instanceof FieldElement && this.y instanceof FieldElement && this.a instanceof FieldElement && this.b instanceof FieldElement) {
-            return String.format("Point(%s,%s)_%s_%s FieldElement(%s)", ((FieldElement) x).getNum(), ((FieldElement) y).getNum(), ((FieldElement) a).getNum(), ((FieldElement) b).getNum(), ((FieldElement) x).getPrime());
+            return String.format("Point(%s,%s)_%s_%s FieldElement(%s)", getNum(x), getNum(y), getNum(a), getNum(b), getPrime(x));
         } else if (this.x == null && this.y == null && this.a instanceof Int && this.b instanceof Int) {
             return "Point(infinity)";
         } else if (this.x == null && this.y == null && this.a instanceof FieldElement && this.b instanceof FieldElement) {
@@ -195,5 +195,21 @@ public class Point {
      */
     public PointOperators getB() {
         return b;
+    }
+
+    public static Int getNum(PointOperators po) {
+        if (po instanceof FieldElement) {
+            return ((FieldElement) po).getNum();
+        } else {
+            return null;
+        }
+    }
+
+    public static Int getPrime(PointOperators po) {
+        if (po instanceof FieldElement) {
+            return ((FieldElement) po).getPrime();
+        } else {
+            return null;
+        }
     }
 }

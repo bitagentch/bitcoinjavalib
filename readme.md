@@ -8,8 +8,7 @@ So this is a Java implementation of it.
 ---
 [^1]: Programming Bitcoin by Jimmy Song (O'Reilly). Copyright 2019 Jimmy Song. 978-1-492-03149-9.
 
-## release notes
-[release notes](release-notes.md)
+## [release notes](release-notes.md)
 
 ## run tests with [maven](https://maven.apache.org/)
 ```
