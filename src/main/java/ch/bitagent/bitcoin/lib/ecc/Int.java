@@ -170,7 +170,7 @@ public class Int implements PointOperators, Comparable<Int> {
     @Override
     public Int mul(PointOperators otherPoint) {
         Int other = (Int) otherPoint;
-        return new Int(this.bigInt.multiply(other.bigInt));
+        return Int.parse(this.bigInt.multiply(other.bigInt));
     }
 
     /** {@inheritDoc} */
@@ -186,26 +186,26 @@ public class Int implements PointOperators, Comparable<Int> {
     /** {@inheritDoc} */
     @Override
     public Int pow(Int exponent) {
-        return new Int(this.bigInt.pow(exponent.bigInt.intValue()));
+        return Int.parse(this.bigInt.pow(exponent.bigInt.intValue()));
     }
 
     /** {@inheritDoc} */
     @Override
     public Int div(PointOperators otherPoint) {
         Int other = (Int) otherPoint;
-        return new Int(this.bigInt.divide(other.bigInt));
+        return Int.parse(this.bigInt.divide(other.bigInt));
     }
 
     /** {@inheritDoc} */
     @Override
     public Int mod(Int divisor) {
-        return new Int(this.bigInt.mod(divisor.bigInt));
+        return Int.parse(this.bigInt.mod(divisor.bigInt));
     }
 
     /** {@inheritDoc} */
     @Override
     public Int powMod(Int exponent, Int divisor) {
-        return new Int(this.bigInt.modPow(exponent.bigInt, divisor.bigInt));
+        return Int.parse(this.bigInt.modPow(exponent.bigInt, divisor.bigInt));
     }
 
     /**
