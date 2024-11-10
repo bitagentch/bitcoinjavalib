@@ -54,12 +54,46 @@ public class Base58 {
     }
 
     /**
-     * <p>decode.</p>
+     * <p>decodeAddress</p>
      *
-     * @param s a {@link java.lang.String} object
-     * @return an array of {@link byte} objects
+     * @param address .
+     * @return .
      */
-    public static byte[] decode(String s) {
+    public static byte[] decodeAddress(String address) {
+        var num = decode(address);
+        var combined = num.toBytes(25);
+        compareChecksum(combined);
+        return Arrays.copyOfRange(combined, 1, combined.length - 4);
+    }
+
+    /**
+     * <p>decodeExtendedKey</p>
+     *
+     * @param extendedKey .
+     * @return .
+     */
+    public static byte[] decodeExtendedKey(String extendedKey) {
+        var num = decode(extendedKey);
+        var combined = num.toBytes(82);
+        compareChecksum(combined);
+        return Arrays.copyOfRange(combined, 0, combined.length - 4);
+    }
+
+    /**
+     * decodeWif
+     *
+     * @param wif .
+     * @param compressed .
+     * @return .
+     */
+    public static byte[] decodeWif(String wif, boolean compressed) {
+        var num = decode(wif);
+        var combined = num.toBytes(compressed ? 38 : 37);
+        compareChecksum(combined);
+        return Arrays.copyOfRange(combined, 0, combined.length - 4);
+    }
+
+    private static Int decode(String s) {
         var fiveEight = Int.parse(58);
         var num = Int.parse(0);
         for (int i = 0; i < s.length(); i++) {
@@ -67,15 +101,17 @@ public class Base58 {
             num = num.mul(fiveEight);
             num = num.add(Int.parse(BASE58_ALPHABET.indexOf(c)));
         }
-        var combined = num.toBytes(25);
+        return num;
+    }
+
+    private static void compareChecksum(byte[] combined) {
         var checksum = Arrays.copyOfRange(combined, combined.length - 4, combined.length);
         var hashInput = Arrays.copyOfRange(combined, 0, combined.length - 4);
         var hash = Helper.hash256(hashInput);
         var hashChecksum = Arrays.copyOfRange(hash, 0, 4);
         if (Arrays.compare(hashChecksum, checksum) != 0) {
-            throw new IllegalStateException(String.format("bad address %h %h", checksum, hashChecksum));
+            throw new IllegalStateException(String.format("bad checksum %h %h", checksum, hashChecksum));
         }
-        return Arrays.copyOfRange(combined, 1, combined.length - 4);
     }
 
     /**

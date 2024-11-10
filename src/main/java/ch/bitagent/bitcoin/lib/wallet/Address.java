@@ -1,4 +1,4 @@
-package ch.bitagent.bitcoin.lib.util;
+package ch.bitagent.bitcoin.lib.wallet;
 
 import ch.bitagent.bitcoin.lib.helper.Base58;
 import ch.bitagent.bitcoin.lib.helper.Bech32;
@@ -6,9 +6,9 @@ import ch.bitagent.bitcoin.lib.helper.Bech32;
 /**
  * AddressUtil
  */
-public class AddressUtil {
+public class Address {
 
-    private AddressUtil() {}
+    private Address() {}
 
     /**
      * <p>Is it an invoice address?</p>
@@ -40,7 +40,7 @@ public class AddressUtil {
         }
         try {
             if (address.startsWith("1")) {
-                Base58.decode(address);
+                Base58.decodeAddress(address);
                 return true;
             }
         } catch (Exception e) {
@@ -62,7 +62,7 @@ public class AddressUtil {
         }
         try {
             if (address.startsWith("3")) {
-                Base58.decode(address);
+                Base58.decodeAddress(address);
                 return true;
             }
         } catch (Exception e) {

@@ -154,7 +154,7 @@ class Chapter12Test {
     void example5() {
         var lastBlockHex = Hex.parse("00000000000538d5c2246336644f9a4956551afb44ba47278759ec55ea912e19");
         var address = "mwJn1YPMq7y5F8J3LkC5Hxg9PHyZ5K4cFv";
-        var h160 = Base58.decode(address);
+        var h160 = Base58.decodeAddress(address);
         var node = new SimpleNode(Properties.getBitcoinP2pHost(), Properties.getBitcoinP2pPort(), Properties.getBitcoinP2pTestnet(), false);
         var bf = new BloomFilter(30, 5, 90210);
         bf.add(h160);
@@ -227,9 +227,9 @@ class Chapter12Test {
         var secret = Hex.parse(Bytes.changeOrder(Helper.hash256("Jimmy Song".getBytes())));
         var privateKey = new PrivateKey(secret);
         var addr = privateKey.getPoint().address(null, true);
-        var h160 = Base58.decode(addr);
+        var h160 = Base58.decodeAddress(addr);
         var targetAddress = "mwJn1YPMq7y5F8J3LkC5Hxg9PHyZ5K4cFv";
-        var targetH160 = Base58.decode(targetAddress);
+        var targetH160 = Base58.decodeAddress(targetAddress);
         var targetScript = Script.p2pkhScript(targetH160);
         var fee = Int.parse(5000);  // fee in satoshis
         // connect to testnet.programmingbitcoin.com in testnet mode

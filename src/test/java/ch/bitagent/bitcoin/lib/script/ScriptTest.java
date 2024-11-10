@@ -34,13 +34,13 @@ class ScriptTest {
     @Test
     void address() {
         var address1 = "1BenRpVUFK65JFWcQSuHnJKzc4M8ZP8Eqa";
-        var h160 = Base58.decode(address1);
+        var h160 = Base58.decodeAddress(address1);
         var p2pkhScriptPubkey = Script.p2pkhScript(h160);
         assertEquals(p2pkhScriptPubkey.address(null), address1);
         var address2 = "mrAjisaT4LXL5MzE81sfcDYKU3wqWSvf9q";
         assertEquals(p2pkhScriptPubkey.address(true), address2);
         var address3 = "3CLoMMyuoDQTPRD3XYZtCvgvkadrAdvdXh";
-        h160 = Base58.decode(address3);
+        h160 = Base58.decodeAddress(address3);
         var p2shScriptPubkey = Script.p2shScript(h160);
         assertEquals(p2shScriptPubkey.address(null), address3);
         var address4 = "2N3u1R6uwQfuobCqbCgBkpsgBxvr1tZpe7B";

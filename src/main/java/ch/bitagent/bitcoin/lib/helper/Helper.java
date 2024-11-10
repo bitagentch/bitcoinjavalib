@@ -119,6 +119,25 @@ public class Helper {
     }
 
     /**
+     * <p>hmacS512Init.</p>
+     *
+     * @param key an array of {@link byte} objects
+     * @return a {@link javax.crypto.Mac} object
+     */
+    public static Mac hmacS512Init(byte[] key) {
+        try {
+            String algorithm = "HmacSHA512";
+            SecretKeySpec secretKeySpec = new SecretKeySpec(key, algorithm);
+            Mac mac = Mac.getInstance(algorithm);
+            mac.init(secretKeySpec);
+            return mac;
+        } catch (Exception e) {
+            log.severe(e.getMessage());
+            throw new IllegalStateException(e.getMessage());
+        }
+    }
+
+    /**
      * <p>zfill64.</p>
      *
      * @param bytes a {@link java.lang.String} object

@@ -10,7 +10,7 @@ class Base58Test {
     @Test
     void base58() {
         var addr = "mnrVtF8DWjMu839VW3rBfgYaAfKk8983Xf";
-        var h160 = Hex.parse(Base58.decode(addr));
+        var h160 = Hex.parse(Base58.decodeAddress(addr));
         var want = Hex.parse("507b27411ccf7f16f10297de6cef3f291623eddf");
         assertEquals(h160, want);
         var got = Base58.encodeChecksum(Bytes.add(new byte[]{0x6f}, h160.toBytes()));

@@ -5,6 +5,7 @@ import ch.bitagent.bitcoin.lib.helper.Bytes;
 import ch.bitagent.bitcoin.lib.helper.Helper;
 
 import javax.crypto.Mac;
+import java.util.Arrays;
 
 /**
  * A private key on a secp256k1 elliptic curve
@@ -22,6 +23,16 @@ public class PrivateKey {
     public PrivateKey(Int secret) {
         this.secret = secret;
         this.point = S256Point.getG().mul(secret);
+    }
+
+    /**
+     * parse
+     *
+     * @param secret .
+     * @return .
+     */
+    public static PrivateKey parse(byte[] secret) {
+        return new PrivateKey(Hex.parse(secret));
     }
 
     /**
@@ -122,11 +133,50 @@ public class PrivateKey {
     }
 
     /**
-     * <p>Getter for the field <code>point</code>.</p>
+     * parseWif
+     *
+     * @param wif .
+     * @param compressed .
+     * @param testnet .
+     * @return .
+     */
+    public static PrivateKey parseWif(String wif, boolean compressed, boolean testnet) {
+        var decodedBytes = Base58.decodeWif(wif, compressed);
+        byte prefix = decodedBytes[0];
+        byte prefixExpected;
+        if (testnet) {
+            prefixExpected = (byte) 0xef;
+        } else {
+            prefixExpected = (byte) 0x80;
+        }
+        if (prefix != prefixExpected) {
+            throw new IllegalArgumentException("Invalid prefix");
+        }
+        byte[] secretBytes;
+        if (compressed) {
+            secretBytes = Arrays.copyOfRange(decodedBytes, 1, decodedBytes.length - 1);
+        } else {
+            secretBytes = Arrays.copyOfRange(decodedBytes, 1, decodedBytes.length);
+        }
+        Int secret = Hex.parse(secretBytes);
+        return new PrivateKey(secret);
+    }
+
+    /**
+     * <p>Get the point (public key)</p>
      *
      * @return a {@link ch.bitagent.bitcoin.lib.ecc.S256Point} object
      */
     public S256Point getPoint() {
         return point;
+    }
+
+    /**
+     * Get the secret
+     *
+     * @return .
+     */
+    public Int getSecret() {
+        return this.secret;
     }
 }

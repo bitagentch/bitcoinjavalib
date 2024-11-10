@@ -73,11 +73,11 @@ class Chapter7Test {
         var prevIndex = Int.parse(13);
         var txIn = new TxIn(prevTx, prevIndex, null, null);
         var changeAmount = Int.parse(Helper.btcToSat(0.33));
-        var changeH160 = Base58.decode("mzx5YhAH9kNHtcN481u6WkjeHjYtVeKVh2");
+        var changeH160 = Base58.decodeAddress("mzx5YhAH9kNHtcN481u6WkjeHjYtVeKVh2");
         var changeScript = Script.p2pkhScript(changeH160);
         var changeOutput = new TxOut(changeAmount, changeScript);
         var targetAmount = Int.parse(Helper.btcToSat(0.1));
-        var target_h160 = Base58.decode("mnrVtF8DWjMu839VW3rBfgYaAfKk8983Xf");
+        var target_h160 = Base58.decodeAddress("mnrVtF8DWjMu839VW3rBfgYaAfKk8983Xf");
         var targetScript = Script.p2pkhScript(target_h160);
         var targetOutput = new TxOut(targetAmount, targetScript);
         var tx = new Tx(Int.parse(1), List.of(txIn), List.of(changeOutput, targetOutput), Int.parse(0), true, null);
@@ -134,11 +134,11 @@ class Chapter7Test {
         var txIns = new ArrayList<TxIn>();
         txIns.add(new TxIn(prevTx, prevIndex, null, null));
         var txOuts = new ArrayList<TxOut>();
-        var h160 = Base58.decode(targetAddress);
+        var h160 = Base58.decodeAddress(targetAddress);
         var scriptPubkey = Script.p2pkhScript(h160);
         var targetSatoshis = Int.parse(Helper.btcToSat(targetAmount));
         txOuts.add(new TxOut(targetSatoshis, scriptPubkey));
-        h160 = Base58.decode(changeAddress);
+        h160 = Base58.decodeAddress(changeAddress);
         scriptPubkey = Script.p2pkhScript(h160);
         var changeSatoshis = Int.parse(Helper.btcToSat(changeAmount));
         txOuts.add(new TxOut(changeSatoshis, scriptPubkey));

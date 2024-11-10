@@ -392,6 +392,27 @@ public class Script {
     }
 
     /**
+     * toHex
+     *
+     * @return .
+     */
+    public String toHex() {
+        List<String> result = new ArrayList<>();
+        for (ScriptCmd cmd : cmds) {
+            if (cmd.isOpCode()) {
+                // if the cmd is an integer, it's an opcode
+                result.add(cmd.getOpCode().getCode().toString());
+            } else if (cmd.isElement()) {
+                // otherwise, this is an element
+                result.add(cmd.getElementAsHexString());
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+        return String.join("", result);
+    }
+
+    /**
      * <p>Getter for the field <code>cmds</code>.</p>
      *
      * @return a {@link java.util.List} object
