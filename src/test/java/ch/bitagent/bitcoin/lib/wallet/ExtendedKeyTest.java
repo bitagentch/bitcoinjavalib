@@ -189,7 +189,9 @@ class ExtendedKeyTest {
         var privkey = PrivateKey.parseWif("KyZpNDKnfs94vbrwhJneDi77V6jF64PWPF8x5cdJb8ifgg2DUc9d", true, false);
         var pubkey = S256Point.parse(Hex.parse("0330d54fd0dd420a6e5f8d3624f5f3482cae350f79d5f0753bf5beef9c2d91af3c").toBytes());
         assertTrue(pubkey.eq(privkey.getPoint()));
-        assertEquals("bc1qcr8te4kr609gcawutmrza0j4xv80jy8z306fyu", pubkey.addressBech32P2wpkh(true, false));
+        var address = Address.parse("bc1qcr8te4kr609gcawutmrza0j4xv80jy8z306fyu");
+        assertArrayEquals(address.hash160(), pubkey.hash160(true));
+        assertEquals(address.address(), pubkey.addressBech32P2wpkh(false));
     }
 
     @Test
@@ -197,7 +199,9 @@ class ExtendedKeyTest {
         var privkey = PrivateKey.parseWif("Kxpf5b8p3qX56DKEe5NqWbNUP9MnqoRFzZwHRtsFqhzuvUJsYZCy", true, false);
         var pubkey = S256Point.parse(Hex.parse("03e775fd51f0dfb8cd865d9ff1cca2a158cf651fe997fdc9fee9c1d3b5e995ea77").toBytes());
         assertTrue(pubkey.eq(privkey.getPoint()));
-        assertEquals("bc1qnjg0jd8228aq7egyzacy8cys3knf9xvrerkf9g", pubkey.addressBech32P2wpkh(true, false));
+        var address = Address.parse("bc1qnjg0jd8228aq7egyzacy8cys3knf9xvrerkf9g");
+        assertArrayEquals(address.hash160(), pubkey.hash160(true));
+        assertEquals(address.address(), pubkey.addressBech32P2wpkh(false));
     }
 
     @Test
@@ -205,6 +209,8 @@ class ExtendedKeyTest {
         var privkey = PrivateKey.parseWif("KxuoxufJL5csa1Wieb2kp29VNdn92Us8CoaUG3aGtPtcF3AzeXvF", true, false);
         var pubkey = S256Point.parse(Hex.parse("03025324888e429ab8e3dbaf1f7802648b9cd01e9b418485c5fa4c1b9b5700e1a6").toBytes());
         assertTrue(pubkey.eq(privkey.getPoint()));
-        assertEquals("bc1q8c6fshw2dlwun7ekn9qwf37cu2rn755upcp6el", pubkey.addressBech32P2wpkh(true, false));
+        var address = Address.parse("bc1q8c6fshw2dlwun7ekn9qwf37cu2rn755upcp6el");
+        assertArrayEquals(address.hash160(), pubkey.hash160(true));
+        assertEquals(address.address(), pubkey.addressBech32P2wpkh(false));
     }
 }

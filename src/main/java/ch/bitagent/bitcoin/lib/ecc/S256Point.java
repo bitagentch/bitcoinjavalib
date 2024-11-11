@@ -17,7 +17,9 @@ import java.util.Objects;
  */
 public class S256Point extends Point {
 
-    /** Constant <code>N</code> */
+    /**
+     * Constant <code>N</code>
+     */
     public static final Int N = Hex.parse("fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141");
 
     private static final Int GX = Hex.parse("79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798");
@@ -49,7 +51,9 @@ public class S256Point extends Point {
         return S256Point.g;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public S256Point add(Point other) {
         Point point = super.add(other);
@@ -61,7 +65,9 @@ public class S256Point extends Point {
         return new S256Point(x, y);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public S256Point mul(Int coefficient) {
         var coeff = coefficient.mod(N);
@@ -80,7 +86,7 @@ public class S256Point extends Point {
     /**
      * <p>verify.</p>
      *
-     * @param z a {@link ch.bitagent.bitcoin.lib.ecc.Int} object
+     * @param z         a {@link ch.bitagent.bitcoin.lib.ecc.Int} object
      * @param signature a {@link ch.bitagent.bitcoin.lib.ecc.Signature} object
      * @return a boolean
      */
@@ -126,7 +132,7 @@ public class S256Point extends Point {
      * Returns the address string
      *
      * @param compressed a {@link java.lang.Boolean} object
-     * @param testnet a boolean
+     * @param testnet    a boolean
      * @return a {@link java.lang.String} object
      */
     public String address(Boolean compressed, boolean testnet) {
@@ -143,12 +149,11 @@ public class S256Point extends Point {
     /**
      * Returns the bech32 p2wpkh address
      *
-     * @param compressed
      * @param testnet
      * @return
      */
-    public String addressBech32P2wpkh(Boolean compressed, boolean testnet) {
-        var script = new Script(List.of(OpCodeNames.OP_0.toScriptCmd(), OpCodeNames.OP_20_PUSHBYTES_20.toScriptCmd(), new ScriptCmd(this.hash160(compressed))));
+    public String addressBech32P2wpkh(boolean testnet) {
+        var script = new Script(List.of(OpCodeNames.OP_0.toScriptCmd(), OpCodeNames.OP_20_PUSHBYTES_20.toScriptCmd(), new ScriptCmd(this.hash160(true))));
         return Bech32.encodeSegwit(testnet ? "tb" : "bc", script.toHex());
     }
 
@@ -184,7 +189,9 @@ public class S256Point extends Point {
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         if (this.getX() instanceof FieldElement && this.getY() instanceof FieldElement && this.getA() instanceof FieldElement && this.getB() instanceof FieldElement) {

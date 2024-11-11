@@ -2,28 +2,36 @@ package ch.bitagent.bitcoin.lib.wallet;
 
 import ch.bitagent.bitcoin.lib.helper.Base58;
 import ch.bitagent.bitcoin.lib.helper.Bech32;
+import ch.bitagent.bitcoin.lib.helper.Bytes;
 
 /**
- * AddressUtil
+ * Address
  */
 public class Address {
 
-    private Address() {}
+    private final String addressString;
+
+    public Address(String address) {
+        this.addressString = address;
+    }
+
+    public static Address parse(String address) {
+        return new Address(address);
+    }
 
     /**
      * <p>Is it an invoice address?</p>
      * <a href="https://en.bitcoin.it/wiki/Invoice_address">Invoice address</a>
      *
-     * @param address .
      * @return .
      */
-    public static boolean isInvoiceAddress(String address) {
-        if (isP2pkhAddress(address)) {
+    public boolean isInvoiceAddress() {
+        if (isP2pkhAddress()) {
             return true;
-        } else if (isP2shAddress(address)) {
+        } else if (isP2shAddress()) {
             return true;
         } else {
-            return isBech32Address(address);
+            return isBech32Address();
         }
     }
 
@@ -31,16 +39,15 @@ public class Address {
      * <p>Is it a pay-to-pubkey-hash address?</p>
      * <a href="https://en.bitcoin.it/wiki/Transaction#Pay-to-PubkeyHash">Pay-to-PubkeyHash</a>
      *
-     * @param address .
      * @return .
      */
-    public static boolean isP2pkhAddress(String address) {
-        if (isNotInvoiceAddressLength(address)) {
+    public boolean isP2pkhAddress() {
+        if (isNotInvoiceAddressLength()) {
             return false;
         }
         try {
-            if (address.startsWith("1")) {
-                Base58.decodeAddress(address);
+            if (addressString.startsWith("1")) {
+                Base58.decodeAddress(addressString);
                 return true;
             }
         } catch (Exception e) {
@@ -53,16 +60,15 @@ public class Address {
      * <p>Is it a pay-to-script-hash address?</p>
      * <a href="https://en.bitcoin.it/wiki/Pay_to_script_hash">Pay to script hash</a>
      *
-     * @param address .
      * @return .
      */
-    public static boolean isP2shAddress(String address) {
-        if (isNotInvoiceAddressLength(address)) {
+    public boolean isP2shAddress() {
+        if (isNotInvoiceAddressLength()) {
             return false;
         }
         try {
-            if (address.startsWith("3")) {
-                Base58.decodeAddress(address);
+            if (addressString.startsWith("3")) {
+                Base58.decodeAddress(addressString);
                 return true;
             }
         } catch (Exception e) {
@@ -75,16 +81,15 @@ public class Address {
      * <p>Is it a bech32 address?</p>
      * <a href="https://en.bitcoin.it/wiki/Bech32">Bech32</a>
      *
-     * @param address .
      * @return .
      */
-    public static boolean isBech32Address(String address) {
-        if (isNotInvoiceAddressLength(address)) {
+    public boolean isBech32Address() {
+        if (isNotInvoiceAddressLength()) {
             return false;
         }
         try {
-            if (address.startsWith("bc")) {
-                Bech32.decodeSegwit(address);
+            if (addressString.startsWith("bc")) {
+                Bech32.decodeSegwit(addressString);
                 return true;
             }
         } catch (Exception e) {
@@ -93,23 +98,38 @@ public class Address {
         return false;
     }
 
-    static boolean isNotInvoiceAddressLength(String address) {
-        if (address == null) {
+    boolean isNotInvoiceAddressLength() {
+        if (addressString == null) {
             return true;
-        } else if (address.startsWith("1") || address.startsWith("3")) {
-            if (address.length() < 26) {
+        } else if (addressString.startsWith("1") || addressString.startsWith("3")) {
+            if (addressString.length() < 26) {
                 return true;
             } else {
-                return address.length() > 35;
+                return addressString.length() > 35;
             }
-        } else if (address.startsWith("bc")) {
-            if (address.length() < 14) {
+        } else if (addressString.startsWith("bc")) {
+            if (addressString.length() < 14) {
                 return true;
             } else {
-                return address.length() > 74;
+                return addressString.length() > 74;
             }
         } else {
             return true;
+        }
+    }
+
+    public String address() {
+        return addressString;
+    }
+
+    public byte[] hash160() {
+        if (this.isP2pkhAddress() || this.isP2shAddress()) {
+            return Base58.decodeAddress(this.addressString);
+        } else if (this.isBech32Address()) {
+            var scriptPubkey = Bech32.decodeSegwit(this.addressString);
+            return Bytes.hexStringToByteArray(scriptPubkey.substring(4));
+        } else {
+            throw new IllegalStateException();
         }
     }
 }
