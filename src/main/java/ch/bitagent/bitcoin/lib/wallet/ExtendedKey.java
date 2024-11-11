@@ -128,7 +128,7 @@ public class ExtendedKey {
             var derivedChildNumber = indexInt.toBytes(4);
             var hmac = Hash.hmacS512Init(this.chainCode);
             if (indexInt.ge(HARDENED_INDEX)) {
-                hmac.update(privateKey.getSecret().toBytes());
+                hmac.update(privateKey.getSecret().toBytes(33));
             } else {
                 hmac.update(publicKeyPoint.sec(true));
             }

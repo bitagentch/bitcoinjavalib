@@ -26,28 +26,18 @@ class ExtendedKeyTest {
 
     @Test
     void bip32_vector1_m_derive_privkey() {
-        var extendedPrivkeyM = ExtendedKey.parse("xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi");
-        var extendedPrivkeyM0hDerived = extendedPrivkeyM.derive(0, true, false);
-        var extendedPrivkeyM0h = ExtendedKey.parse("xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7");
-        assertArrayEquals(extendedPrivkeyM0h.getPrefix(), extendedPrivkeyM0hDerived.getPrefix());
-        assertEquals(extendedPrivkeyM0h.getDepth(), extendedPrivkeyM0hDerived.getDepth());
-        assertArrayEquals(extendedPrivkeyM0h.getFingerprint(), extendedPrivkeyM0hDerived.getFingerprint());
-        assertArrayEquals(extendedPrivkeyM0h.getChildNumber(), extendedPrivkeyM0hDerived.getChildNumber());
-        assertArrayEquals(extendedPrivkeyM0h.getChainCode(), extendedPrivkeyM0hDerived.getChainCode());
-        assertArrayEquals(extendedPrivkeyM0h.getKey(), extendedPrivkeyM0hDerived.getKey());
+        var k1 = ExtendedKey.parse("xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi");
+        var k2 = k1.derive(0, true, false);
+        var k3 = ExtendedKey.parse("xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7");
+        compareExtendedKeys(k3, k2);
     }
 
     @Test
     void bip32_vector1_m_derive_privkey_neutral() {
-        var extendedPrivkeyM = ExtendedKey.parse("xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi");
-        var extendedPubkeyM0hDerived = extendedPrivkeyM.derive(0, true, true);
-        var extendedPubkeyM0h = ExtendedKey.parse("xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw");
-        assertArrayEquals(extendedPubkeyM0h.getPrefix(), extendedPubkeyM0hDerived.getPrefix());
-        assertEquals(extendedPubkeyM0h.getDepth(), extendedPubkeyM0hDerived.getDepth());
-        assertArrayEquals(extendedPubkeyM0h.getFingerprint(), extendedPubkeyM0hDerived.getFingerprint());
-        assertArrayEquals(extendedPubkeyM0h.getChildNumber(), extendedPubkeyM0hDerived.getChildNumber());
-        assertArrayEquals(extendedPubkeyM0h.getChainCode(), extendedPubkeyM0hDerived.getChainCode());
-        assertEquals(Hex.parse(extendedPubkeyM0h.getKey()), Hex.parse(extendedPubkeyM0hDerived.getKey()));
+        var k1 = ExtendedKey.parse("xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi");
+        var k2 = k1.derive(0, true, true);
+        var k3 = ExtendedKey.parse("xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw");
+        compareExtendedKeys(k3, k2);
     }
 
     @Test
@@ -67,28 +57,18 @@ class ExtendedKeyTest {
 
     @Test
     void bip32_vector1_m_0h_derive_privkey() {
-        var extendedPrivkeyM0h = ExtendedKey.parse("xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7");
-        var extendedPrivkeyM0h1Derived = extendedPrivkeyM0h.derive(1);
-        var extendedPrivkeyM0h1 = ExtendedKey.parse("xprv9wTYmMFdV23N2TdNG573QoEsfRrWKQgWeibmLntzniatZvR9BmLnvSxqu53Kw1UmYPxLgboyZQaXwTCg8MSY3H2EU4pWcQDnRnrVA1xe8fs");
-        assertArrayEquals(extendedPrivkeyM0h1.getPrefix(), extendedPrivkeyM0h1Derived.getPrefix());
-        assertEquals(extendedPrivkeyM0h1.getDepth(), extendedPrivkeyM0h1Derived.getDepth());
-        assertArrayEquals(extendedPrivkeyM0h1.getFingerprint(), extendedPrivkeyM0h1Derived.getFingerprint());
-        assertArrayEquals(extendedPrivkeyM0h1.getChildNumber(), extendedPrivkeyM0h1Derived.getChildNumber());
-        assertArrayEquals(extendedPrivkeyM0h1.getChainCode(), extendedPrivkeyM0h1Derived.getChainCode());
-        assertArrayEquals(extendedPrivkeyM0h1.getKey(), extendedPrivkeyM0h1Derived.getKey());
+        var k1 = ExtendedKey.parse("xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7");
+        var k2 = k1.derive(1);
+        var k3 = ExtendedKey.parse("xprv9wTYmMFdV23N2TdNG573QoEsfRrWKQgWeibmLntzniatZvR9BmLnvSxqu53Kw1UmYPxLgboyZQaXwTCg8MSY3H2EU4pWcQDnRnrVA1xe8fs");
+        compareExtendedKeys(k3, k2);
     }
 
     @Test
     void bip32_vector1_m_0h_derive_pubkey() {
-        var extendedPubkeyM0h = ExtendedKey.parse("xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw");
-        var extendedPubkeyM0h1Derived = extendedPubkeyM0h.derive(1);
-        var extendedPubkeyM0h1 = ExtendedKey.parse("xpub6ASuArnXKPbfEwhqN6e3mwBcDTgzisQN1wXN9BJcM47sSikHjJf3UFHKkNAWbWMiGj7Wf5uMash7SyYq527Hqck2AxYysAA7xmALppuCkwQ");
-        assertArrayEquals(extendedPubkeyM0h1.getPrefix(), extendedPubkeyM0h1Derived.getPrefix());
-        assertEquals(extendedPubkeyM0h1.getDepth(), extendedPubkeyM0h1Derived.getDepth());
-        assertArrayEquals(extendedPubkeyM0h1.getFingerprint(), extendedPubkeyM0h1Derived.getFingerprint());
-        assertArrayEquals(extendedPubkeyM0h1.getChildNumber(), extendedPubkeyM0h1Derived.getChildNumber());
-        assertArrayEquals(extendedPubkeyM0h1.getChainCode(), extendedPubkeyM0h1Derived.getChainCode());
-        assertArrayEquals(extendedPubkeyM0h1.getKey(), extendedPubkeyM0h1Derived.getKey());
+        var k1 = ExtendedKey.parse("xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw");
+        var k2 = k1.derive(1);
+        var k3 = ExtendedKey.parse("xpub6ASuArnXKPbfEwhqN6e3mwBcDTgzisQN1wXN9BJcM47sSikHjJf3UFHKkNAWbWMiGj7Wf5uMash7SyYq527Hqck2AxYysAA7xmALppuCkwQ");
+        compareExtendedKeys(k3, k2);
     }
 
     @Test
@@ -107,6 +87,99 @@ class ExtendedKeyTest {
     }
 
     @Test
+    void bip32_vector1_m_0h_1_derive_privkey() {
+        var k1 = ExtendedKey.parse("xprv9wTYmMFdV23N2TdNG573QoEsfRrWKQgWeibmLntzniatZvR9BmLnvSxqu53Kw1UmYPxLgboyZQaXwTCg8MSY3H2EU4pWcQDnRnrVA1xe8fs");
+        var k2 = k1.derive(2, true, false);
+        var k3 = ExtendedKey.parse("xprv9z4pot5VBttmtdRTWfWQmoH1taj2axGVzFqSb8C9xaxKymcFzXBDptWmT7FwuEzG3ryjH4ktypQSAewRiNMjANTtpgP4mLTj34bhnZX7UiM");
+        compareExtendedKeys(k3, k2);
+    }
+
+    @Test
+    void bip32_vector1_m_0h_1_derive_privkey_neutral() {
+        var k1 = ExtendedKey.parse("xprv9wTYmMFdV23N2TdNG573QoEsfRrWKQgWeibmLntzniatZvR9BmLnvSxqu53Kw1UmYPxLgboyZQaXwTCg8MSY3H2EU4pWcQDnRnrVA1xe8fs");
+        var k2 = k1.derive(2, true, true);
+        var k3 = ExtendedKey.parse("xpub6D4BDPcP2GT577Vvch3R8wDkScZWzQzMMUm3PWbmWvVJrZwQY4VUNgqFJPMM3No2dFDFGTsxxpG5uJh7n7epu4trkrX7x7DogT5Uv6fcLW5");
+        compareExtendedKeys(k3, k2);
+    }
+
+    @Test
+    void bip32_vector1_m_0h_1_2h() {
+        var extendedPrivkey = ExtendedKey.parse("xprv9z4pot5VBttmtdRTWfWQmoH1taj2axGVzFqSb8C9xaxKymcFzXBDptWmT7FwuEzG3ryjH4ktypQSAewRiNMjANTtpgP4mLTj34bhnZX7UiM");
+        assertArrayEquals(ExtendedKey.PREFIX_XPRV.toBytes(), extendedPrivkey.getPrefix());
+        assertEquals(3, extendedPrivkey.getDepth());
+        var privkey = PrivateKey.parse(extendedPrivkey.getKey());
+
+        var extendedPubkey = ExtendedKey.parse("xpub6D4BDPcP2GT577Vvch3R8wDkScZWzQzMMUm3PWbmWvVJrZwQY4VUNgqFJPMM3No2dFDFGTsxxpG5uJh7n7epu4trkrX7x7DogT5Uv6fcLW5");
+        assertArrayEquals(ExtendedKey.PREFIX_XPUB.toBytes(), extendedPubkey.getPrefix());
+        assertEquals(3, extendedPubkey.getDepth());
+        var pubkey = S256Point.parse(extendedPubkey.getKey());
+
+        assertTrue(pubkey.eq(privkey.getPoint()));
+    }
+
+    @Test
+    void bip32_vector1_m_0h_1_2h_derive_privkey() {
+        var k1 = ExtendedKey.parse("xprv9z4pot5VBttmtdRTWfWQmoH1taj2axGVzFqSb8C9xaxKymcFzXBDptWmT7FwuEzG3ryjH4ktypQSAewRiNMjANTtpgP4mLTj34bhnZX7UiM");
+        var k2 = k1.derive(2);
+        var k3 = ExtendedKey.parse("xprvA2JDeKCSNNZky6uBCviVfJSKyQ1mDYahRjijr5idH2WwLsEd4Hsb2Tyh8RfQMuPh7f7RtyzTtdrbdqqsunu5Mm3wDvUAKRHSC34sJ7in334");
+        compareExtendedKeys(k3, k2);
+    }
+
+    @Test
+    void bip32_vector1_m_0h_1_2h_derive_pubkey() {
+        var k1 = ExtendedKey.parse("xpub6D4BDPcP2GT577Vvch3R8wDkScZWzQzMMUm3PWbmWvVJrZwQY4VUNgqFJPMM3No2dFDFGTsxxpG5uJh7n7epu4trkrX7x7DogT5Uv6fcLW5");
+        var k2 = k1.derive(2);
+        var k3 = ExtendedKey.parse("xpub6FHa3pjLCk84BayeJxFW2SP4XRrFd1JYnxeLeU8EqN3vDfZmbqBqaGJAyiLjTAwm6ZLRQUMv1ZACTj37sR62cfN7fe5JnJ7dh8zL4fiyLHV");
+        compareExtendedKeys(k3, k2);
+    }
+
+    @Test
+    void bip32_vector1_m_0h_1_2h_2() {
+        var extendedPrivkey = ExtendedKey.parse("xprvA2JDeKCSNNZky6uBCviVfJSKyQ1mDYahRjijr5idH2WwLsEd4Hsb2Tyh8RfQMuPh7f7RtyzTtdrbdqqsunu5Mm3wDvUAKRHSC34sJ7in334");
+        assertArrayEquals(ExtendedKey.PREFIX_XPRV.toBytes(), extendedPrivkey.getPrefix());
+        assertEquals(4, extendedPrivkey.getDepth());
+        var privkey = PrivateKey.parse(extendedPrivkey.getKey());
+
+        var extendedPubkey = ExtendedKey.parse("xpub6FHa3pjLCk84BayeJxFW2SP4XRrFd1JYnxeLeU8EqN3vDfZmbqBqaGJAyiLjTAwm6ZLRQUMv1ZACTj37sR62cfN7fe5JnJ7dh8zL4fiyLHV");
+        assertArrayEquals(ExtendedKey.PREFIX_XPUB.toBytes(), extendedPubkey.getPrefix());
+        assertEquals(4, extendedPubkey.getDepth());
+        var pubkey = S256Point.parse(extendedPubkey.getKey());
+
+        assertTrue(pubkey.eq(privkey.getPoint()));
+    }
+
+    @Test
+    void bip32_vector1_m_0h_1_2h_2_derive_privkey() {
+        var k1 = ExtendedKey.parse("xprvA2JDeKCSNNZky6uBCviVfJSKyQ1mDYahRjijr5idH2WwLsEd4Hsb2Tyh8RfQMuPh7f7RtyzTtdrbdqqsunu5Mm3wDvUAKRHSC34sJ7in334");
+        var k2 = k1.derive(1000000000);
+        var k3 = ExtendedKey.parse("xprvA41z7zogVVwxVSgdKUHDy1SKmdb533PjDz7J6N6mV6uS3ze1ai8FHa8kmHScGpWmj4WggLyQjgPie1rFSruoUihUZREPSL39UNdE3BBDu76");
+        compareExtendedKeys(k3, k2);
+    }
+
+    @Test
+    void bip32_vector1_m_0h_1_2h_2_derive_pubkey() {
+        var k1 = ExtendedKey.parse("xpub6FHa3pjLCk84BayeJxFW2SP4XRrFd1JYnxeLeU8EqN3vDfZmbqBqaGJAyiLjTAwm6ZLRQUMv1ZACTj37sR62cfN7fe5JnJ7dh8zL4fiyLHV");
+        var k2 = k1.derive(1000000000);
+        var k3 = ExtendedKey.parse("xpub6H1LXWLaKsWFhvm6RVpEL9P4KfRZSW7abD2ttkWP3SSQvnyA8FSVqNTEcYFgJS2UaFcxupHiYkro49S8yGasTvXEYBVPamhGW6cFJodrTHy");
+        compareExtendedKeys(k3, k2);
+    }
+
+    @Test
+    void bip32_vector1_m_0h_1_2h_2_1000000000() {
+        var extendedPrivkey = ExtendedKey.parse("xprvA41z7zogVVwxVSgdKUHDy1SKmdb533PjDz7J6N6mV6uS3ze1ai8FHa8kmHScGpWmj4WggLyQjgPie1rFSruoUihUZREPSL39UNdE3BBDu76");
+        assertArrayEquals(ExtendedKey.PREFIX_XPRV.toBytes(), extendedPrivkey.getPrefix());
+        assertEquals(5, extendedPrivkey.getDepth());
+        var privkey = PrivateKey.parse(extendedPrivkey.getKey());
+
+        var extendedPubkey = ExtendedKey.parse("xpub6H1LXWLaKsWFhvm6RVpEL9P4KfRZSW7abD2ttkWP3SSQvnyA8FSVqNTEcYFgJS2UaFcxupHiYkro49S8yGasTvXEYBVPamhGW6cFJodrTHy");
+        assertArrayEquals(ExtendedKey.PREFIX_XPUB.toBytes(), extendedPubkey.getPrefix());
+        assertEquals(5, extendedPubkey.getDepth());
+        var pubkey = S256Point.parse(extendedPubkey.getKey());
+
+        assertTrue(pubkey.eq(privkey.getPoint()));
+    }
+
+    @Test
     void bip84_m() {
         var extendedPrivkey = ExtendedKey.parse("zprvAWgYBBk7JR8Gjrh4UJQ2uJdG1r3WNRRfURiABBE3RvMXYSrRJL62XuezvGdPvG6GFBZduosCc1YP5wixPox7zhZLfiUm8aunE96BBa4Kei5");
         assertArrayEquals(ExtendedKey.PREFIX_ZPRV.toBytes(), extendedPrivkey.getPrefix());
@@ -119,6 +192,26 @@ class ExtendedKeyTest {
         var pubkey = S256Point.parse(extendedPubkey.getKey());
 
         assertTrue(pubkey.eq(privkey.getPoint()));
+    }
+
+    @Test
+    void bip84_m_derive_privkey() {
+        var k1 = ExtendedKey.parse("zprvAWgYBBk7JR8Gjrh4UJQ2uJdG1r3WNRRfURiABBE3RvMXYSrRJL62XuezvGdPvG6GFBZduosCc1YP5wixPox7zhZLfiUm8aunE96BBa4Kei5");
+        var k2 = k1.derive(84, true, false)
+                .derive(0, true, false)
+                .derive(0, true, false);
+        var k3 = ExtendedKey.parse("zprvAdG4iTXWBoARxkkzNpNh8r6Qag3irQB8PzEMkAFeTRXxHpbF9z4QgEvBRmfvqWvGp42t42nvgGpNgYSJA9iefm1yYNZKEm7z6qUWCroSQnE");
+        compareExtendedKeys(k3, k2);
+    }
+
+    @Test
+    void bip84_m_derive_privkey_neutral() {
+        var k1 = ExtendedKey.parse("zprvAWgYBBk7JR8Gjrh4UJQ2uJdG1r3WNRRfURiABBE3RvMXYSrRJL62XuezvGdPvG6GFBZduosCc1YP5wixPox7zhZLfiUm8aunE96BBa4Kei5");
+        var k2 = k1.derive(84, true, false)
+                .derive(0, true, false)
+                .derive(0, true, true);
+        var k3 = ExtendedKey.parse("zpub6rFR7y4Q2AijBEqTUquhVz398htDFrtymD9xYYfG1m4wAcvPhXNfE3EfH1r1ADqtfSdVCToUG868RvUUkgDKf31mGDtKsAYz2oz2AGutZYs");
+        compareExtendedKeys(k3, k2);
     }
 
     @Test
@@ -212,5 +305,14 @@ class ExtendedKeyTest {
         var address = Address.parse("bc1q8c6fshw2dlwun7ekn9qwf37cu2rn755upcp6el");
         assertArrayEquals(address.hash160(), pubkey.hash160(true));
         assertEquals(address.address(), pubkey.addressBech32P2wpkh(false));
+    }
+
+    private static void compareExtendedKeys(ExtendedKey k3, ExtendedKey k2) {
+        assertArrayEquals(k3.getPrefix(), k2.getPrefix());
+        assertEquals(k3.getDepth(), k2.getDepth());
+        assertArrayEquals(k3.getFingerprint(), k2.getFingerprint());
+        assertArrayEquals(k3.getChildNumber(), k2.getChildNumber());
+        assertArrayEquals(k3.getChainCode(), k2.getChainCode());
+        assertArrayEquals(k3.getKey(), k2.getKey());
     }
 }
