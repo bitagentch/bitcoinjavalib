@@ -4,7 +4,7 @@ import ch.bitagent.bitcoin.lib.ecc.Hex;
 import ch.bitagent.bitcoin.lib.ecc.Int;
 import ch.bitagent.bitcoin.lib.ecc.PrivateKey;
 import ch.bitagent.bitcoin.lib.helper.Bytes;
-import ch.bitagent.bitcoin.lib.helper.Helper;
+import ch.bitagent.bitcoin.lib.helper.Hash;
 import ch.bitagent.bitcoin.lib.helper.Varint;
 import ch.bitagent.bitcoin.lib.network.Message;
 import ch.bitagent.bitcoin.lib.script.OpCodeNames;
@@ -26,10 +26,14 @@ public class Tx implements Message {
 
     private static final Logger log = Logger.getLogger(Tx.class.getSimpleName());
 
-    /** Constant <code>COMMAND="tx"</code> */
+    /**
+     * Constant <code>COMMAND="tx"</code>
+     */
     public static final String COMMAND = "tx";
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public byte[] getCommand() {
         return COMMAND.getBytes();
@@ -48,12 +52,12 @@ public class Tx implements Message {
     /**
      * <p>Constructor for Tx.</p>
      *
-     * @param version a {@link ch.bitagent.bitcoin.lib.ecc.Int} object
-     * @param txIns a {@link java.util.List} object
-     * @param txOuts a {@link java.util.List} object
+     * @param version  a {@link ch.bitagent.bitcoin.lib.ecc.Int} object
+     * @param txIns    a {@link java.util.List} object
+     * @param txOuts   a {@link java.util.List} object
      * @param locktime a {@link ch.bitagent.bitcoin.lib.ecc.Int} object
-     * @param testnet a {@link java.lang.Boolean} object
-     * @param segwit a {@link java.lang.Boolean} object
+     * @param testnet  a {@link java.lang.Boolean} object
+     * @param segwit   a {@link java.lang.Boolean} object
      */
     public Tx(Int version, List<TxIn> txIns, List<TxOut> txOuts, Int locktime, Boolean testnet, Boolean segwit) {
         this.version = version;
@@ -79,13 +83,13 @@ public class Tx implements Message {
      * @return an array of {@link byte} objects
      */
     public byte[] hash() {
-        return Bytes.changeOrder(Helper.hash256(this.serializeLegacy()));
+        return Bytes.changeOrder(Hash.hash256(this.serializeLegacy()));
     }
 
     /**
      * <p>parse.</p>
      *
-     * @param stream a {@link java.io.ByteArrayInputStream} object
+     * @param stream  a {@link java.io.ByteArrayInputStream} object
      * @param testnet a {@link java.lang.Boolean} object
      * @return a {@link ch.bitagent.bitcoin.lib.tx.Tx} object
      */
@@ -123,7 +127,7 @@ public class Tx implements Message {
             txOuts.add(TxOut.parse(stream));
         }
         // locktime is an integer in 4 bytes, little-endian
-        var locktime = Hex.parse(Bytes.changeOrder(Bytes.read(stream,4)));
+        var locktime = Hex.parse(Bytes.changeOrder(Bytes.read(stream, 4)));
         // return an instance of the class (see __init__ for args)
         return new Tx(version, txIns, txOuts, locktime, testnet, false);
     }
@@ -264,7 +268,7 @@ public class Tx implements Message {
     /**
      * Returns the integer representation of the hash that needs to get signed for index input_index
      *
-     * @param inputIndex a int
+     * @param inputIndex   a int
      * @param redeemScript a {@link ch.bitagent.bitcoin.lib.script.Script} object
      * @return a {@link ch.bitagent.bitcoin.lib.ecc.Int} object
      */
@@ -303,9 +307,9 @@ public class Tx implements Message {
         // add the locktime using int_to_little_endian in 4 bytes
         stream.writeBytes(this.locktime.toBytesLittleEndian(4));
         // add SIGHASH_ALL using int_to_little_endian in 4 bytes
-        stream.writeBytes(Helper.SIGHASH_ALL.toBytesLittleEndian(4));
+        stream.writeBytes(Hash.SIGHASH_ALL.toBytesLittleEndian(4));
         // hash256 the serialization
-        var h256 = Helper.hash256(stream.toByteArray());
+        var h256 = Hash.hash256(stream.toByteArray());
         // convert the result to an integer using int.from_bytes(x, 'big')
         return Hex.parse(h256);
     }
@@ -318,8 +322,8 @@ public class Tx implements Message {
                 allPrevouts = Bytes.add(new byte[][]{allPrevouts, txIn.getPrevTx().toBytesLittleEndian(), txIn.getPrevIndex().toBytesLittleEndian(4)});
                 allSequence = Bytes.add(allSequence, txIn.getSequence().toBytesLittleEndian(4));
             }
-            this._hashPrevouts = Helper.hash256(allPrevouts);
-            this._hashSequence = Helper.hash256(allSequence);
+            this._hashPrevouts = Hash.hash256(allPrevouts);
+            this._hashSequence = Hash.hash256(allSequence);
         }
         return this._hashPrevouts;
     }
@@ -338,7 +342,7 @@ public class Tx implements Message {
             for (TxOut txOut : this.txOuts) {
                 allOutputs = Bytes.add(allOutputs, txOut.serialize());
             }
-            this._hashOutputs = Helper.hash256(allOutputs);
+            this._hashOutputs = Hash.hash256(allOutputs);
         }
         return this._hashOutputs;
     }
@@ -346,8 +350,8 @@ public class Tx implements Message {
     /**
      * Returns the integer representation of the hash that needs to get signed for index input_index
      *
-     * @param inputIndex a int
-     * @param redeemScript a {@link ch.bitagent.bitcoin.lib.script.Script} object
+     * @param inputIndex    a int
+     * @param redeemScript  a {@link ch.bitagent.bitcoin.lib.script.Script} object
      * @param witnessScript a {@link ch.bitagent.bitcoin.lib.script.Script} object
      * @return a {@link ch.bitagent.bitcoin.lib.ecc.Int} object
      */
@@ -373,8 +377,8 @@ public class Tx implements Message {
         stream.writeBytes(txIn.getSequence().toBytesLittleEndian(4));
         stream.writeBytes(this.hashOutputs());
         stream.writeBytes(this.locktime.toBytesLittleEndian(4));
-        stream.writeBytes(Helper.SIGHASH_ALL.toBytesLittleEndian(4));
-        return Hex.parse(Helper.hash256(stream.toByteArray()));
+        stream.writeBytes(Hash.SIGHASH_ALL.toBytesLittleEndian(4));
+        return Hex.parse(Hash.hash256(stream.toByteArray()));
     }
 
     /**
@@ -445,7 +449,7 @@ public class Tx implements Message {
         }
         // check that each input has a valid ScriptSig
         for (int i = 0; i < this.txIns.size(); i++) {
-            log.info(String.format("txin %s/%s", i+1, this.txIns.size()));
+            log.info(String.format("txin %s/%s", i + 1, this.txIns.size()));
             if (!this.verifyInput(i)) {
                 log.warning(String.format("TxIn has no valid signature - %s", this.txIns.get(i)));
                 return false;
@@ -467,7 +471,7 @@ public class Tx implements Message {
         // get der signature of z from private key
         var der = privateKey.sign(z).der();
         // append the SIGHASH_ALL to der
-        var sig = Bytes.add(der, Helper.SIGHASH_ALL.toBytes(1));
+        var sig = Bytes.add(der, Hash.SIGHASH_ALL.toBytes(1));
         // calculate the sec
         var sec = privateKey.getPoint().sec(null);
         // initialize a new script with [sig, sec] as the cmds
@@ -518,7 +522,9 @@ public class Tx implements Message {
         return Hex.parse(Bytes.changeOrder(firstCmd.getElement()));
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return String.format("tx %s:%s:\n%s:\n%s:%s",

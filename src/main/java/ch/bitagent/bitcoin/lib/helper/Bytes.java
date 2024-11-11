@@ -17,13 +17,24 @@ public class Bytes {
 
     private static final Logger log = Logger.getLogger(Bytes.class.getSimpleName());
 
-    private Bytes() {}
+    /**
+     * Constant <code>TWO_WEEKS</code>
+     */
+    public static final Int TWO_WEEKS = Int.parse(60 * 60 * 24 * 14);
+
+    /**
+     * Constant <code>MAX_TARGET</code>
+     */
+    private static final Int MAX_TARGET = Hex.parse("ffff").mul(Int.parse(256).pow(Hex.parse("1d").sub(Int.parse(3))));
+
+    private Bytes() {
+    }
 
     /**
      * Strip leading
      *
      * @param bytes an array of {@link byte} objects
-     * @param bite a byte
+     * @param bite  a byte
      * @return an array of {@link byte} objects
      */
     public static byte[] lstrip(byte[] bytes, byte bite) {
@@ -38,7 +49,7 @@ public class Bytes {
      * Strip trailing
      *
      * @param bytes an array of {@link byte} objects
-     * @param bite a byte
+     * @param bite  a byte
      * @return an array of {@link byte} objects
      */
     public static byte[] strip(byte[] bytes, byte bite) {
@@ -47,7 +58,7 @@ public class Bytes {
         while (setyb[i] == bite) {
             i++;
         }
-        return Arrays.copyOfRange(bytes, 0, bytes.length-i);
+        return Arrays.copyOfRange(bytes, 0, bytes.length - i);
     }
 
     /**
@@ -117,7 +128,7 @@ public class Bytes {
      * <p>read.</p>
      *
      * @param stream a {@link java.io.ByteArrayInputStream} object
-     * @param len a int
+     * @param len    a int
      * @return an array of {@link byte} objects
      */
     public static byte[] read(ByteArrayInputStream stream, int len) {
@@ -138,7 +149,7 @@ public class Bytes {
         int len = s.length();
         byte[] data = new byte[len / 2];
         for (int i = 0; i < len; i += 2) {
-            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i+1), 16));
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i + 1), 16));
         }
         return data;
     }
@@ -180,9 +191,9 @@ public class Bytes {
     public static Int bitsToTarget(byte[] bits) {
         var bitsLen = bits.length;
         // last byte is exponent
-        var exponent = Hex.parse(Arrays.copyOfRange(bits, bitsLen-1, bitsLen));
+        var exponent = Hex.parse(Arrays.copyOfRange(bits, bitsLen - 1, bitsLen));
         // the first three bytes are the coefficient in little endian
-        var coefficient = Hex.parse(Bytes.changeOrder(Arrays.copyOfRange(bits, 0, bitsLen-1)));
+        var coefficient = Hex.parse(Bytes.changeOrder(Arrays.copyOfRange(bits, 0, bitsLen - 1)));
         // the formula is: coefficient * 256**(exponent-3)
         return coefficient.mul(Int.parse(256).pow(exponent.sub(Int.parse(3))));
     }
@@ -217,24 +228,24 @@ public class Bytes {
     /**
      * Calculates the new bits given a 2016-block time differential and the previous bits
      *
-     * @param previousBits an array of {@link byte} objects
+     * @param previousBits     an array of {@link byte} objects
      * @param timeDifferential a {@link ch.bitagent.bitcoin.lib.ecc.Int} object
      * @return an array of {@link byte} objects
      */
     public static byte[] calculateNewBits(byte[] previousBits, Int timeDifferential) {
         // if the time differential is greater than 8 weeks, set to 8 weeks
-        if (timeDifferential.gt(Helper.TWO_WEEKS.mul(Int.parse(4)))) {
-            timeDifferential = Helper.TWO_WEEKS.mul(Int.parse(4));
+        if (timeDifferential.gt(TWO_WEEKS.mul(Int.parse(4)))) {
+            timeDifferential = TWO_WEEKS.mul(Int.parse(4));
         }
         // if the time differential is less than half a week, set to half a week
-        if (timeDifferential.lt(Helper.TWO_WEEKS.div(Int.parse(4)))) {
-            timeDifferential = Helper.TWO_WEEKS.div(Int.parse(4));
+        if (timeDifferential.lt(TWO_WEEKS.div(Int.parse(4)))) {
+            timeDifferential = TWO_WEEKS.div(Int.parse(4));
         }
         // the new target is the previous target * time differential / two weeks
-        var newTarget = bitsToTarget(previousBits).mul(timeDifferential).div(Helper.TWO_WEEKS);
+        var newTarget = bitsToTarget(previousBits).mul(timeDifferential).div(TWO_WEEKS);
         // if the new target is bigger than MAX_TARGET, set to MAX_TARGET
-        if (newTarget.gt(Helper.MAX_TARGET)) {
-            newTarget = Helper.MAX_TARGET;
+        if (newTarget.gt(MAX_TARGET)) {
+            newTarget = MAX_TARGET;
         }
         // convert the new target to bits
         return targetToBits(newTarget);
@@ -294,13 +305,13 @@ public class Bytes {
      * @return an byte array
      */
     public static byte[] xor(byte[] b0, byte[] b1) {
-        if(b0.length != b1.length)   {
+        if (b0.length != b1.length) {
             return new byte[0];
         }
         byte[] ret = new byte[b0.length];
         int i = 0;
-        for (byte b : b0)   {
-            ret[i] = (byte)(b ^ b1[i]);
+        for (byte b : b0) {
+            ret[i] = (byte) (b ^ b1[i]);
             i++;
         }
         return ret;
@@ -309,9 +320,9 @@ public class Bytes {
     /**
      * <p>log.</p>
      *
-     * @deprecated temp use only
      * @param bytes an array of {@link byte} objects
      * @return an array of {@link byte} objects
+     * @deprecated temp use only
      */
     @Deprecated(since = "0")
     public static byte[] log(byte[] bytes) {

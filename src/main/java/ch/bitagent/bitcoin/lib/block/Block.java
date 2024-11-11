@@ -3,7 +3,7 @@ package ch.bitagent.bitcoin.lib.block;
 import ch.bitagent.bitcoin.lib.ecc.Hex;
 import ch.bitagent.bitcoin.lib.ecc.Int;
 import ch.bitagent.bitcoin.lib.helper.Bytes;
-import ch.bitagent.bitcoin.lib.helper.Helper;
+import ch.bitagent.bitcoin.lib.helper.Hash;
 import ch.bitagent.bitcoin.lib.helper.Merkle;
 
 import java.io.ByteArrayInputStream;
@@ -17,11 +17,17 @@ import java.util.stream.Collectors;
  */
 public class Block {
 
-    /** Constant <code>GENESIS_BLOCK</code> */
+    /**
+     * Constant <code>GENESIS_BLOCK</code>
+     */
     public static final Int GENESIS_BLOCK = Hex.parse("0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c");
-    /** Constant <code>TESTNET_GENESIS_BLOCK</code> */
+    /**
+     * Constant <code>TESTNET_GENESIS_BLOCK</code>
+     */
     public static final Int TESTNET_GENESIS_BLOCK = Hex.parse("0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4adae5494dffff001d1aa4ae18");
-    /** Constant <code>LOWEST_BITS</code> */
+    /**
+     * Constant <code>LOWEST_BITS</code>
+     */
     public static final Int LOWEST_BITS = Hex.parse("ffff001d");
 
     private final Int version;
@@ -35,12 +41,12 @@ public class Block {
     /**
      * <p>Constructor for Block.</p>
      *
-     * @param version a {@link ch.bitagent.bitcoin.lib.ecc.Int} object
-     * @param prevBlock an array of {@link byte} objects
+     * @param version    a {@link ch.bitagent.bitcoin.lib.ecc.Int} object
+     * @param prevBlock  an array of {@link byte} objects
      * @param merkleRoot an array of {@link byte} objects
-     * @param timestamp a {@link ch.bitagent.bitcoin.lib.ecc.Int} object
-     * @param bits an array of {@link byte} objects
-     * @param nonce an array of {@link byte} objects
+     * @param timestamp  a {@link ch.bitagent.bitcoin.lib.ecc.Int} object
+     * @param bits       an array of {@link byte} objects
+     * @param nonce      an array of {@link byte} objects
      */
     public Block(Int version, byte[] prevBlock, byte[] merkleRoot, Int timestamp, byte[] bits, byte[] nonce) {
         this.version = version;
@@ -106,7 +112,7 @@ public class Block {
         // serialize
         var stream = this.serialize();
         // hash256
-        var h256 = Helper.hash256(stream);
+        var h256 = Hash.hash256(stream);
         // reverse
         return Bytes.changeOrder(h256);
     }
@@ -172,7 +178,7 @@ public class Block {
      */
     public Int proof() {
         // get the hash256 of the serialization of this block
-        var h256 = Helper.hash256(this.serialize());
+        var h256 = Hash.hash256(this.serialize());
         // interpret this hash as a little-endian number
         return Hex.parse(Bytes.changeOrder(h256));
     }

@@ -3,7 +3,7 @@ package ch.bitagent.bitcoin.lib.network;
 import ch.bitagent.bitcoin.lib.ecc.Hex;
 import ch.bitagent.bitcoin.lib.ecc.Int;
 import ch.bitagent.bitcoin.lib.helper.Bytes;
-import ch.bitagent.bitcoin.lib.helper.Helper;
+import ch.bitagent.bitcoin.lib.helper.Hash;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -60,7 +60,7 @@ public class NetworkEnvelope {
     /**
      * Takes a stream and creates a NetworkEnvelope
      *
-     * @param stream a {@link java.io.ByteArrayInputStream} object
+     * @param stream  a {@link java.io.ByteArrayInputStream} object
      * @param testnet a {@link java.lang.Boolean} object
      * @return a {@link ch.bitagent.bitcoin.lib.network.NetworkEnvelope} object
      */
@@ -89,7 +89,7 @@ public class NetworkEnvelope {
         // payload is of length payload_length
         var payload = Bytes.read(stream, payloadLength.intValue());
         // verify checksum
-        var calculatedChecksum = Arrays.copyOfRange(Helper.hash256(payload), 0, 4);
+        var calculatedChecksum = Arrays.copyOfRange(Hash.hash256(payload), 0, 4);
         if (Arrays.compare(calculatedChecksum, checksum) != 0) {
             throw new IllegalArgumentException(String.format("checksum does not match - expected %s - calculated %s - payload length %s", Hex.parse(checksum), Hex.parse(calculatedChecksum), payload.length));
         } else {
@@ -110,12 +110,12 @@ public class NetworkEnvelope {
         result.writeBytes(this.magic);
         // command 12 bytes
         // fill with 0's
-        var commandFiller = Bytes.initFill(12-this.command.length, (byte) 0x00);
+        var commandFiller = Bytes.initFill(12 - this.command.length, (byte) 0x00);
         result.writeBytes(Bytes.add(this.command, commandFiller));
         // payload length 4 bytes, little endian
         result.writeBytes(Int.parse(this.payload.length).toBytesLittleEndian(4));
         // checksum 4 bytes, first four of hash256 of payload
-        result.writeBytes(Arrays.copyOfRange(Helper.hash256(this.payload), 0, 4));
+        result.writeBytes(Arrays.copyOfRange(Hash.hash256(this.payload), 0, 4));
         // payload
         result.writeBytes(this.payload);
         return result.toByteArray();
@@ -131,7 +131,9 @@ public class NetworkEnvelope {
         return Arrays.equals(this.command, command.getBytes());
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return "NetworkEnvelope{" +

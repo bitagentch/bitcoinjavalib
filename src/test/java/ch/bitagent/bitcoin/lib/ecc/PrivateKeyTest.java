@@ -1,5 +1,6 @@
 package ch.bitagent.bitcoin.lib.ecc;
 
+import ch.bitagent.bitcoin.lib.helper.Hash;
 import ch.bitagent.bitcoin.lib.helper.Helper;
 import org.junit.jupiter.api.Test;
 
@@ -10,8 +11,8 @@ class PrivateKeyTest {
 
     @Test
     void sign() {
-        var pk = new PrivateKey(Hex.parse(Helper.hash256("my secret".getBytes())));
-        var z = Hex.parse(Helper.hash256("my message".getBytes()));
+        var pk = new PrivateKey(Hex.parse(Hash.hash256("my secret".getBytes())));
+        var z = Hex.parse(Hash.hash256("my message".getBytes()));
         var sig = pk.sign(z);
         assertTrue(pk.getPoint().verify(z, sig));
 

@@ -5,7 +5,7 @@ import ch.bitagent.bitcoin.lib.ecc.Int;
 import ch.bitagent.bitcoin.lib.ecc.PrivateKey;
 import ch.bitagent.bitcoin.lib.ecc.S256Point;
 import ch.bitagent.bitcoin.lib.helper.Base58;
-import ch.bitagent.bitcoin.lib.helper.Helper;
+import ch.bitagent.bitcoin.lib.helper.Hash;
 
 import java.util.Arrays;
 
@@ -126,7 +126,7 @@ public class ExtendedKey {
             var publicKeyPoint = privateKey.getPoint();
             var derivedFingerprint = Arrays.copyOfRange(publicKeyPoint.hash160(true), 0, 4);
             var derivedChildNumber = indexInt.toBytes(4);
-            var hmac = Helper.hmacS512Init(this.chainCode);
+            var hmac = Hash.hmacS512Init(this.chainCode);
             if (indexInt.ge(HARDENED_INDEX)) {
                 hmac.update(privateKey.getSecret().toBytes());
             } else {
@@ -154,7 +154,7 @@ public class ExtendedKey {
             var publicKey = S256Point.parse(this.key);
             var derivedFingerprint = Arrays.copyOfRange(publicKey.hash160(true), 0, 4);
             var derivedChildNumber = indexInt.toBytes(4);
-            var hmac = Helper.hmacS512Init(this.chainCode);
+            var hmac = Hash.hmacS512Init(this.chainCode);
             var publicKeySec = publicKey.sec(true);
             hmac.update(publicKeySec);
             hmac.update(indexInt.toBytes(4));

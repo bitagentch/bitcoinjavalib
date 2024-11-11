@@ -1,9 +1,10 @@
 # release notes
 
 ## snapshot
-- package wallet
+- wallet
 - extended key
-- refactoring address util to package wallet as address (breaking change)
+- refactoring address (breaking change)
+- refactoring hash (breaking change)
 
 ## 0.0.5
 - schnorr

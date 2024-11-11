@@ -11,7 +11,8 @@ public class Merkle {
 
     private static final Logger log = Logger.getLogger(Merkle.class.getSimpleName());
 
-    private Merkle() {}
+    private Merkle() {
+    }
 
     /**
      * Takes the binary hashes and calculates the hash256
@@ -22,7 +23,7 @@ public class Merkle {
      */
     public static byte[] merkleParent(byte[] hash0, byte[] hash1) {
         // return the hash256 of hash1 + hash2
-        return Helper.hash256(Bytes.add(hash0, hash1));
+        return Hash.hash256(Bytes.add(hash0, hash1));
     }
 
     /**
@@ -46,9 +47,9 @@ public class Merkle {
         // initialize next level
         var parentLevel = new ArrayList<byte[]>();
         // loop over every pair (use: for i in range(0, len(hashes), 2))
-        for (int i = 0; i < hashes.size(); i=i+2) {
+        for (int i = 0; i < hashes.size(); i = i + 2) {
             // get the merkle parent of the hashes at index i and i+1
-            var parent = merkleParent(hashes.get(i), hashes.get(i+1));
+            var parent = merkleParent(hashes.get(i), hashes.get(i + 1));
             // append parent to parent level
             parentLevel.add(parent);
         }

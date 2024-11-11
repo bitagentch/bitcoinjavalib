@@ -14,7 +14,8 @@ public class Base58 {
 
     private static final String BASE58_ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
-    private Base58() {}
+    private Base58() {
+    }
 
     /**
      * <p>encode.</p>
@@ -50,7 +51,7 @@ public class Base58 {
      * @return a {@link java.lang.String} object
      */
     public static String encodeChecksum(byte[] b) {
-        return Base58.encode(Bytes.add(b, Arrays.copyOfRange(Helper.hash256(b), 0, 4)));
+        return Base58.encode(Bytes.add(b, Arrays.copyOfRange(Hash.hash256(b), 0, 4)));
     }
 
     /**
@@ -82,7 +83,7 @@ public class Base58 {
     /**
      * decodeWif
      *
-     * @param wif .
+     * @param wif        .
      * @param compressed .
      * @return .
      */
@@ -107,7 +108,7 @@ public class Base58 {
     private static void compareChecksum(byte[] combined) {
         var checksum = Arrays.copyOfRange(combined, combined.length - 4, combined.length);
         var hashInput = Arrays.copyOfRange(combined, 0, combined.length - 4);
-        var hash = Helper.hash256(hashInput);
+        var hash = Hash.hash256(hashInput);
         var hashChecksum = Arrays.copyOfRange(hash, 0, 4);
         if (Arrays.compare(hashChecksum, checksum) != 0) {
             throw new IllegalStateException(String.format("bad checksum %h %h", checksum, hashChecksum));
@@ -117,7 +118,7 @@ public class Base58 {
     /**
      * <p>h160toP2pkhAddress.</p>
      *
-     * @param h160 an array of {@link byte} objects
+     * @param h160    an array of {@link byte} objects
      * @param testnet a {@link java.lang.Boolean} object
      * @return a {@link java.lang.String} object
      */
@@ -135,7 +136,7 @@ public class Base58 {
     /**
      * <p>h160toP2shAddress.</p>
      *
-     * @param h160 an array of {@link byte} objects
+     * @param h160    an array of {@link byte} objects
      * @param testnet a {@link java.lang.Boolean} object
      * @return a {@link java.lang.String} object
      */

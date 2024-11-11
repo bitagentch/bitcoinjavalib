@@ -2,7 +2,7 @@ package ch.bitagent.bitcoin.lib.ecc;
 
 import ch.bitagent.bitcoin.lib.helper.Base58;
 import ch.bitagent.bitcoin.lib.helper.Bytes;
-import ch.bitagent.bitcoin.lib.helper.Helper;
+import ch.bitagent.bitcoin.lib.helper.Hash;
 
 import javax.crypto.Mac;
 import java.util.Arrays;
@@ -73,27 +73,27 @@ public class PrivateKey {
             zBytes = z.sub(S256Point.N).toBytes(32);
         }
 
-        Mac hmac = Helper.hmacS256Init(k);
+        Mac hmac = Hash.hmacS256Init(k);
         hmac.update(v);
         hmac.update(new byte[]{0x00});
         hmac.update(secretBytes);
         k = hmac.doFinal(zBytes);
 
-        hmac = Helper.hmacS256Init(k);
+        hmac = Hash.hmacS256Init(k);
         v = hmac.doFinal(v);
 
-        hmac = Helper.hmacS256Init(k);
+        hmac = Hash.hmacS256Init(k);
         hmac.update(v);
         hmac.update(new byte[]{0x01});
         hmac.update(secretBytes);
         k = hmac.doFinal(zBytes);
 
-        hmac = Helper.hmacS256Init(k);
+        hmac = Hash.hmacS256Init(k);
         v = hmac.doFinal(v);
 
         var one = Int.parse(1);
         while (true) {
-            hmac = Helper.hmacS256Init(k);
+            hmac = Hash.hmacS256Init(k);
             v = hmac.doFinal(v);
 
             var candidate = Hex.parse(v);
@@ -101,11 +101,11 @@ public class PrivateKey {
                 return candidate;
             }
 
-            hmac = Helper.hmacS256Init(k);
+            hmac = Hash.hmacS256Init(k);
             hmac.update(v);
             k = hmac.doFinal(new byte[]{0x00});
 
-            hmac = Helper.hmacS256Init(k);
+            hmac = Hash.hmacS256Init(k);
             v = hmac.doFinal(v);
         }
     }
@@ -114,7 +114,7 @@ public class PrivateKey {
      * <p>wif.</p>
      *
      * @param compressed a boolean
-     * @param testnet a boolean
+     * @param testnet    a boolean
      * @return a {@link java.lang.String} object
      */
     public String wif(boolean compressed, boolean testnet) {
@@ -135,9 +135,9 @@ public class PrivateKey {
     /**
      * parseWif
      *
-     * @param wif .
+     * @param wif        .
      * @param compressed .
-     * @param testnet .
+     * @param testnet    .
      * @return .
      */
     public static PrivateKey parseWif(String wif, boolean compressed, boolean testnet) {

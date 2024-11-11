@@ -1,7 +1,7 @@
 package ch.bitagent.bitcoin.lib.chapter;
 
 import ch.bitagent.bitcoin.lib.ecc.*;
-import ch.bitagent.bitcoin.lib.helper.Helper;
+import ch.bitagent.bitcoin.lib.helper.Hash;
 import org.junit.jupiter.api.Test;
 
 import java.util.logging.Logger;
@@ -242,8 +242,8 @@ class Chapter3Test {
 
     @Test
     void example10CreateSig() {
-        var e = Hex.parse(Helper.hash256("my secret".getBytes()));
-        var z = Hex.parse(Helper.hash256("my message".getBytes()));
+        var e = Hex.parse(Hash.hash256("my secret".getBytes()));
+        var z = Hex.parse(Hash.hash256("my message".getBytes()));
         log.fine(String.format("z %s", z));
         assertEquals("0231c6f3d980a6b0fb7152f85cee7eb52bf92433d9919b9c5218cb08e79cce78", z.toString());
 
@@ -266,7 +266,7 @@ class Chapter3Test {
     @Test
     void exercise7() {
         var e = Int.parse(12345);
-        var z = Hex.parse(Helper.hash256("Programming Bitcoin!".getBytes()));
+        var z = Hex.parse(Hash.hash256("Programming Bitcoin!".getBytes()));
         log.fine(String.format("z %s", z));
         assertEquals("969f6056aa26f7d2795fd013fe88868d09c9f6aed96965016e1936ae47060d48", z.toString());
 

@@ -3,7 +3,7 @@ package ch.bitagent.bitcoin.lib.ecc;
 import ch.bitagent.bitcoin.lib.helper.Base58;
 import ch.bitagent.bitcoin.lib.helper.Bech32;
 import ch.bitagent.bitcoin.lib.helper.Bytes;
-import ch.bitagent.bitcoin.lib.helper.Helper;
+import ch.bitagent.bitcoin.lib.helper.Hash;
 import ch.bitagent.bitcoin.lib.script.OpCodeNames;
 import ch.bitagent.bitcoin.lib.script.Script;
 import ch.bitagent.bitcoin.lib.script.ScriptCmd;
@@ -125,7 +125,7 @@ public class S256Point extends Point {
      * @return an array of {@link byte} objects
      */
     public byte[] hash160(Boolean compressed) {
-        return Helper.hash160(this.sec(compressed));
+        return Hash.hash160(this.sec(compressed));
     }
 
     /**

@@ -3,6 +3,7 @@ package ch.bitagent.bitcoin.lib.chapter;
 import ch.bitagent.bitcoin.lib.ecc.*;
 import ch.bitagent.bitcoin.lib.helper.Base58;
 import ch.bitagent.bitcoin.lib.helper.Bytes;
+import ch.bitagent.bitcoin.lib.helper.Hash;
 import ch.bitagent.bitcoin.lib.helper.Helper;
 import ch.bitagent.bitcoin.lib.script.Script;
 import ch.bitagent.bitcoin.lib.script.ScriptCmd;
@@ -45,7 +46,7 @@ class Chapter7Test {
     @Test
     void example3() {
         var modifiedTx = Hex.parse("0100000001813f79011acb80925dfe69b3def355fe914bd1d96a3f5f71bf8303c6a989c7d1000000001976a914a802fc56c704ce87c42d7c92eb75e7896bdc41ae88acfeffffff02a135ef01000000001976a914bc3b654dca7e56b04dca18f2566cdaf02e8d9ada88ac99c39800000000001976a9141c4bc762dd5423e332166702cb75f40df79fea1288ac1943060001000000");
-        var h256 = Helper.hash256(modifiedTx.toBytes());
+        var h256 = Hash.hash256(modifiedTx.toBytes());
         var z = Hex.parse(h256);
         assertEquals("27e0c5994dec7824e56dec6b2fcb342eb7cdb0d0957c2fce9882f715e85d81a6", z.toString());
     }
@@ -97,7 +98,7 @@ class Chapter7Test {
         var z = transaction.sigHash(0, null);
         var privateKey = new PrivateKey(Int.parse(8675309));
         var der = privateKey.sign(z).der();
-        var sig = new ScriptCmd(Bytes.add(der, Helper.SIGHASH_ALL.toBytes(1)));
+        var sig = new ScriptCmd(Bytes.add(der, Hash.SIGHASH_ALL.toBytes(1)));
         var sec = new ScriptCmd(privateKey.getPoint().sec(null));
         var scriptSig = new Script(List.of(sig, sec));
         transaction.getTxIns().get(0).setScriptSig(scriptSig);
@@ -111,7 +112,7 @@ class Chapter7Test {
      */
     @Test
     void example7() {
-        var secret =  Hex.parse(Bytes.changeOrder(Helper.hash256("Jimmy Song secret".getBytes())));
+        var secret = Hex.parse(Bytes.changeOrder(Hash.hash256("Jimmy Song secret".getBytes())));
         var privateKey = new PrivateKey(secret);
         var testnetAddress = privateKey.getPoint().address(null, true);
         log.fine(String.format("testnet address %s", testnetAddress));
