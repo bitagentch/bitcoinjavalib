@@ -136,7 +136,11 @@ public class ExtendedKey {
             var i = hmac.doFinal();
             var derivedChainCode = Arrays.copyOfRange(i, 32, i.length);
             var iLeft = Arrays.copyOfRange(i, 0, 32);
-            var derivedPrivateKey = Hex.parse(iLeft).add(privateKey.getSecret()).mod(S256Point.N).toBytes(33);
+            var iLeftHex = Hex.parse(iLeft);
+            var derivedPrivateKey = iLeftHex.add(privateKey.getSecret()).mod(S256Point.N).toBytes(33);
+            if (iLeftHex.ge(S256Point.N) || Hex.parse(derivedPrivateKey).eq(Int.parse(0))) {
+                return derive(index + 1, harden, neutral);
+            }
             if (neutral) {
                 var neutralPublicKey = PrivateKey.parse(derivedPrivateKey).getPoint().sec(true);
                 return new ExtendedKey(this.getPrefixNeutral(), derivedDepth, derivedFingerprint, derivedChildNumber, derivedChainCode, neutralPublicKey);
@@ -162,8 +166,12 @@ public class ExtendedKey {
             var derivedChainCode = Arrays.copyOfRange(i, 32, i.length);
             var iLeft = Arrays.copyOfRange(i, 0, 32);
             var iLeftPoint = PrivateKey.parse(iLeft).getPoint();
-            var derivedPublicKey = iLeftPoint.add(publicKey).sec(true);
-            return new ExtendedKey(this.prefix, derivedDepth, derivedFingerprint, derivedChildNumber, derivedChainCode, derivedPublicKey);
+            var derivedPublicKey = iLeftPoint.add(publicKey);
+            if (Hex.parse(iLeft).ge(S256Point.N) || (derivedPublicKey.getX() == null && derivedPublicKey.getY() == null)) {
+                return derive(index + 1, harden, neutral);
+            }
+            var derivedPublicKeySec = derivedPublicKey.sec(true);
+            return new ExtendedKey(this.prefix, derivedDepth, derivedFingerprint, derivedChildNumber, derivedChainCode, derivedPublicKeySec);
         }
     }
 
