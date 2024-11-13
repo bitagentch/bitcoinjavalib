@@ -1,6 +1,6 @@
 # release notes
 
-## snapshot
+## 0.1.0
 - wallet
 - extended key
 - refactoring address (breaking change)

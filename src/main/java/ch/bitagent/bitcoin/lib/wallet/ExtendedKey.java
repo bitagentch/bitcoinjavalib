@@ -20,6 +20,10 @@ public class ExtendedKey {
     public static final Int PREFIX_XPRV = Hex.parse("0488ADE4");
     public static final Int PREFIX_XPUB = Hex.parse("0488B21E");
 
+    // BIP-49
+    public static final Int PREFIX_YPRV = Hex.parse("049d7878");
+    public static final Int PREFIX_YPUB = Hex.parse("049d7cb2");
+
     // BIP-84
     public static final Int PREFIX_ZPRV = Hex.parse("04b2430c");
     public static final Int PREFIX_ZPUB = Hex.parse("04b24746");
@@ -110,6 +114,10 @@ public class ExtendedKey {
             return true;
         } else if (Arrays.equals(PREFIX_XPUB.toBytes(), this.prefix)) {
             return false;
+        } else if (Arrays.equals(PREFIX_YPRV.toBytes(), this.prefix)) {
+            return true;
+        } else if (Arrays.equals(PREFIX_YPUB.toBytes(), this.prefix)) {
+            return false;
         } else if (Arrays.equals(PREFIX_ZPRV.toBytes(), this.prefix)) {
             return true;
         } else if (Arrays.equals(PREFIX_ZPUB.toBytes(), this.prefix)) {
@@ -119,12 +127,23 @@ public class ExtendedKey {
         }
     }
 
+    private byte[] getPrefixNeutral() {
+        if (Arrays.equals(PREFIX_XPRV.toBytes(), this.prefix)) {
+            return PREFIX_XPUB.toBytes();
+        } else if (Arrays.equals(PREFIX_YPRV.toBytes(), this.prefix)) {
+            return PREFIX_YPUB.toBytes();
+        } else if (Arrays.equals(PREFIX_ZPRV.toBytes(), this.prefix)) {
+            return PREFIX_ZPUB.toBytes();
+        } else {
+            return this.prefix;
+        }
+    }
+
     public ExtendedKey derive(int index) {
         return this.derive(index, false, false);
     }
 
-    public ExtendedKey
-    derive(int index, boolean harden, boolean neutral) {
+    public ExtendedKey derive(int index, boolean harden, boolean neutral) {
         var indexInt = Int.parse(index);
         if (harden) {
             indexInt = indexInt.add(HARDENED_INDEX);
@@ -181,16 +200,6 @@ public class ExtendedKey {
             }
             var derivedPublicKeySec = derivedPublicKey.sec(true);
             return new ExtendedKey(this.prefix, derivedDepth, derivedFingerprint, derivedChildNumber, derivedChainCode, derivedPublicKeySec);
-        }
-    }
-
-    private byte[] getPrefixNeutral() {
-        if (Arrays.equals(PREFIX_XPRV.toBytes(), this.prefix)) {
-            return PREFIX_XPUB.toBytes();
-        } else if (Arrays.equals(PREFIX_ZPRV.toBytes(), this.prefix)) {
-            return PREFIX_ZPUB.toBytes();
-        } else {
-            return this.prefix;
         }
     }
 
