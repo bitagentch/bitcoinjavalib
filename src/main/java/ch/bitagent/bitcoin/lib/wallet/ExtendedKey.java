@@ -59,6 +59,15 @@ public class ExtendedKey {
         }
         this.chainCode = Arrays.copyOfRange(decoded, 13, 45);
         this.key = Arrays.copyOfRange(decoded, 45, decoded.length);
+        if (this.isKeyPrivate()) {
+            var hexKey = Hex.parse(this.key);
+            var one = Int.parse(1);
+            if (hexKey.lt(one) || hexKey.gt(S256Point.N.sub(one))) {
+                throw new IllegalArgumentException("Invalid privkey");
+            }
+        } else {
+            S256Point.parse(this.key);
+        }
     }
 
     /**

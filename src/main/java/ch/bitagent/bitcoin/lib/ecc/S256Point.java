@@ -165,27 +165,32 @@ public class S256Point extends Point {
      */
     public static S256Point parse(byte[] secBin) {
         if (secBin[0] == 4) {
+            // uncompressed
             var x = Hex.parse(Arrays.copyOfRange(secBin, 1, 33));
             var y = Hex.parse(Arrays.copyOfRange(secBin, 33, 65));
             return new S256Point(new S256Field(x), new S256Field(y));
-        }
-        var x = new S256Field(Hex.parse(Arrays.copyOfRange(secBin, 1, 33)));
-        var alpha = x.pow(Int.parse(3)).add(new S256Field(B));
-        var beta = alpha.sqrt();
-        S256Field evenBeta;
-        S256Field oddBeta;
-        if (beta.num.mod(Int.parse(2)).eq(Int.parse(0))) {
-            evenBeta = beta;
-            oddBeta = new S256Field(S256Field.P.sub(beta.num));
+        } else if (secBin[0] == 2 || secBin[0] == 3) {
+            // compressed
+            var x = new S256Field(Hex.parse(Arrays.copyOfRange(secBin, 1, 33)));
+            var alpha = x.pow(Int.parse(3)).add(new S256Field(B));
+            var beta = alpha.sqrt();
+            S256Field evenBeta;
+            S256Field oddBeta;
+            if (beta.num.mod(Int.parse(2)).eq(Int.parse(0))) {
+                evenBeta = beta;
+                oddBeta = new S256Field(S256Field.P.sub(beta.num));
+            } else {
+                evenBeta = new S256Field(S256Field.P.sub(beta.num));
+                oddBeta = beta;
+            }
+            var isEven = secBin[0] == 2;
+            if (isEven) {
+                return new S256Point(x, evenBeta);
+            } else {
+                return new S256Point(x, oddBeta);
+            }
         } else {
-            evenBeta = new S256Field(S256Field.P.sub(beta.num));
-            oddBeta = beta;
-        }
-        var isEven = secBin[0] == 2;
-        if (isEven) {
-            return new S256Point(x, evenBeta);
-        } else {
-            return new S256Point(x, oddBeta);
+            throw new IllegalArgumentException("Invalid pubkey");
         }
     }
 
