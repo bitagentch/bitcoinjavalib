@@ -34,7 +34,7 @@ class Chapter12Test {
     void example1() {
         var bitFieldSize = Int.parse(10);
         var bitField = Bytes.initFill(bitFieldSize.intValue(), (byte) 0);
-        var h = Helper.hash256(Hex.parse("hello world".getBytes()).toBytes());
+        var h = Hash.hash256(Hex.parse("hello world".getBytes()).toBytes());
         var bit = Hex.parse(h).mod(bitFieldSize).intValue();
         bitField[bit] = 1;
         var want = new byte[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
@@ -46,7 +46,7 @@ class Chapter12Test {
         var bitFieldSize = Int.parse(10);
         var bitField = Bytes.initFill(bitFieldSize.intValue(), (byte) 0);
         for (byte[] item : getItems()) {
-            var h = Helper.hash256(item);
+            var h = Hash.hash256(item);
             var bit = Hex.parse(h).mod(bitFieldSize).intValue();
             bitField[bit] = 1;
         }
@@ -66,7 +66,7 @@ class Chapter12Test {
         var bitFieldSize = Int.parse(10);
         var bitField = Bytes.initFill(bitFieldSize.intValue(), (byte) 0);
         for (byte[] item : getItems()) {
-            var h = Helper.hash160(item);
+            var h = Hash.hash160(item);
             var bit = Hex.parse(h).mod(bitFieldSize).intValue();
             bitField[bit] = 1;
         }
@@ -96,9 +96,9 @@ class Chapter12Test {
     private byte[] executeFunction(String function, byte[] item) {
         switch (function) {
             case "hash160":
-                return Helper.hash160(item);
+                return Hash.hash160(item);
             case "hash256":
-                return Helper.hash256(item);
+                return Hash.hash256(item);
             default:
                 throw new IllegalArgumentException();
         }
@@ -154,7 +154,7 @@ class Chapter12Test {
     void example5() {
         var lastBlockHex = Hex.parse("00000000000538d5c2246336644f9a4956551afb44ba47278759ec55ea912e19");
         var address = "mwJn1YPMq7y5F8J3LkC5Hxg9PHyZ5K4cFv";
-        var h160 = Base58.decode(address);
+        var h160 = Base58.decodeAddress(address);
         var node = new SimpleNode(Properties.getBitcoinP2pHost(), Properties.getBitcoinP2pPort(), Properties.getBitcoinP2pTestnet(), false);
         var bf = new BloomFilter(30, 5, 90210);
         bf.add(h160);
@@ -224,12 +224,12 @@ class Chapter12Test {
     @Test
     void exercise6() {
         var lastBlockHex = Hex.parse("00000000000000a03f9432ac63813c6710bfe41712ac5ef6faab093fe2917636");
-        var secret = Hex.parse(Bytes.changeOrder(Helper.hash256("Jimmy Song".getBytes())));
+        var secret = Hex.parse(Bytes.changeOrder(Hash.hash256("Jimmy Song".getBytes())));
         var privateKey = new PrivateKey(secret);
         var addr = privateKey.getPoint().address(null, true);
-        var h160 = Base58.decode(addr);
+        var h160 = Base58.decodeAddress(addr);
         var targetAddress = "mwJn1YPMq7y5F8J3LkC5Hxg9PHyZ5K4cFv";
-        var targetH160 = Base58.decode(targetAddress);
+        var targetH160 = Base58.decodeAddress(targetAddress);
         var targetScript = Script.p2pkhScript(targetH160);
         var fee = Int.parse(5000);  // fee in satoshis
         // connect to testnet.programmingbitcoin.com in testnet mode

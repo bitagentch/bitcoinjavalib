@@ -1,5 +1,6 @@
 package ch.bitagent.bitcoin.lib.ecc;
 
+import ch.bitagent.bitcoin.lib.helper.Hash;
 import ch.bitagent.bitcoin.lib.helper.Helper;
 import org.junit.jupiter.api.Test;
 
@@ -10,8 +11,8 @@ class PrivateKeyTest {
 
     @Test
     void sign() {
-        var pk = new PrivateKey(Hex.parse(Helper.hash256("my secret".getBytes())));
-        var z = Hex.parse(Helper.hash256("my message".getBytes()));
+        var pk = new PrivateKey(Hex.parse(Hash.hash256("my secret".getBytes())));
+        var z = Hex.parse(Hash.hash256("my message".getBytes()));
         var sig = pk.sign(z);
         assertTrue(pk.getPoint().verify(z, sig));
 
@@ -38,5 +39,18 @@ class PrivateKeyTest {
         pk = new PrivateKey(Hex.parse("1cca23de92fd1862fb5b76e5f4f50eb082165e5191e116c18ed1a6b24be6a53f"));
         expected = "cNYfWuhDpbNM1JWc3c6JTrtrFVxU4AGhUKgw5f93NP2QaBqmxKkg";
         assertEquals(expected, pk.wif(true, true));
+
+        pk = new PrivateKey(Hex.parse("0C28FCA386C7A227600B2FE50B7CAE11EC86D3BF1FBE471BE89827E19D72AA1D"));
+        expected = "5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ";
+        assertEquals(expected, pk.wif(false, false));
+    }
+
+    @Test
+    void parseWif() {
+        PrivateKey pk = PrivateKey.parseWif("cNYfWuhDpbNM1JWc3c6JTrtrFVxU4AGhUKgw5f93NP2QaBqmxKkg", true, true);
+        assertEquals(Hex.parse("1cca23de92fd1862fb5b76e5f4f50eb082165e5191e116c18ed1a6b24be6a53f"), pk.getSecret());
+
+        pk = PrivateKey.parseWif("5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ", false, false);
+        assertEquals(Hex.parse("0C28FCA386C7A227600B2FE50B7CAE11EC86D3BF1FBE471BE89827E19D72AA1D"), pk.getSecret());
     }
 }

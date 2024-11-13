@@ -1,10 +1,15 @@
 package ch.bitagent.bitcoin.lib.ecc;
 
 import ch.bitagent.bitcoin.lib.helper.Base58;
+import ch.bitagent.bitcoin.lib.helper.Bech32;
 import ch.bitagent.bitcoin.lib.helper.Bytes;
-import ch.bitagent.bitcoin.lib.helper.Helper;
+import ch.bitagent.bitcoin.lib.helper.Hash;
+import ch.bitagent.bitcoin.lib.script.OpCodeNames;
+import ch.bitagent.bitcoin.lib.script.Script;
+import ch.bitagent.bitcoin.lib.script.ScriptCmd;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -12,7 +17,9 @@ import java.util.Objects;
  */
 public class S256Point extends Point {
 
-    /** Constant <code>N</code> */
+    /**
+     * Constant <code>N</code>
+     */
     public static final Int N = Hex.parse("fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141");
 
     private static final Int GX = Hex.parse("79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798");
@@ -44,7 +51,9 @@ public class S256Point extends Point {
         return S256Point.g;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public S256Point add(Point other) {
         Point point = super.add(other);
@@ -56,7 +65,9 @@ public class S256Point extends Point {
         return new S256Point(x, y);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public S256Point mul(Int coefficient) {
         var coeff = coefficient.mod(N);
@@ -75,7 +86,7 @@ public class S256Point extends Point {
     /**
      * <p>verify.</p>
      *
-     * @param z a {@link ch.bitagent.bitcoin.lib.ecc.Int} object
+     * @param z         a {@link ch.bitagent.bitcoin.lib.ecc.Int} object
      * @param signature a {@link ch.bitagent.bitcoin.lib.ecc.Signature} object
      * @return a boolean
      */
@@ -114,14 +125,14 @@ public class S256Point extends Point {
      * @return an array of {@link byte} objects
      */
     public byte[] hash160(Boolean compressed) {
-        return Helper.hash160(this.sec(compressed));
+        return Hash.hash160(this.sec(compressed));
     }
 
     /**
      * Returns the address string
      *
      * @param compressed a {@link java.lang.Boolean} object
-     * @param testnet a boolean
+     * @param testnet    a boolean
      * @return a {@link java.lang.String} object
      */
     public String address(Boolean compressed, boolean testnet) {
@@ -136,6 +147,17 @@ public class S256Point extends Point {
     }
 
     /**
+     * Returns the bech32 p2wpkh address
+     *
+     * @param testnet
+     * @return
+     */
+    public String addressBech32P2wpkh(boolean testnet) {
+        var script = new Script(List.of(OpCodeNames.OP_0.toScriptCmd(), OpCodeNames.OP_20_PUSHBYTES_20.toScriptCmd(), new ScriptCmd(this.hash160(true))));
+        return Bech32.encodeSegwit(testnet ? "tb" : "bc", script.toHex());
+    }
+
+    /**
      * returns a Point object from a SEC binary (not hex)
      *
      * @param secBin an array of {@link byte} objects
@@ -143,31 +165,38 @@ public class S256Point extends Point {
      */
     public static S256Point parse(byte[] secBin) {
         if (secBin[0] == 4) {
+            // uncompressed
             var x = Hex.parse(Arrays.copyOfRange(secBin, 1, 33));
             var y = Hex.parse(Arrays.copyOfRange(secBin, 33, 65));
             return new S256Point(new S256Field(x), new S256Field(y));
-        }
-        var x = new S256Field(Hex.parse(Arrays.copyOfRange(secBin, 1, 33)));
-        var alpha = x.pow(Int.parse(3)).add(new S256Field(B));
-        var beta = alpha.sqrt();
-        S256Field evenBeta;
-        S256Field oddBeta;
-        if (beta.num.mod(Int.parse(2)).eq(Int.parse(0))) {
-            evenBeta = beta;
-            oddBeta = new S256Field(S256Field.P.sub(beta.num));
+        } else if (secBin[0] == 2 || secBin[0] == 3) {
+            // compressed
+            var x = new S256Field(Hex.parse(Arrays.copyOfRange(secBin, 1, 33)));
+            var alpha = x.pow(Int.parse(3)).add(new S256Field(B));
+            var beta = alpha.sqrt();
+            S256Field evenBeta;
+            S256Field oddBeta;
+            if (beta.num.mod(Int.parse(2)).eq(Int.parse(0))) {
+                evenBeta = beta;
+                oddBeta = new S256Field(S256Field.P.sub(beta.num));
+            } else {
+                evenBeta = new S256Field(S256Field.P.sub(beta.num));
+                oddBeta = beta;
+            }
+            var isEven = secBin[0] == 2;
+            if (isEven) {
+                return new S256Point(x, evenBeta);
+            } else {
+                return new S256Point(x, oddBeta);
+            }
         } else {
-            evenBeta = new S256Field(S256Field.P.sub(beta.num));
-            oddBeta = beta;
-        }
-        var isEven = secBin[0] == 2;
-        if (isEven) {
-            return new S256Point(x, evenBeta);
-        } else {
-            return new S256Point(x, oddBeta);
+            throw new IllegalArgumentException("Invalid pubkey");
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         if (this.getX() instanceof FieldElement && this.getY() instanceof FieldElement && this.getA() instanceof FieldElement && this.getB() instanceof FieldElement) {

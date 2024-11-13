@@ -2,9 +2,10 @@ package ch.bitagent.bitcoin.lib.ecc;
 
 import ch.bitagent.bitcoin.lib.helper.Base58;
 import ch.bitagent.bitcoin.lib.helper.Bytes;
-import ch.bitagent.bitcoin.lib.helper.Helper;
+import ch.bitagent.bitcoin.lib.helper.Hash;
 
 import javax.crypto.Mac;
+import java.util.Arrays;
 
 /**
  * A private key on a secp256k1 elliptic curve
@@ -22,6 +23,16 @@ public class PrivateKey {
     public PrivateKey(Int secret) {
         this.secret = secret;
         this.point = S256Point.getG().mul(secret);
+    }
+
+    /**
+     * parse
+     *
+     * @param secret .
+     * @return .
+     */
+    public static PrivateKey parse(byte[] secret) {
+        return new PrivateKey(Hex.parse(secret));
     }
 
     /**
@@ -62,27 +73,27 @@ public class PrivateKey {
             zBytes = z.sub(S256Point.N).toBytes(32);
         }
 
-        Mac hmac = Helper.hmacS256Init(k);
+        Mac hmac = Hash.hmacS256Init(k);
         hmac.update(v);
         hmac.update(new byte[]{0x00});
         hmac.update(secretBytes);
         k = hmac.doFinal(zBytes);
 
-        hmac = Helper.hmacS256Init(k);
+        hmac = Hash.hmacS256Init(k);
         v = hmac.doFinal(v);
 
-        hmac = Helper.hmacS256Init(k);
+        hmac = Hash.hmacS256Init(k);
         hmac.update(v);
         hmac.update(new byte[]{0x01});
         hmac.update(secretBytes);
         k = hmac.doFinal(zBytes);
 
-        hmac = Helper.hmacS256Init(k);
+        hmac = Hash.hmacS256Init(k);
         v = hmac.doFinal(v);
 
         var one = Int.parse(1);
         while (true) {
-            hmac = Helper.hmacS256Init(k);
+            hmac = Hash.hmacS256Init(k);
             v = hmac.doFinal(v);
 
             var candidate = Hex.parse(v);
@@ -90,11 +101,11 @@ public class PrivateKey {
                 return candidate;
             }
 
-            hmac = Helper.hmacS256Init(k);
+            hmac = Hash.hmacS256Init(k);
             hmac.update(v);
             k = hmac.doFinal(new byte[]{0x00});
 
-            hmac = Helper.hmacS256Init(k);
+            hmac = Hash.hmacS256Init(k);
             v = hmac.doFinal(v);
         }
     }
@@ -103,7 +114,7 @@ public class PrivateKey {
      * <p>wif.</p>
      *
      * @param compressed a boolean
-     * @param testnet a boolean
+     * @param testnet    a boolean
      * @return a {@link java.lang.String} object
      */
     public String wif(boolean compressed, boolean testnet) {
@@ -122,11 +133,50 @@ public class PrivateKey {
     }
 
     /**
-     * <p>Getter for the field <code>point</code>.</p>
+     * parseWif
+     *
+     * @param wif        .
+     * @param compressed .
+     * @param testnet    .
+     * @return .
+     */
+    public static PrivateKey parseWif(String wif, boolean compressed, boolean testnet) {
+        var decodedBytes = Base58.decodeWif(wif, compressed);
+        byte prefix = decodedBytes[0];
+        byte prefixExpected;
+        if (testnet) {
+            prefixExpected = (byte) 0xef;
+        } else {
+            prefixExpected = (byte) 0x80;
+        }
+        if (prefix != prefixExpected) {
+            throw new IllegalArgumentException("Invalid prefix");
+        }
+        byte[] secretBytes;
+        if (compressed) {
+            secretBytes = Arrays.copyOfRange(decodedBytes, 1, decodedBytes.length - 1);
+        } else {
+            secretBytes = Arrays.copyOfRange(decodedBytes, 1, decodedBytes.length);
+        }
+        Int secret = Hex.parse(secretBytes);
+        return new PrivateKey(secret);
+    }
+
+    /**
+     * <p>Get the point (public key)</p>
      *
      * @return a {@link ch.bitagent.bitcoin.lib.ecc.S256Point} object
      */
     public S256Point getPoint() {
         return point;
+    }
+
+    /**
+     * Get the secret
+     *
+     * @return .
+     */
+    public Int getSecret() {
+        return this.secret;
     }
 }

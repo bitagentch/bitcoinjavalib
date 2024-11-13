@@ -4,6 +4,7 @@ import ch.bitagent.bitcoin.lib.block.Block;
 import ch.bitagent.bitcoin.lib.ecc.Hex;
 import ch.bitagent.bitcoin.lib.ecc.Int;
 import ch.bitagent.bitcoin.lib.helper.Bytes;
+import ch.bitagent.bitcoin.lib.helper.Hash;
 import ch.bitagent.bitcoin.lib.helper.Helper;
 import ch.bitagent.bitcoin.lib.script.OpCodeNames;
 import ch.bitagent.bitcoin.lib.script.Script;
@@ -49,7 +50,7 @@ class Chapter9Test {
     @Test
     void example3() {
         var block = Hex.parse("020000208ec39428b17323fa0ddec8e887b4a7c53b8c0a0a220cfd0000000000000000005b0750fce0a889502d40508d39576821155e9c9e3f5c3157f961db38fd8b25be1e77a759e93c0118a4ffd71d");
-        var blockHash = Bytes.changeOrder(Helper.hash256(block.toBytes()));
+        var blockHash = Bytes.changeOrder(Hash.hash256(block.toBytes()));
         var blockId = Bytes.byteArrayToHexString(blockHash);
         assertEquals("0000000000000000007e9e4c586439b0cdbe13b1370bdd9435d76a644d047523", blockId);
     }
@@ -67,7 +68,7 @@ class Chapter9Test {
 
     @Test
     void example5() {
-        var blockId = Bytes.changeOrder(Helper.hash256(Hex.parse("020000208ec39428b17323fa0ddec8e887b4a7c53b8c0a0a220cfd0000000000000000005b0750fce0a889502d40508d39576821155e9c9e3f5c3157f961db38fd8b25be1e77a759e93c0118a4ffd71d").toBytes()));
+        var blockId = Bytes.changeOrder(Hash.hash256(Hex.parse("020000208ec39428b17323fa0ddec8e887b4a7c53b8c0a0a220cfd0000000000000000005b0750fce0a889502d40508d39576821155e9c9e3f5c3157f961db38fd8b25be1e77a759e93c0118a4ffd71d").toBytes()));
         assertEquals("0000000000000000007e9e4c586439b0cdbe13b1370bdd9435d76a644d047523", Bytes.byteArrayToHexString(blockId));
     }
 
@@ -76,10 +77,10 @@ class Chapter9Test {
         var bits = Hex.parse("e93c0118").toBytes();
         var bitsLen = bits.length;
         // exponent, which is the last byte
-        var exponent = Hex.parse(Arrays.copyOfRange(bits, bitsLen-1, bitsLen));
+        var exponent = Hex.parse(Arrays.copyOfRange(bits, bitsLen - 1, bitsLen));
         assertEquals(Int.parse(24), exponent);
         // coefficient, which is the other three bytes in little-endian
-        var coefficient = Hex.parse(Bytes.changeOrder(Arrays.copyOfRange(bits, 0, bitsLen-1)));
+        var coefficient = Hex.parse(Bytes.changeOrder(Arrays.copyOfRange(bits, 0, bitsLen - 1)));
         assertEquals(Int.parse(81129), coefficient);
         // The target is a 256-bit number that is computed directly from the bits field (in our example, e93c0118).
         // The target is very small compared to an average 256-bit number.
@@ -88,7 +89,7 @@ class Chapter9Test {
         // We are purposefully printing this number as 64 hexadecimal digits to show how small the number is in 256-bit terms.
         assertEquals("0000000000000000013ce9000000000000000000000000000000000000000000", Helper.zfill64(target.toHex().toString()));
 
-        var proof = Hex.parse(Bytes.changeOrder(Helper.hash256(Hex.parse("020000208ec39428b17323fa0ddec8e887b4a7c53b8c0a0a220cfd0000000000000000005b0750fce0a889502d40508d39576821155e9c9e3f5c3157f961db38fd8b25be1e77a759e93c0118a4ffd71d").toBytes())));
+        var proof = Hex.parse(Bytes.changeOrder(Hash.hash256(Hex.parse("020000208ec39428b17323fa0ddec8e887b4a7c53b8c0a0a220cfd0000000000000000005b0750fce0a889502d40508d39576821155e9c9e3f5c3157f961db38fd8b25be1e77a759e93c0118a4ffd71d").toBytes())));
         assertEquals("0000000000000000007e9e4c586439b0cdbe13b1370bdd9435d76a644d047523", Helper.zfill64(proof.toHex().toString()));
         // proof-of-work is lower than target
         assertTrue(proof.lt(target));
@@ -108,13 +109,13 @@ class Chapter9Test {
         var lastBlock = Block.parse(new ByteArrayInputStream(Hex.parse("00000020fdf740b0e49cf75bb3d5168fb3586f7613dcc5cd89675b0100000000000000002e37b144c0baced07eb7e7b64da916cd3121f2427005551aeb0ec6a6402ac7d7f0e4235954d801187f5da9f5").toBytes()));
         var firstBlock = Block.parse(new ByteArrayInputStream(Hex.parse("000000201ecd89664fd205a37566e694269ed76e425803003628ab010000000000000000bfcade29d080d9aae8fd461254b041805ae442749f2a40100440fc0e3d5868e55019345954d80118a1721b2e").toBytes()));
         var timeDifferential = lastBlock.getTimestamp().sub(firstBlock.getTimestamp());
-        if (timeDifferential.gt(Helper.TWO_WEEKS.mul(Int.parse(4)))) {
-            timeDifferential = Helper.TWO_WEEKS.mul(Int.parse(4));
+        if (timeDifferential.gt(Bytes.TWO_WEEKS.mul(Int.parse(4)))) {
+            timeDifferential = Bytes.TWO_WEEKS.mul(Int.parse(4));
         }
-        if (timeDifferential.lt(Helper.TWO_WEEKS.div(Int.parse(4)))) {
-            timeDifferential = Helper.TWO_WEEKS.div(Int.parse(4));
+        if (timeDifferential.lt(Bytes.TWO_WEEKS.div(Int.parse(4)))) {
+            timeDifferential = Bytes.TWO_WEEKS.div(Int.parse(4));
         }
-        var newTarget = lastBlock.target().mul(timeDifferential).div(Helper.TWO_WEEKS);
+        var newTarget = lastBlock.target().mul(timeDifferential).div(Bytes.TWO_WEEKS);
         assertEquals("0000000000000000007615000000000000000000000000000000000000000000", Helper.zfill64(newTarget.toHex().toString()));
     }
 }

@@ -1,7 +1,7 @@
 package ch.bitagent.bitcoin.lib.ecc;
 
 import ch.bitagent.bitcoin.lib.helper.Bytes;
-import ch.bitagent.bitcoin.lib.helper.Helper;
+import ch.bitagent.bitcoin.lib.helper.Hash;
 
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -13,7 +13,8 @@ import java.util.Arrays;
  */
 public class Schnorr {
 
-    private Schnorr()  {}
+    private Schnorr() {
+    }
 
     private static final Int P = Hex.parse("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F");
 
@@ -28,16 +29,16 @@ public class Schnorr {
     }
 
     private static byte[] taggedHash(String tag, byte[] msg) {
-        var tagHash = Helper.sha256(tag.getBytes());
+        var tagHash = Hash.sha256(tag.getBytes());
         var tagged = Bytes.add(new byte[][]{tagHash, tagHash, msg});
-        return Helper.sha256(tagged);
+        return Hash.sha256(tagged);
     }
 
     /**
      * <p>sign</p>
      *
-     * @param msg .
-     * @param seckey .
+     * @param msg     .
+     * @param seckey  .
      * @param auxRand .
      * @return .
      */
@@ -89,9 +90,9 @@ public class Schnorr {
     /**
      * <p>verify</p>
      *
-     * @param msg .
+     * @param msg    .
      * @param pubkey .
-     * @param sig .
+     * @param sig    .
      * @return .
      */
     public static boolean verify(byte[] msg, byte[] pubkey, byte[] sig) {

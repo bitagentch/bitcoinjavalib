@@ -5,6 +5,7 @@ import ch.bitagent.bitcoin.lib.ecc.Int;
 import ch.bitagent.bitcoin.lib.ecc.S256Point;
 import ch.bitagent.bitcoin.lib.ecc.Signature;
 import ch.bitagent.bitcoin.lib.helper.Bytes;
+import ch.bitagent.bitcoin.lib.helper.Hash;
 import ch.bitagent.bitcoin.lib.helper.Helper;
 
 import java.util.ArrayList;
@@ -19,7 +20,8 @@ public class Op {
 
     private static final Logger log = Logger.getLogger(Op.class.getSimpleName());
 
-    private Op() {}
+    private Op() {
+    }
 
     static byte[] encodeNum(int num) {
         var result = new byte[0];
@@ -262,7 +264,7 @@ public class Op {
             return false;
         }
         byte[] element = stack.pop();
-        stack.push(Helper.sha1(element));
+        stack.push(Hash.sha1(element));
         log.fine(String.format("%s", printStack(stack)));
         return true;
     }
@@ -272,7 +274,7 @@ public class Op {
             return false;
         }
         byte[] element = stack.pop();
-        stack.push(Helper.hash160(element));
+        stack.push(Hash.hash160(element));
         log.fine(String.format("%s", printStack(stack)));
         return true;
     }
@@ -282,7 +284,7 @@ public class Op {
             return false;
         }
         byte[] element = stack.pop();
-        stack.push(Helper.hash256(element));
+        stack.push(Hash.hash256(element));
         log.fine(String.format("%s", printStack(stack)));
         return true;
     }

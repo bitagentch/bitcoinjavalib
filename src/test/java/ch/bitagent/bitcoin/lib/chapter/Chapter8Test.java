@@ -6,7 +6,7 @@ import ch.bitagent.bitcoin.lib.ecc.S256Point;
 import ch.bitagent.bitcoin.lib.ecc.Signature;
 import ch.bitagent.bitcoin.lib.helper.Base58;
 import ch.bitagent.bitcoin.lib.helper.Bytes;
-import ch.bitagent.bitcoin.lib.helper.Helper;
+import ch.bitagent.bitcoin.lib.helper.Hash;
 import ch.bitagent.bitcoin.lib.helper.Varint;
 import ch.bitagent.bitcoin.lib.script.Script;
 import ch.bitagent.bitcoin.lib.tx.Tx;
@@ -31,7 +31,7 @@ class Chapter8Test {
     @Test
     void example2() {
         var modifiedTx = Hex.parse("0100000001868278ed6ddfb6c1ed3ad5f8181eb0c7a385aa0836f01d5e4789e6bd304d87221a000000475221022626e955ea6ea6d98850c994f9107b036b1334f18ca8830bfff1295d21cfdb702103b287eaf122eea69030a0e9feed096bed8045c8b98bec453e1ffac7fbdbd4bb7152aeffffffff04d3b11400000000001976a914904a49878c0adfc3aa05de7afad2cc15f483a56a88ac7f400900000000001976a914418327e3f3dda4cf5b9089325a4b95abdfa0334088ac722c0c00000000001976a914ba35042cfe9fc66fd35ac2224eebdafd1028ad2788acdc4ace020000000017a91474d691da1574e6b3c192ecfb52cc8984ee7b6c56870000000001000000");
-        var s256 = Helper.hash256(modifiedTx.toBytes());
+        var s256 = Hash.hash256(modifiedTx.toBytes());
         var z = Hex.parse(s256);
         var want = Hex.parse("e71bfa115715d6fd33796948126f40a8cdd39f187e4afb03896795189fe1423c");
         assertEquals(want, z);
@@ -40,7 +40,7 @@ class Chapter8Test {
     @Test
     void example3() {
         var modifiedTx = Hex.parse("0100000001868278ed6ddfb6c1ed3ad5f8181eb0c7a385aa0836f01d5e4789e6bd304d87221a000000475221022626e955ea6ea6d98850c994f9107b036b1334f18ca8830bfff1295d21cfdb702103b287eaf122eea69030a0e9feed096bed8045c8b98bec453e1ffac7fbdbd4bb7152aeffffffff04d3b11400000000001976a914904a49878c0adfc3aa05de7afad2cc15f483a56a88ac7f400900000000001976a914418327e3f3dda4cf5b9089325a4b95abdfa0334088ac722c0c00000000001976a914ba35042cfe9fc66fd35ac2224eebdafd1028ad2788acdc4ace020000000017a91474d691da1574e6b3c192ecfb52cc8984ee7b6c56870000000001000000");
-        var h256 = Helper.hash256(modifiedTx.toBytes());
+        var h256 = Hash.hash256(modifiedTx.toBytes());
         var z = Hex.parse(h256);
         var sec = Hex.parse("022626e955ea6ea6d98850c994f9107b036b1334f18ca8830bfff1295d21cfdb70");
         var der = Hex.parse("3045022100dc92655fe37036f47756db8102e0d7d5e28b3beb83a8fef4f5dc0559bddfb94e02205a36d4e4e6c7fcd16658c50783e00c341609977aed3ad00937bf4ee942a89937");
@@ -63,12 +63,12 @@ class Chapter8Test {
         var i = txObj.getTxIns().get(0);
         s = Bytes.add(s, new TxIn(i.getPrevTx(), i.getPrevIndex(), redeemScript, i.getSequence()).serialize());
         s = Bytes.add(s, Varint.encode(Int.parse(txObj.getTxOuts().size())));
-        for (TxOut txOut: txObj.getTxOuts()) {
+        for (TxOut txOut : txObj.getTxOuts()) {
             s = Bytes.add(s, txOut.serialize());
         }
         s = Bytes.add(s, txObj.getLocktime().toBytesLittleEndian(4));
-        s = Bytes.add(s, Helper.SIGHASH_ALL.toBytesLittleEndian(4));
-        var z = Hex.parse(Helper.hash256(s));
+        s = Bytes.add(s, Hash.SIGHASH_ALL.toBytesLittleEndian(4));
+        var z = Hex.parse(Hash.hash256(s));
         var point = S256Point.parse(sec.toBytes());
         var sig = Signature.parse(der.toBytes());
         assertTrue(point.verify(z, sig));

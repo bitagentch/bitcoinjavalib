@@ -1,10 +1,7 @@
 package ch.bitagent.bitcoin.lib.tx;
 
 import ch.bitagent.bitcoin.lib.ecc.Hex;
-import ch.bitagent.bitcoin.lib.helper.Bytes;
-import ch.bitagent.bitcoin.lib.helper.Helper;
-import ch.bitagent.bitcoin.lib.helper.Http;
-import ch.bitagent.bitcoin.lib.helper.Properties;
+import ch.bitagent.bitcoin.lib.helper.*;
 
 import java.io.*;
 import java.util.Arrays;
@@ -23,14 +20,15 @@ public class TxFetcher {
 
     private static final String CACHE_FILE = Properties.getTxCachefile();
 
-    private TxFetcher() {}
+    private TxFetcher() {
+    }
 
     /**
      * <p>fetch.</p>
      *
-     * @param txId a {@link java.lang.String} object
+     * @param txId    a {@link java.lang.String} object
      * @param testnet a {@link java.lang.Boolean} object
-     * @param fresh a boolean
+     * @param fresh   a boolean
      * @return a {@link ch.bitagent.bitcoin.lib.tx.Tx} object
      */
     public static Tx fetch(String txId, Boolean testnet, boolean fresh) {
@@ -77,7 +75,7 @@ public class TxFetcher {
         if (Boolean.TRUE.equals(tx.getSegwit())) {
             computed = tx.id();
         } else {
-            computed = Hex.parse(Bytes.changeOrder(Helper.hash256(txBytes))).toString();
+            computed = Hex.parse(Bytes.changeOrder(Hash.hash256(txBytes))).toString();
         }
         if (!computed.equals(txId)) {
             throw new IllegalStateException(String.format("server lied: %s vs %s", computed, txId));

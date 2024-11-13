@@ -4,7 +4,7 @@ import ch.bitagent.bitcoin.lib.ecc.Hex;
 import ch.bitagent.bitcoin.lib.ecc.Int;
 import ch.bitagent.bitcoin.lib.helper.Base58;
 import ch.bitagent.bitcoin.lib.helper.Bytes;
-import ch.bitagent.bitcoin.lib.helper.Helper;
+import ch.bitagent.bitcoin.lib.helper.Hash;
 import ch.bitagent.bitcoin.lib.helper.Varint;
 
 import java.io.ByteArrayInputStream;
@@ -105,7 +105,7 @@ public class Script {
                 count += n;
             } else if (currentByte.eq(Int.parse(76))) {
                 // op_pushdata1
-                var dataLength = Hex.parse(Bytes.changeOrder(Bytes.read(stream,1)));
+                var dataLength = Hex.parse(Bytes.changeOrder(Bytes.read(stream, 1)));
                 cmds.add(new ScriptCmd(Bytes.read(stream, dataLength.intValue())));
                 count += dataLength.intValue() + 1;
             } else if (currentByte.eq(Int.parse(77))) {
@@ -180,7 +180,7 @@ public class Script {
     /**
      * <p>evaluate.</p>
      *
-     * @param z a {@link ch.bitagent.bitcoin.lib.ecc.Int} object
+     * @param z       a {@link ch.bitagent.bitcoin.lib.ecc.Int} object
      * @param witness a {@link ch.bitagent.bitcoin.lib.script.Script} object
      * @return a boolean
      */
@@ -236,7 +236,7 @@ public class Script {
                     stack.pop();
                     var witnessScript = witness.getCmds().remove((witness.getCmds().size() - 1));
                     _cmds.addAll(witness.getCmds());
-                    var witnessScriptSha256 = Helper.sha256(witnessScript.getElement());
+                    var witnessScriptSha256 = Hash.sha256(witnessScript.getElement());
                     if (!Arrays.equals(s256, witnessScriptSha256)) {
                         log.severe(String.format("bad sha256 %s vs %s", Hex.parse(s256), Hex.parse(witnessScriptSha256)));
                         return false;
@@ -373,7 +373,9 @@ public class Script {
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         List<String> result = new ArrayList<>();
@@ -389,6 +391,27 @@ public class Script {
             }
         }
         return String.join(" ", result);
+    }
+
+    /**
+     * toHex
+     *
+     * @return .
+     */
+    public String toHex() {
+        List<String> result = new ArrayList<>();
+        for (ScriptCmd cmd : cmds) {
+            if (cmd.isOpCode()) {
+                // if the cmd is an integer, it's an opcode
+                result.add(cmd.getOpCode().getCode().toString());
+            } else if (cmd.isElement()) {
+                // otherwise, this is an element
+                result.add(cmd.getElementAsHexString());
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+        return String.join("", result);
     }
 
     /**
