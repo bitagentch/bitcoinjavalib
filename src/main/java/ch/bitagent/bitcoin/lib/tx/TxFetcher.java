@@ -32,7 +32,7 @@ public class TxFetcher {
      * @return a {@link ch.bitagent.bitcoin.lib.tx.Tx} object
      */
     public static Tx fetch(String txId, Boolean testnet, boolean fresh) {
-        String txId64 = Helper.zfill64(txId);
+        String txId64 = Helper.zfill(64, txId);
         var doFresh = fresh || Properties.getTxFresh();
         loadCache(doFresh);
         if (doFresh || !cache.containsKey(txId64)) {

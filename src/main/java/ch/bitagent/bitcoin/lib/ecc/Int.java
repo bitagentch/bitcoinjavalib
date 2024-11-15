@@ -299,6 +299,15 @@ public class Int implements PointOperators, Comparable<Int> {
     }
 
     /**
+     * <p>toBin</p>
+     *
+     * @return .
+     */
+    public String toBin() {
+        return this.bigInt.toString(2);
+    }
+
+    /**
      * <p>toScriptCmd.</p>
      *
      * @return a {@link ch.bitagent.bitcoin.lib.script.ScriptCmd} object

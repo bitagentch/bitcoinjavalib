@@ -1,7 +1,7 @@
 package ch.bitagent.bitcoin.lib.ecc;
 
+import ch.bitagent.bitcoin.lib.helper.Bytes;
 import ch.bitagent.bitcoin.lib.helper.Hash;
-import ch.bitagent.bitcoin.lib.helper.Helper;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,8 +16,8 @@ class PrivateKeyTest {
         var sig = pk.sign(z);
         assertTrue(pk.getPoint().verify(z, sig));
 
-        pk = new PrivateKey(Hex.parse(Helper.randomBytes(S256Point.N.toBytes(32).length)));
-        z = Hex.parse(Helper.randomBytes(Int.parse(2).pow(Int.parse(256)).toBytes(32).length));
+        pk = new PrivateKey(Hex.parse(Bytes.randomBytes(S256Point.N.toBytes(32).length)));
+        z = Hex.parse(Bytes.randomBytes(Int.parse(2).pow(Int.parse(256)).toBytes(32).length));
         sig = pk.sign(z);
         assertTrue(pk.getPoint().verify(z, sig));
     }
