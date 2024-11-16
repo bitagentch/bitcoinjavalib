@@ -49,7 +49,7 @@ public class ExtendedKey {
             throw new IllegalArgumentException("Invalid extendend key length");
         }
         this.prefix = Arrays.copyOfRange(decoded, 0, 4);
-        this.isKeyPrivate();
+        isKeyPrivate(this.prefix);
         this.depth = decoded[4];
         this.fingerprint = Arrays.copyOfRange(decoded, 5, 9);
         this.childNumber = Arrays.copyOfRange(decoded, 9, 13);
@@ -63,7 +63,7 @@ public class ExtendedKey {
         }
         this.chainCode = Arrays.copyOfRange(decoded, 13, 45);
         this.key = Arrays.copyOfRange(decoded, 45, decoded.length);
-        if (this.isKeyPrivate()) {
+        if (isKeyPrivate(this.prefix)) {
             var hexKey = Hex.parse(this.key);
             var one = Int.parse(1);
             if (hexKey.lt(one) || hexKey.gt(S256Point.N.sub(one))) {
@@ -89,7 +89,7 @@ public class ExtendedKey {
         if (this.prefix.length != 4) {
             throw new IllegalArgumentException("invalid prefix");
         }
-        this.isKeyPrivate();
+        isKeyPrivate(this.prefix);
         this.depth = depth;
         this.fingerprint = fingerprint;
         if (this.fingerprint.length != 4) {
@@ -109,21 +109,21 @@ public class ExtendedKey {
         }
     }
 
-    public boolean isKeyPrivate() {
-        if (Arrays.equals(PREFIX_XPRV.toBytes(), this.prefix)) {
+    public static boolean isKeyPrivate(byte[] prefix) {
+        if (Arrays.equals(PREFIX_XPRV.toBytes(), prefix)) {
             return true;
-        } else if (Arrays.equals(PREFIX_XPUB.toBytes(), this.prefix)) {
+        } else if (Arrays.equals(PREFIX_XPUB.toBytes(), prefix)) {
             return false;
-        } else if (Arrays.equals(PREFIX_YPRV.toBytes(), this.prefix)) {
+        } else if (Arrays.equals(PREFIX_YPRV.toBytes(), prefix)) {
             return true;
-        } else if (Arrays.equals(PREFIX_YPUB.toBytes(), this.prefix)) {
+        } else if (Arrays.equals(PREFIX_YPUB.toBytes(), prefix)) {
             return false;
-        } else if (Arrays.equals(PREFIX_ZPRV.toBytes(), this.prefix)) {
+        } else if (Arrays.equals(PREFIX_ZPRV.toBytes(), prefix)) {
             return true;
-        } else if (Arrays.equals(PREFIX_ZPUB.toBytes(), this.prefix)) {
+        } else if (Arrays.equals(PREFIX_ZPUB.toBytes(), prefix)) {
             return false;
         } else {
-            throw new IllegalArgumentException(String.format("Unknown prefix %s", Hex.parse(this.prefix)));
+            throw new IllegalArgumentException(String.format("Unknown prefix %s", Hex.parse(prefix)));
         }
     }
 
@@ -148,7 +148,7 @@ public class ExtendedKey {
         if (harden) {
             indexInt = indexInt.add(HARDENED_INDEX);
         }
-        if (this.isKeyPrivate()) {
+        if (isKeyPrivate(this.prefix)) {
             var derivedDepth = this.depth + 1;
             var privateKey = PrivateKey.parse(this.key);
             var publicKeyPoint = privateKey.getPoint();

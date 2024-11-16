@@ -187,6 +187,6 @@ class MnemonicSentenceTest {
         assertEquals(mnemonic, MnemonicSentence.entropyToMnemonic(Bytes.hexStringToByteArray(entropy)));
         assertEquals(entropy, Bytes.byteArrayToHexString(MnemonicSentence.mnemonicToEntropy(mnemonic)));
         assertEquals(seed, Bytes.byteArrayToHexString(MnemonicSentence.mnemonicToSeed(mnemonic, passphrase)));
-        assertEquals(xprv, MnemonicSentence.seedToExtendedPrivateKey(Bytes.hexStringToByteArray(seed)));
+        assertEquals(xprv, MnemonicSentence.seedToExtendedKey(Bytes.hexStringToByteArray(seed), ExtendedKey.PREFIX_XPRV));
     }
 }

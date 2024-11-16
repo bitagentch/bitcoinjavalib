@@ -11,8 +11,15 @@ class ExtendedKeyTest {
 
     @Test
     void bip32_vector1_m() {
-        var extendedPrivkey = ExtendedKey.parse("xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi");
-        var extendedPubkey = ExtendedKey.parse("xpub661MyMwAqRbcFtXgS5sYJABqqG9YLmC4Q1Rdap9gSE8NqtwybGhePY2gZ29ESFjqJoCu1Rupje8YtGqsefD265TMg7usUDFdp6W1EGMcet8");
+        var seed = Hex.parse("000102030405060708090a0b0c0d0e0f").toBytes();
+        var xprv = "xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi";
+        var xpub = "xpub661MyMwAqRbcFtXgS5sYJABqqG9YLmC4Q1Rdap9gSE8NqtwybGhePY2gZ29ESFjqJoCu1Rupje8YtGqsefD265TMg7usUDFdp6W1EGMcet8";
+
+        assertEquals(xprv, MnemonicSentence.seedToExtendedKey(seed, ExtendedKey.PREFIX_XPRV));
+        assertEquals(xpub, MnemonicSentence.seedToExtendedKey(seed, ExtendedKey.PREFIX_XPUB));
+
+        var extendedPrivkey = ExtendedKey.parse(xprv);
+        var extendedPubkey = ExtendedKey.parse(xpub);
         compareXKeys(extendedPrivkey, extendedPubkey, 0);
     }
 
@@ -133,8 +140,15 @@ class ExtendedKeyTest {
 
     @Test
     void bip32_vector2_m() {
-        var extendedPrivkey = ExtendedKey.parse("xprv9s21ZrQH143K31xYSDQpPDxsXRTUcvj2iNHm5NUtrGiGG5e2DtALGdso3pGz6ssrdK4PFmM8NSpSBHNqPqm55Qn3LqFtT2emdEXVYsCzC2U");
-        var extendedPubkey = ExtendedKey.parse("xpub661MyMwAqRbcFW31YEwpkMuc5THy2PSt5bDMsktWQcFF8syAmRUapSCGu8ED9W6oDMSgv6Zz8idoc4a6mr8BDzTJY47LJhkJ8UB7WEGuduB");
+        var seed = Hex.parse("fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542").toBytes();
+        var xprv = "xprv9s21ZrQH143K31xYSDQpPDxsXRTUcvj2iNHm5NUtrGiGG5e2DtALGdso3pGz6ssrdK4PFmM8NSpSBHNqPqm55Qn3LqFtT2emdEXVYsCzC2U";
+        var xpub = "xpub661MyMwAqRbcFW31YEwpkMuc5THy2PSt5bDMsktWQcFF8syAmRUapSCGu8ED9W6oDMSgv6Zz8idoc4a6mr8BDzTJY47LJhkJ8UB7WEGuduB";
+
+        assertEquals(xprv, MnemonicSentence.seedToExtendedKey(seed, ExtendedKey.PREFIX_XPRV));
+        assertEquals(xpub, MnemonicSentence.seedToExtendedKey(seed, ExtendedKey.PREFIX_XPUB));
+
+        var extendedPrivkey = ExtendedKey.parse(xprv);
+        var extendedPubkey = ExtendedKey.parse(xpub);
         compareXKeys(extendedPrivkey, extendedPubkey, 0);
     }
 
@@ -255,8 +269,15 @@ class ExtendedKeyTest {
 
     @Test
     void bip32_vector3_m() {
-        var extendedPrivkey = ExtendedKey.parse("xprv9s21ZrQH143K25QhxbucbDDuQ4naNntJRi4KUfWT7xo4EKsHt2QJDu7KXp1A3u7Bi1j8ph3EGsZ9Xvz9dGuVrtHHs7pXeTzjuxBrCmmhgC6");
-        var extendedPubkey = ExtendedKey.parse("xpub661MyMwAqRbcEZVB4dScxMAdx6d4nFc9nvyvH3v4gJL378CSRZiYmhRoP7mBy6gSPSCYk6SzXPTf3ND1cZAceL7SfJ1Z3GC8vBgp2epUt13");
+        var seed = Hex.parse("4b381541583be4423346c643850da4b320e46a87ae3d2a4e6da11eba819cd4acba45d239319ac14f863b8d5ab5a0d0c64d2e8a1e7d1457df2e5a3c51c73235be").toBytes();
+        var xprv = "xprv9s21ZrQH143K25QhxbucbDDuQ4naNntJRi4KUfWT7xo4EKsHt2QJDu7KXp1A3u7Bi1j8ph3EGsZ9Xvz9dGuVrtHHs7pXeTzjuxBrCmmhgC6";
+        var xpub = "xpub661MyMwAqRbcEZVB4dScxMAdx6d4nFc9nvyvH3v4gJL378CSRZiYmhRoP7mBy6gSPSCYk6SzXPTf3ND1cZAceL7SfJ1Z3GC8vBgp2epUt13";
+
+        assertEquals(xprv, MnemonicSentence.seedToExtendedKey(seed, ExtendedKey.PREFIX_XPRV));
+        assertEquals(xpub, MnemonicSentence.seedToExtendedKey(seed, ExtendedKey.PREFIX_XPUB));
+
+        var extendedPrivkey = ExtendedKey.parse(xprv);
+        var extendedPubkey = ExtendedKey.parse(xpub);
         compareXKeys(extendedPrivkey, extendedPubkey, 0);
     }
 
@@ -285,8 +306,15 @@ class ExtendedKeyTest {
 
     @Test
     void bip32_vector4_m() {
-        var extendedPrivkey = ExtendedKey.parse("xprv9s21ZrQH143K48vGoLGRPxgo2JNkJ3J3fqkirQC2zVdk5Dgd5w14S7fRDyHH4dWNHUgkvsvNDCkvAwcSHNAQwhwgNMgZhLtQC63zxwhQmRv");
-        var extendedPubkey = ExtendedKey.parse("xpub661MyMwAqRbcGczjuMoRm6dXaLDEhW1u34gKenbeYqAix21mdUKJyuyu5F1rzYGVxyL6tmgBUAEPrEz92mBXjByMRiJdba9wpnN37RLLAXa");
+        var seed = Hex.parse("3ddd5602285899a946114506157c7997e5444528f3003f6134712147db19b678").toBytes();
+        var xprv = "xprv9s21ZrQH143K48vGoLGRPxgo2JNkJ3J3fqkirQC2zVdk5Dgd5w14S7fRDyHH4dWNHUgkvsvNDCkvAwcSHNAQwhwgNMgZhLtQC63zxwhQmRv";
+        var xpub = "xpub661MyMwAqRbcGczjuMoRm6dXaLDEhW1u34gKenbeYqAix21mdUKJyuyu5F1rzYGVxyL6tmgBUAEPrEz92mBXjByMRiJdba9wpnN37RLLAXa";
+
+        assertEquals(xprv, MnemonicSentence.seedToExtendedKey(seed, ExtendedKey.PREFIX_XPRV));
+        assertEquals(xpub, MnemonicSentence.seedToExtendedKey(seed, ExtendedKey.PREFIX_XPUB));
+
+        var extendedPrivkey = ExtendedKey.parse(xprv);
+        var extendedPubkey = ExtendedKey.parse(xpub);
         compareXKeys(extendedPrivkey, extendedPubkey, 0);
     }
 
@@ -374,8 +402,16 @@ class ExtendedKeyTest {
 
     @Test
     void bip84_m() {
-        var extendedPrivkey = ExtendedKey.parse("zprvAWgYBBk7JR8Gjrh4UJQ2uJdG1r3WNRRfURiABBE3RvMXYSrRJL62XuezvGdPvG6GFBZduosCc1YP5wixPox7zhZLfiUm8aunE96BBa4Kei5");
-        var extendedPubkey = ExtendedKey.parse("zpub6jftahH18ngZxLmXaKw3GSZzZsszmt9WqedkyZdezFtWRFBZqsQH5hyUmb4pCEeZGmVfQuP5bedXTB8is6fTv19U1GQRyQUKQGUTzyHACMF");
+        var mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about";
+        var zprv = "zprvAWgYBBk7JR8Gjrh4UJQ2uJdG1r3WNRRfURiABBE3RvMXYSrRJL62XuezvGdPvG6GFBZduosCc1YP5wixPox7zhZLfiUm8aunE96BBa4Kei5";
+        var zpub = "zpub6jftahH18ngZxLmXaKw3GSZzZsszmt9WqedkyZdezFtWRFBZqsQH5hyUmb4pCEeZGmVfQuP5bedXTB8is6fTv19U1GQRyQUKQGUTzyHACMF";
+
+        var seed = MnemonicSentence.mnemonicToSeed(mnemonic, null);
+        assertEquals(zprv, MnemonicSentence.seedToExtendedKey(seed, ExtendedKey.PREFIX_ZPRV));
+        assertEquals(zpub, MnemonicSentence.seedToExtendedKey(seed, ExtendedKey.PREFIX_ZPUB));
+
+        var extendedPrivkey = ExtendedKey.parse(zprv);
+        var extendedPubkey = ExtendedKey.parse(zpub);
         compareZKeys(extendedPrivkey, extendedPubkey, 0);
     }
 

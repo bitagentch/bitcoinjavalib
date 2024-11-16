@@ -1,11 +1,14 @@
 package ch.bitagent.bitcoin.lib.wallet;
 
 import ch.bitagent.bitcoin.lib.ecc.Hex;
+import ch.bitagent.bitcoin.lib.ecc.Int;
+import ch.bitagent.bitcoin.lib.ecc.PrivateKey;
 import ch.bitagent.bitcoin.lib.helper.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.logging.Logger;
 
 /**
  * <p>MnemonicSentence</p>
@@ -13,6 +16,8 @@ import java.util.Collections;
  * <a href="https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki">BIP-0039</a>
  */
 public class MnemonicSentence {
+
+    private static final Logger log = Logger.getLogger(MnemonicSentence.class.getSimpleName());
 
     private static final String RESOURCE_ENGLISH = "/wallet/english.txt";
 
@@ -143,23 +148,28 @@ public class MnemonicSentence {
         return wordIndex;
     }
 
-    public static String seedToExtendedPrivateKey(byte[] seed) {
+    public static String seedToExtendedKey(byte[] seed, Int xkeyPrefix) {
         if (seed.length != DERIVED_KEY_LENGTH) {
-            throw new IllegalArgumentException(String.format("Provided seed should have length of %s", DERIVED_KEY_LENGTH));
+            log.warning(String.format("Provided seed should have length of %s, not %s.", DERIVED_KEY_LENGTH, seed.length));
         }
 
         var bitcoinSeedMac = Hash.hmacS512Init("Bitcoin seed".getBytes());
         bitcoinSeedMac.update(seed);
         var bitcoinSeed = bitcoinSeedMac.doFinal();
 
-        var xprv = ExtendedKey.PREFIX_XPRV.toBytes(); // Version for private mainnet
-        xprv = Bytes.add(xprv, Bytes.initFill(9, (byte) 0x00)); // Depth, parent fingerprint and child number
-        xprv = Bytes.add(xprv, Arrays.copyOfRange(bitcoinSeed, 32, bitcoinSeed.length)); // Chain code
+        var xkey = xkeyPrefix.toBytes(); // Version
+        xkey = Bytes.add(xkey, Bytes.initFill(9, (byte) 0x00)); // Depth, parent fingerprint and child number
+        xkey = Bytes.add(xkey, Arrays.copyOfRange(bitcoinSeed, 32, bitcoinSeed.length)); // Chain code
         var masterKey = Bytes.add(new byte[]{0x00}, Arrays.copyOfRange(bitcoinSeed, 0, 32));
-        xprv = Bytes.add(xprv, masterKey); // Master key
-        var hashedXprv = Hash.hash256(xprv);
-        xprv = Bytes.add(xprv, Arrays.copyOfRange(hashedXprv, 0, 4)); // Checksum
+        if (ExtendedKey.isKeyPrivate(xkeyPrefix.toBytes())) {
+            xkey = Bytes.add(xkey, masterKey); // Master key
+        } else {
+            var neutralMasterKey = PrivateKey.parse(masterKey).getPoint().sec(true);
+            xkey = Bytes.add(xkey, neutralMasterKey); // Neutral master key
+        }
+        var hashedXprv = Hash.hash256(xkey);
+        xkey = Bytes.add(xkey, Arrays.copyOfRange(hashedXprv, 0, 4)); // Checksum
 
-        return Base58.encode(xprv);
+        return Base58.encode(xkey);
     }
 }
