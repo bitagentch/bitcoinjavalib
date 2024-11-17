@@ -550,6 +550,6 @@ class ExtendedKeyTest {
     private static void compareAddress(PrivateKey privkey, S256Point pubkey, Address address) {
         assertTrue(privkey.getPoint().eq(pubkey));
         assertArrayEquals(address.hash160(), pubkey.hash160(true));
-        assertEquals(address.address(), pubkey.addressBech32P2wpkh(false));
+        assertEquals(address.getAddressString(), pubkey.addressBech32P2wpkh(false));
     }
 }

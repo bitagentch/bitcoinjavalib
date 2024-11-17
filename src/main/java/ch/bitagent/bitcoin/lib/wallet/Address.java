@@ -11,6 +11,9 @@ public class Address {
 
     private final String addressString;
 
+    private int change = -1;
+    private int addressIndex = -1;
+
     public Address(String address) {
         this.addressString = address;
     }
@@ -118,10 +121,6 @@ public class Address {
         }
     }
 
-    public String address() {
-        return addressString;
-    }
-
     public byte[] hash160() {
         if (this.isP2pkhAddress() || this.isP2shAddress()) {
             return Base58.decodeAddress(this.addressString);
@@ -130,6 +129,35 @@ public class Address {
             return Bytes.hexStringToByteArray(scriptPubkey.substring(4));
         } else {
             throw new IllegalStateException();
+        }
+    }
+
+    public String getAddressString() {
+        return addressString;
+    }
+
+    public int getChange() {
+        return change;
+    }
+
+    public void setChange(int change) {
+        this.change = change;
+    }
+
+    public int getAddressIndex() {
+        return addressIndex;
+    }
+
+    public void setAddressIndex(int addressIndex) {
+        this.addressIndex = addressIndex;
+    }
+
+    @Override
+    public String toString() {
+        if (change >= 0 && addressIndex >= 0) {
+            return String.format("/%s/%s/%s", change, addressIndex, addressString);
+        } else {
+            return addressString;
         }
     }
 }
