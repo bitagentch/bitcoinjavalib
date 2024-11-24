@@ -3,6 +3,8 @@ package ch.bitagent.bitcoin.lib.wallet;
 import ch.bitagent.bitcoin.lib.helper.Base58;
 import ch.bitagent.bitcoin.lib.helper.Bech32;
 import ch.bitagent.bitcoin.lib.helper.Bytes;
+import ch.bitagent.bitcoin.lib.helper.Hash;
+import ch.bitagent.bitcoin.lib.script.Script;
 
 /**
  * Address
@@ -127,6 +129,29 @@ public class Address {
         } else if (this.isBech32Address()) {
             var scriptPubkey = Bech32.decodeSegwit(this.addressString);
             return Bytes.hexStringToByteArray(scriptPubkey.substring(4));
+        } else {
+            throw new IllegalStateException();
+        }
+    }
+
+    /**
+     * https://electrumx-spesmilo.readthedocs.io/en/latest/protocol-basics.html#script-hashes
+     */
+    public String electrumScripthash() {
+        if (this.isP2pkhAddress()) {
+            var hash160 = Base58.decodeAddress(this.addressString);
+            var script = Script.p2pkhScriptPubkey(hash160);
+            var hash = Hash.sha256(Bytes.hexStringToByteArray(script.toHex()));
+            return Bytes.byteArrayToHexString(Bytes.changeOrder(hash));
+        } else if (this.isP2shAddress()) {
+            var hash160 = Base58.decodeAddress(this.addressString);
+            var script = Script.p2shScriptPubkey(hash160);
+            var hash = Hash.sha256(Bytes.hexStringToByteArray(script.toHex()));
+            return Bytes.byteArrayToHexString(Bytes.changeOrder(hash));
+        } else if (this.isBech32Address()) {
+            var scriptPubkey = Bech32.decodeSegwit(this.addressString);
+            var hash = Hash.sha256(Bytes.hexStringToByteArray(scriptPubkey));
+            return Bytes.byteArrayToHexString(Bytes.changeOrder(hash));
         } else {
             throw new IllegalStateException();
         }

@@ -2,8 +2,7 @@ package ch.bitagent.bitcoin.lib.wallet;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class AddressTest {
 
@@ -49,5 +48,32 @@ class AddressTest {
 
         assertFalse(Address.parse("12345678901234567890123456").isNotInvoiceAddressLength());
         assertFalse(Address.parse("12345678901234567890123456789012345").isNotInvoiceAddressLength());
+    }
+
+    @Test
+    void electrumScripthashP2pkh() {
+        var address = Address.parse("1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa");
+        assertTrue(address.isP2pkhAddress());
+        var scripthash = address.electrumScripthash();
+        assertEquals("8b01df4e368ea28f8dc0423bcf7a4923e3a12d307c875e47a0cfbf90b5c39161", scripthash);
+        var electrum = new Electrum();
+        var history = electrum.getHistory(scripthash);
+        assertFalse(history.isEmpty());
+        var balance = electrum.getBalance(scripthash);
+        assertTrue(balance.getLong("unconfirmed") > 0);
+        assertTrue(balance.getLong("confirmed") > 0);
+    }
+
+    @Test
+    void electrumScripthashBech32() {
+        var address = Address.parse("bc1qcr8te4kr609gcawutmrza0j4xv80jy8z306fyu");
+        assertTrue(address.isBech32Address());
+        var scripthash = address.electrumScripthash();
+        var electrum = new Electrum();
+        var history = electrum.getHistory(scripthash);
+        assertEquals(120, history.length());
+        var balance = electrum.getBalance(scripthash);
+        assertEquals(0l, balance.getLong("unconfirmed"));
+        assertEquals(0l, balance.getLong("confirmed"));
     }
 }

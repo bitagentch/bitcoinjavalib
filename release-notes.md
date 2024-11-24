@@ -2,6 +2,10 @@
 
 ## snapshot
 - mnemonic sentence (bip-0039)
+- wallet
+- electrum
+- tcp
+- address
 
 ## 0.1.0
 - wallet

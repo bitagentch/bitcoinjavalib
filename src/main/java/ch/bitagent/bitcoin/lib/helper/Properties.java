@@ -1,6 +1,8 @@
 package ch.bitagent.bitcoin.lib.helper;
 
 import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -8,7 +10,8 @@ import java.util.logging.Logger;
  */
 public class Properties {
 
-    private Properties() {}
+    private Properties() {
+    }
 
     private static final Logger log = Logger.getLogger(Properties.class.getSimpleName());
 
@@ -22,14 +25,25 @@ public class Properties {
                 bitcoinjavalibProperties.load(fileInputStream);
                 for (Object keyObject : bitcoinjavalibProperties.keySet().stream().sorted().toArray()) {
                     String key = (String) keyObject;
-                    log.info(String.format("%s=%s", key, bitcoinjavalibProperties.getProperty(key)));
+                    log.fine(String.format("%s=%s", key, bitcoinjavalibProperties.getProperty(key)));
                 }
             }
             return bitcoinjavalibProperties.getProperty(property);
-        } catch (Exception e){
+        } catch (Exception e) {
             log.severe(e.getMessage());
             throw new IllegalStateException(e.getMessage());
         }
+    }
+
+    private static List<String> getPropertyList(String property) {
+        List<String> list = new ArrayList<>();
+        int i = 0;
+        var propertyI = getProperty(property + i++);
+        while (propertyI != null && !propertyI.isEmpty()) {
+            list.add(propertyI);
+            propertyI = getProperty(property + i++);
+        }
+        return list;
     }
 
     /**
@@ -134,5 +148,9 @@ public class Properties {
      */
     public static String getTxCachefile() {
         return getProperty("tx.cachefile");
+    }
+
+    public static List<String> getElectrumRpcSockets() {
+        return getPropertyList("electrum.rpc.socket.");
     }
 }
