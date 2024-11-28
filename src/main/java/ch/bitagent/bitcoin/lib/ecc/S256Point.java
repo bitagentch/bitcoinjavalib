@@ -4,12 +4,9 @@ import ch.bitagent.bitcoin.lib.helper.Base58;
 import ch.bitagent.bitcoin.lib.helper.Bech32;
 import ch.bitagent.bitcoin.lib.helper.Bytes;
 import ch.bitagent.bitcoin.lib.helper.Hash;
-import ch.bitagent.bitcoin.lib.script.OpCodeNames;
 import ch.bitagent.bitcoin.lib.script.Script;
-import ch.bitagent.bitcoin.lib.script.ScriptCmd;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
 /**

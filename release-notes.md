@@ -6,6 +6,7 @@
 - electrum
 - tcp
 - address
+- message sign/verify (bip-0137)
 
 ## 0.1.0
 - wallet

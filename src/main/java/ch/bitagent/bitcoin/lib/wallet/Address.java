@@ -11,6 +11,10 @@ import ch.bitagent.bitcoin.lib.script.Script;
  */
 public class Address {
 
+    public static final String P2PKH = "p2pkh";
+    public static final String P2SH = "p2sh";
+    public static final String BECH32 = "bech32";
+
     private final String addressString;
 
     private int change = -1;
