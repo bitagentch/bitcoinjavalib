@@ -23,8 +23,14 @@ public class Electrum {
     }
 
     public String defaultSocket() {
-        String electrumRpcSocket = Properties.getElectrumRpcSockets().get(0);
-        log.info(electrumRpcSocket);
+        var electrumRpcSockets = Properties.getElectrumRpcSockets();
+        if (electrumRpcSockets.isEmpty()) {
+            var error = "Please configure a default electrum rpc socket in bitcoinjavalib.properties";
+            log.severe(error);
+            throw new IllegalStateException(error);
+        }
+        String electrumRpcSocket = electrumRpcSockets.get(0);
+        log.fine(electrumRpcSocket);
         sockets.clear();
         sockets.add(electrumRpcSocket);
         return electrumRpcSocket;
@@ -33,18 +39,18 @@ public class Electrum {
     public void allSockets() {
         sockets.clear();
         for (String electrumRpcSocket : Properties.getElectrumRpcSockets()) {
-            log.info(electrumRpcSocket);
+            log.fine(electrumRpcSocket);
             sockets.add(electrumRpcSocket);
         }
     }
 
     public String callSocket(String socket, String jsonRequest) {
+        var start = System.currentTimeMillis();
         try {
             if (socket == null) {
                 socket = defaultSocket();
             }
-            var start = System.currentTimeMillis();
-            log.info(String.format(">> %s", jsonRequest));
+            log.fine(String.format(">> %s", jsonRequest));
             var socketData = socket.split(":");
             if (socketData.length != 3) {
                 throw new IllegalArgumentException("Invalid socket");
@@ -61,14 +67,20 @@ public class Electrum {
             } else {
                 jsonResponse = Tcp.socket(host, port, jsonRequest);
             }
+            if (jsonResponse == null) {
+                log.severe(String.format("jsonResponse == null\n%s %sms", socket, System.currentTimeMillis() - start));
+                return null;
+            }
             var responseLog = jsonResponse.toString();
             if (responseLog.length() > 80) {
                 responseLog = responseLog.substring(0, 80) + " ...";
             }
-            log.info(String.format("<< %sms %s", System.currentTimeMillis() - start, responseLog));
+            log.fine(String.format("<< %s", responseLog));
+            log.info(String.format("%s %sms", socket, System.currentTimeMillis() - start));
             return jsonResponse;
         } catch (Exception e) {
-            log.severe(e.toString());
+            log.severe(String.format("%s\n%s %sms", e, socket, System.currentTimeMillis() - start));
+            e.printStackTrace();
             return null;
         }
     }
@@ -117,6 +129,9 @@ public class Electrum {
     public JSONArray getHistory(String scripthash) {
         var jsonRequest = String.format("{\"jsonrpc\": \"2.0\", \"method\": \"blockchain.scripthash.get_history\", \"params\": [\"%s\"], \"id\": \"bitcoinjavalib\"}", scripthash);
         var jsonResponse = callSocket(null, jsonRequest);
+        if (jsonResponse == null) {
+            return null;
+        }
         var json = new JSONObject(jsonResponse);
         return json.getJSONArray("result");
     }
@@ -124,7 +139,20 @@ public class Electrum {
     public JSONObject getBalance(String scripthash) {
         var jsonRequest = String.format("{\"jsonrpc\": \"2.0\", \"method\": \"blockchain.scripthash.get_balance\", \"params\": [\"%s\"], \"id\": \"bitcoinjavalib\"}", scripthash);
         var jsonResponse = callSocket(null, jsonRequest);
+        if (jsonResponse == null) {
+            return null;
+        }
         var json = new JSONObject(jsonResponse);
         return json.getJSONObject("result");
+    }
+
+    public Long getBalanceTotal(String scripthash) {
+        var balance = this.getBalance(scripthash);
+        if (balance == null) {
+            return null;
+        }
+        var unconfirmed = balance.getLong("unconfirmed");
+        var confirmed = balance.getLong("confirmed");
+        return unconfirmed + confirmed;
     }
 }
