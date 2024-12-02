@@ -1,6 +1,8 @@
 # release notes
 
 ## snapshot
+
+## 0.1.1
 - mnemonic sentence (bip-0039)
 - wallet
 - electrum
