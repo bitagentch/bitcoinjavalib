@@ -1,6 +1,11 @@
 package ch.bitagent.bitcoin.lib.helper;
 
-import java.security.SecureRandom;
+import ch.bitagent.bitcoin.lib.wallet.MnemonicSentence;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 /**
@@ -14,25 +19,28 @@ public class Helper {
     }
 
     /**
-     * <p>randomBytes.</p>
+     * <p>zfill</p>
      *
-     * @param length a int
-     * @return an array of {@link byte} objects
+     * @param length .
+     * @param bytes .
+     * @return .
      */
-    public static byte[] randomBytes(int length) {
-        byte[] bytes = new byte[length];
-        new SecureRandom().nextBytes(bytes);
-        return bytes;
+    public static String zfill(int length, String bytes) {
+        return String.format("%" + length + "s", bytes).replace(' ', '0');
     }
 
     /**
-     * <p>zfill64.</p>
+     * boolArrayToString
      *
-     * @param bytes a {@link java.lang.String} object
-     * @return a {@link java.lang.String} object
+     * @param boolArray .
+     * @return .
      */
-    public static String zfill64(String bytes) {
-        return String.format("%64s", bytes).replace(' ', '0');
+    public static String boolArrayToString(boolean[] boolArray) {
+        var string = new StringBuilder();
+        for (boolean bool : boolArray) {
+            string.append(bool ? "1" : "0");
+        }
+        return string.toString();
     }
 
     /**
@@ -65,6 +73,31 @@ public class Helper {
      */
     public static double logWithBase(double value, double base) {
         return Math.log(value) / Math.log(base);
+    }
+
+    /**
+     * loadWordList
+     *
+     * @param resource .
+     * @return .
+     */
+    public static ArrayList<String> loadWordlist(String resource) {
+        var wordlist = new ArrayList<String>();
+        try {
+            var inputStream = MnemonicSentence.class.getResourceAsStream(resource);
+            if (inputStream == null) {
+                throw new IllegalStateException("File not found.");
+            }
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    wordlist.add(line);
+                }
+            }
+        } catch (IOException e) {
+            log.severe(e.getMessage());
+        }
+        return wordlist;
     }
 
     /**

@@ -4,12 +4,9 @@ import ch.bitagent.bitcoin.lib.helper.Base58;
 import ch.bitagent.bitcoin.lib.helper.Bech32;
 import ch.bitagent.bitcoin.lib.helper.Bytes;
 import ch.bitagent.bitcoin.lib.helper.Hash;
-import ch.bitagent.bitcoin.lib.script.OpCodeNames;
 import ch.bitagent.bitcoin.lib.script.Script;
-import ch.bitagent.bitcoin.lib.script.ScriptCmd;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -153,7 +150,7 @@ public class S256Point extends Point {
      * @return
      */
     public String addressBech32P2wpkh(boolean testnet) {
-        var script = new Script(List.of(OpCodeNames.OP_0.toScriptCmd(), OpCodeNames.OP_20_PUSHBYTES_20.toScriptCmd(), new ScriptCmd(this.hash160(true))));
+        var script = Script.p2wpkhScriptPubkey(this.hash160(true));
         return Bech32.encodeSegwit(testnet ? "tb" : "bc", script.toHex());
     }
 

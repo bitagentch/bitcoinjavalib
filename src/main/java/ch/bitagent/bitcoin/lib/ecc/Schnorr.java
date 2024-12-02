@@ -16,7 +16,7 @@ public class Schnorr {
     private Schnorr() {
     }
 
-    private static final Int P = Hex.parse("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F");
+    public static final Int P = Hex.parse("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F");
 
     private static final int BYTES_LENGTH = 32;
 

@@ -5,6 +5,7 @@ import ch.bitagent.bitcoin.lib.ecc.Int;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -315,6 +316,18 @@ public class Bytes {
             i++;
         }
         return ret;
+    }
+
+    /**
+     * <p>randomBytes.</p>
+     *
+     * @param length a int
+     * @return an array of {@link byte} objects
+     */
+    public static byte[] randomBytes(int length) {
+        byte[] bytes = new byte[length];
+        new SecureRandom().nextBytes(bytes);
+        return bytes;
     }
 
     /**

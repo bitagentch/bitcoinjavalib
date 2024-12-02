@@ -32,6 +32,16 @@ public class Script {
     }
 
     /**
+     * https://learnmeabitcoin.com/technical/script/p2pkh/
+     *
+     * @param h160 .
+     * @return .
+     */
+    public static Script p2pkhScriptPubkey(byte[] h160) {
+        return new Script(List.of(OpCodeNames.OP_118_DUP.toScriptCmd(), OpCodeNames.OP_169_HASH160.toScriptCmd(), OpCodeNames.OP_20_PUSHBYTES_20.toScriptCmd(), new ScriptCmd(h160), OpCodeNames.OP_136_EQUALVERIFY.toScriptCmd(), OpCodeNames.OP_172_CHECKSIG.toScriptCmd()));
+    }
+
+    /**
      * Takes a hash160 and returns the p2sh ScriptPubKey
      *
      * @param h160 an array of {@link byte} objects
@@ -42,6 +52,16 @@ public class Script {
     }
 
     /**
+     * https://learnmeabitcoin.com/technical/script/p2sh/
+     *
+     * @param h160 .
+     * @return .
+     */
+    public static Script p2shScriptPubkey(byte[] h160) {
+        return new Script(List.of(OpCodeNames.OP_169_HASH160.toScriptCmd(), OpCodeNames.OP_20_PUSHBYTES_20.toScriptCmd(), new ScriptCmd(h160), OpCodeNames.OP_135_EQUAL.toScriptCmd()));
+    }
+
+    /**
      * Takes a hash160 and returns the p2wpkh ScriptPubKey
      *
      * @param h160 an array of {@link byte} objects
@@ -49,6 +69,16 @@ public class Script {
      */
     public static Script p2wpkhScript(byte[] h160) {
         return new Script(List.of(OpCodeNames.OP_0.toScriptCmd(), new ScriptCmd(h160)));
+    }
+
+    /**
+     * https://learnmeabitcoin.com/technical/script/p2wpkh/
+     *
+     * @param h160 .
+     * @return .
+     */
+    public static Script p2wpkhScriptPubkey(byte[] h160) {
+        return new Script(List.of(OpCodeNames.OP_0.toScriptCmd(), OpCodeNames.OP_20_PUSHBYTES_20.toScriptCmd(), new ScriptCmd(h160)));
     }
 
     /**

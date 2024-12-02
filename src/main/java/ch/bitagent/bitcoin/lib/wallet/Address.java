@@ -3,13 +3,24 @@ package ch.bitagent.bitcoin.lib.wallet;
 import ch.bitagent.bitcoin.lib.helper.Base58;
 import ch.bitagent.bitcoin.lib.helper.Bech32;
 import ch.bitagent.bitcoin.lib.helper.Bytes;
+import ch.bitagent.bitcoin.lib.helper.Hash;
+import ch.bitagent.bitcoin.lib.script.Script;
 
 /**
  * Address
  */
 public class Address {
 
+    public static final String P2PKH = "p2pkh";
+    public static final String P2SH = "p2sh";
+    public static final String BECH32 = "bech32";
+
     private final String addressString;
+
+    private int change = -1;
+    private int addressIndex = -1;
+    private int historyCount = 0;
+    private long balance = 0L;
 
     public Address(String address) {
         this.addressString = address;
@@ -118,10 +129,6 @@ public class Address {
         }
     }
 
-    public String address() {
-        return addressString;
-    }
-
     public byte[] hash160() {
         if (this.isP2pkhAddress() || this.isP2shAddress()) {
             return Base58.decodeAddress(this.addressString);
@@ -130,6 +137,74 @@ public class Address {
             return Bytes.hexStringToByteArray(scriptPubkey.substring(4));
         } else {
             throw new IllegalStateException();
+        }
+    }
+
+    /**
+     * https://electrumx-spesmilo.readthedocs.io/en/latest/protocol-basics.html#script-hashes
+     */
+    public String electrumScripthash() {
+        if (this.isP2pkhAddress()) {
+            var hash160 = Base58.decodeAddress(this.addressString);
+            var script = Script.p2pkhScriptPubkey(hash160);
+            var hash = Hash.sha256(Bytes.hexStringToByteArray(script.toHex()));
+            return Bytes.byteArrayToHexString(Bytes.changeOrder(hash));
+        } else if (this.isP2shAddress()) {
+            var hash160 = Base58.decodeAddress(this.addressString);
+            var script = Script.p2shScriptPubkey(hash160);
+            var hash = Hash.sha256(Bytes.hexStringToByteArray(script.toHex()));
+            return Bytes.byteArrayToHexString(Bytes.changeOrder(hash));
+        } else if (this.isBech32Address()) {
+            var scriptPubkey = Bech32.decodeSegwit(this.addressString);
+            var hash = Hash.sha256(Bytes.hexStringToByteArray(scriptPubkey));
+            return Bytes.byteArrayToHexString(Bytes.changeOrder(hash));
+        } else {
+            throw new IllegalStateException();
+        }
+    }
+
+    public String getAddressString() {
+        return addressString;
+    }
+
+    public int getChange() {
+        return change;
+    }
+
+    public void setChange(int change) {
+        this.change = change;
+    }
+
+    public int getAddressIndex() {
+        return addressIndex;
+    }
+
+    public void setAddressIndex(int addressIndex) {
+        this.addressIndex = addressIndex;
+    }
+
+    public int getHistoryCount() {
+        return historyCount;
+    }
+
+    public void setHistoryCount(int historyCount) {
+        this.historyCount = historyCount;
+    }
+
+    public long getBalance() {
+        return balance;
+    }
+
+    public void setBalance(long balance) {
+        this.balance = balance;
+    }
+
+    @Override
+    public String toString() {
+        if (change >= 0 && addressIndex >= 0) {
+            return String.format("/%s/%s/%s/%s/%s", change, addressIndex, addressString, historyCount, balance);
+        } else {
+            return addressString;
         }
     }
 }

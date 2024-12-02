@@ -87,10 +87,10 @@ class Chapter9Test {
         var target = coefficient.mul(Int.parse(256).pow(exponent.sub(Int.parse(3))));
         assertEquals("30353962581764818649842367179120467226026534727449575424", target.toString());
         // We are purposefully printing this number as 64 hexadecimal digits to show how small the number is in 256-bit terms.
-        assertEquals("0000000000000000013ce9000000000000000000000000000000000000000000", Helper.zfill64(target.toHex().toString()));
+        assertEquals("0000000000000000013ce9000000000000000000000000000000000000000000", Helper.zfill(64, target.toHex().toString()));
 
         var proof = Hex.parse(Bytes.changeOrder(Hash.hash256(Hex.parse("020000208ec39428b17323fa0ddec8e887b4a7c53b8c0a0a220cfd0000000000000000005b0750fce0a889502d40508d39576821155e9c9e3f5c3157f961db38fd8b25be1e77a759e93c0118a4ffd71d").toBytes())));
-        assertEquals("0000000000000000007e9e4c586439b0cdbe13b1370bdd9435d76a644d047523", Helper.zfill64(proof.toHex().toString()));
+        assertEquals("0000000000000000007e9e4c586439b0cdbe13b1370bdd9435d76a644d047523", Helper.zfill(64, proof.toHex().toString()));
         // proof-of-work is lower than target
         assertTrue(proof.lt(target));
     }
@@ -116,6 +116,6 @@ class Chapter9Test {
             timeDifferential = Bytes.TWO_WEEKS.div(Int.parse(4));
         }
         var newTarget = lastBlock.target().mul(timeDifferential).div(Bytes.TWO_WEEKS);
-        assertEquals("0000000000000000007615000000000000000000000000000000000000000000", Helper.zfill64(newTarget.toHex().toString()));
+        assertEquals("0000000000000000007615000000000000000000000000000000000000000000", Helper.zfill(64, newTarget.toHex().toString()));
     }
 }

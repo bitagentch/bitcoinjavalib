@@ -76,7 +76,7 @@ public class VersionMessage implements Message {
         this.senderServices = Objects.requireNonNullElse(senderServices, Int.parse(0));
         this.senderIp = Objects.requireNonNullElse(senderIp, new byte[]{0x00, 0x00, 0x00, 0x00});
         this.senderPort = Objects.requireNonNullElse(senderPort, Int.parse(8333));
-        this.nonce = Objects.requireNonNullElse(nonce, Helper.randomBytes(8));
+        this.nonce = Objects.requireNonNullElse(nonce, Bytes.randomBytes(8));
         this.userAgent = Objects.requireNonNullElse(userAgent, "/bitcoinjavalib/");
         this.latestBlock = Objects.requireNonNullElse(latestBlock, Int.parse(0));
         this.relay = Objects.requireNonNullElse(relay, false);
