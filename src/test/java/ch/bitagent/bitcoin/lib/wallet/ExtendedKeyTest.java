@@ -413,6 +413,11 @@ class ExtendedKeyTest {
         var extendedPrivkey = ExtendedKey.parse(zprv);
         var extendedPubkey = ExtendedKey.parse(zpub);
         compareZKeys(extendedPrivkey, extendedPubkey, 0);
+
+        assertEquals(zprv, extendedPrivkey.serialize(false));
+        assertEquals(zpub, extendedPrivkey.serialize(true));
+        assertEquals(zpub, extendedPubkey.serialize(false));
+        assertEquals(zpub, extendedPubkey.serialize(true));
     }
 
     @Test

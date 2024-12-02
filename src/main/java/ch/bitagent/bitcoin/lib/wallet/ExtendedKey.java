@@ -5,6 +5,7 @@ import ch.bitagent.bitcoin.lib.ecc.Int;
 import ch.bitagent.bitcoin.lib.ecc.PrivateKey;
 import ch.bitagent.bitcoin.lib.ecc.S256Point;
 import ch.bitagent.bitcoin.lib.helper.Base58;
+import ch.bitagent.bitcoin.lib.helper.Bytes;
 import ch.bitagent.bitcoin.lib.helper.Hash;
 
 import java.util.Arrays;
@@ -137,6 +138,27 @@ public class ExtendedKey {
         } else {
             return this.prefix;
         }
+    }
+
+    public String serialize(boolean neutral) {
+        byte[] xkey;
+        if (isKeyPrivate(this.prefix) && neutral) {
+            xkey = getPrefixNeutral();
+        } else {
+            xkey = this.prefix;
+        }
+        xkey = Bytes.add(xkey, new byte[]{(byte) this.depth});
+        xkey = Bytes.add(xkey, this.fingerprint);
+        xkey = Bytes.add(xkey, this.childNumber);
+        xkey = Bytes.add(xkey, this.chainCode);
+        if (isKeyPrivate(this.prefix) && neutral) {
+            xkey = Bytes.add(xkey, PrivateKey.parse(this.key).getPoint().sec(true));
+        } else {
+            xkey = Bytes.add(xkey, this.key);
+        }
+        var hashedXprv = Hash.hash256(xkey);
+        xkey = Bytes.add(xkey, Arrays.copyOfRange(hashedXprv, 0, 4)); // Checksum
+        return Base58.encode(xkey);
     }
 
     public ExtendedKey derive(int index) {

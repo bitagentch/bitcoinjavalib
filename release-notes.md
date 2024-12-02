@@ -7,6 +7,7 @@
 - tcp
 - address
 - message sign/verify (bip-0137)
+- extended key serialize
 
 ## 0.1.0
 - wallet
