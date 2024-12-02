@@ -48,9 +48,22 @@ class MessageTest {
         var pubkey = privkey.getPoint();
         assertEquals("14JmU9a7SzieZNEtBnsZo688rt3mGrw6hr", pubkey.address(true, false));
 
+        // 1 attempt required for low R
         var message = "Test2";
         var signature = Message.sign(privkey, message, Address.P2PKH, false);
         assertEquals("IHra0jSywF1TjIJ5uf7IDECae438cr4o3VmG6Ri7hYlDL+pUEXyUfwLwpiAfUQVqQFLgs6OaX0KsoydpuwRI71o=", signature);
+        assertTrue(Message.verify(pubkey, signature, message, false));
+
+        // 2 attempts required for low R
+        message = "Test";
+        signature = Message.sign(privkey, message, Address.P2PKH, false);
+        assertEquals("IDgMx1ljPhLHlKUOwnO/jBIgK+K8n8mvDUDROzTgU8gOaPDMs+eYXJpNXXINUx5WpeV605p5uO6B3TzBVcvs478=", signature);
+        assertTrue(Message.verify(pubkey, signature, message, false));
+
+        // 3 attempts required for low R
+        message = "Test1";
+        signature = Message.sign(privkey, message, Address.P2PKH, false);
+        assertEquals("IEt/v9K95YVFuRtRtWaabPVwWOFv1FSA/e874I8ABgYMbRyVvHhSwLFz0RZuO87ukxDd4TOsRdofQwMEA90LCgI=", signature);
         assertTrue(Message.verify(pubkey, signature, message, false));
     }
 }

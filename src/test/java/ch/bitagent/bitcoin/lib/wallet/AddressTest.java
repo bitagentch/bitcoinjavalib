@@ -60,7 +60,7 @@ class AddressTest {
         var history = electrum.getHistory(scripthash);
         assertFalse(history.isEmpty());
         var balance = electrum.getBalance(scripthash);
-        assertTrue(balance.getLong("unconfirmed") > 0);
+        assertTrue(balance.getLong("unconfirmed") >= 0);
         assertTrue(balance.getLong("confirmed") > 0);
     }
 

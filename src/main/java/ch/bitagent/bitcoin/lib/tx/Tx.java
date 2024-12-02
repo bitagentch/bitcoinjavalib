@@ -469,7 +469,7 @@ public class Tx implements Message {
         // get the signature hash (z)
         var z = this.sigHash(inputIndex, null);
         // get der signature of z from private key
-        var der = privateKey.sign(z).der();
+        var der = privateKey.sign(z, 0).der();
         // append the SIGHASH_ALL to der
         var sig = Bytes.add(der, Hash.SIGHASH_ALL.toBytes(1));
         // calculate the sec

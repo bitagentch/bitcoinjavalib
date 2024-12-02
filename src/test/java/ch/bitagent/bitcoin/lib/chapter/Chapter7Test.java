@@ -97,7 +97,7 @@ class Chapter7Test {
         var transaction = Tx.parse(new ByteArrayInputStream(rawTx.toBytes()), false);
         var z = transaction.sigHash(0, null);
         var privateKey = new PrivateKey(Int.parse(8675309));
-        var der = privateKey.sign(z).der();
+        var der = privateKey.sign(z, 0).der();
         var sig = new ScriptCmd(Bytes.add(der, Hash.SIGHASH_ALL.toBytes(1)));
         var sec = new ScriptCmd(privateKey.getPoint().sec(null));
         var scriptSig = new Script(List.of(sig, sec));

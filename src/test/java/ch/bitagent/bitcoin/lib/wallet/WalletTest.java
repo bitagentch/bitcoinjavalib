@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class WalletTest {
 
@@ -35,10 +36,16 @@ class WalletTest {
     }
 
     @Test
-    void mnemonicSentence() {
+    void mnemonicSentenceSignVerify() {
         var mnemonicSentence = "dove labor word syrup speed panther flash episode forest dice measure ankle";
         var wallet = Wallet.parse(mnemonicSentence, null);
         assertEquals(20, wallet.getAddressList0().size());
         assertEquals(10, wallet.getAddressList1().size());
+        var address = wallet.getAddressList0().get(0).getAddressString();
+        var message = "Test";
+        assertEquals("bc1qnp48lrju5sjwajt6hvwp932vlq28s7nrvnuxwg", address);
+        var signature = wallet.signMessage(address, message);
+        assertEquals("H2XnmPZT5aifKvmCQhOQta0OE4Sz/66COfZf9BZ/2ZJOOfOCJGX/VeAXS+dQpbtuDqhJ+jVczeUs9/nF4F6fj7s=", signature);
+        assertTrue(wallet.verifyMessage(address, signature, message));
     }
 }

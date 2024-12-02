@@ -41,8 +41,8 @@ public class PrivateKey {
      * @param z a {@link ch.bitagent.bitcoin.lib.ecc.Int} object
      * @return a {@link ch.bitagent.bitcoin.lib.ecc.Signature} object
      */
-    public Signature sign(Int z) {
-        var k = this.deterministicK(z);
+    public Signature sign(Int z, int counter) {
+        var k = this.deterministicK(z, counter);
         // r is the x coordinate of the resulting point k*G
         var r = ((S256Field) S256Point.getG().mul(k).getX()).num;
         // remember 1/k = pow(k, N-2, N)
@@ -59,10 +59,11 @@ public class PrivateKey {
     /**
      * <p>deterministicK.</p>
      *
-     * @param z a {@link ch.bitagent.bitcoin.lib.ecc.Int} object
-     * @return a {@link ch.bitagent.bitcoin.lib.ecc.Int} object
+     * @param z .
+     * @param counter .
+     * @return a .
      */
-    public Int deterministicK(Int z) {
+    public Int deterministicK(Int z, int counter) {
         byte[] k = Bytes.initFill(32, (byte) 0x00);
         byte[] v = Bytes.initFill(32, (byte) 0x01);
 
@@ -72,12 +73,22 @@ public class PrivateKey {
         if (z.gt(S256Point.N)) {
             zBytes = z.sub(S256Point.N).toBytes(32);
         }
+        var cBytes = new byte[0];
+        if (counter > 0) {
+            var additional = Int.parse(counter);
+            cBytes = additional.toBytes(32);
+            cBytes = Bytes.changeOrder(cBytes);
+        }
 
         Mac hmac = Hash.hmacS256Init(k);
         hmac.update(v);
         hmac.update(new byte[]{0x00});
         hmac.update(secretBytes);
-        k = hmac.doFinal(zBytes);
+        hmac.update(zBytes);
+        if (counter > 0) {
+            hmac.update(cBytes);
+        }
+        k = hmac.doFinal();
 
         hmac = Hash.hmacS256Init(k);
         v = hmac.doFinal(v);
@@ -86,7 +97,11 @@ public class PrivateKey {
         hmac.update(v);
         hmac.update(new byte[]{0x01});
         hmac.update(secretBytes);
-        k = hmac.doFinal(zBytes);
+        hmac.update(zBytes);
+        if (counter > 0) {
+            hmac.update(cBytes);
+        }
+        k = hmac.doFinal();
 
         hmac = Hash.hmacS256Init(k);
         v = hmac.doFinal(v);

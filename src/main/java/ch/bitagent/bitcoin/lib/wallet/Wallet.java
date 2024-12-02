@@ -9,7 +9,7 @@ import java.util.List;
 
 public class Wallet {
 
-    private ExtendedKey extendedKey;
+    private final ExtendedKey extendedKey;
 
     private final List<Address> addressList0 = new ArrayList<>();
     private final List<Address> addressList1 = new ArrayList<>();
@@ -82,10 +82,10 @@ public class Wallet {
         }
     }
 
-    public String signMessage(Address address, String message) {
+    public String signMessage(String address, String message) {
         if (ExtendedKey.isKeyPrivate(this.extendedKey.getPrefix())) {
             for (int i = 0; i < addressList0.size(); i++) {
-                if (addressList0.get(i).equals(address)) {
+                if (addressList0.get(i).getAddressString().equals(address)) {
                     var extendedKey0i = this.extendedKey.derive(0).derive(i);
                     var privateKey0i = PrivateKey.parse(extendedKey0i.getKey());
                     return Message.sign(privateKey0i, message, Address.BECH32, true);
@@ -95,6 +95,22 @@ public class Wallet {
         } else {
             throw new IllegalArgumentException("Sign message with a public key not possible");
         }
+    }
+
+    public boolean verifyMessage(String address, String signature, String message) {
+        for (int i = 0; i < addressList0.size(); i++) {
+            if (addressList0.get(i).getAddressString().equals(address)) {
+                var extendedKey0i = this.extendedKey.derive(0).derive(i);
+                S256Point publicKey0i;
+                if (ExtendedKey.isKeyPrivate(this.extendedKey.getPrefix())) {
+                    publicKey0i = PrivateKey.parse(extendedKey0i.getKey()).getPoint();
+                } else {
+                    publicKey0i = S256Point.parse(extendedKey0i.getKey());
+                }
+                return Message.verify(publicKey0i, signature, message, true);
+            }
+        }
+        throw new IllegalArgumentException("Address not found");
     }
 
     public ExtendedKey getExtendedKey() {

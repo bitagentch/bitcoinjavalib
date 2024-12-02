@@ -6,8 +6,6 @@ import ch.bitagent.bitcoin.lib.helper.Bytes;
 import ch.bitagent.bitcoin.lib.helper.Hash;
 import ch.bitagent.bitcoin.lib.script.Script;
 
-import java.util.Objects;
-
 /**
  * Address
  */
@@ -22,7 +20,7 @@ public class Address {
     private int change = -1;
     private int addressIndex = -1;
     private int historyCount = 0;
-    private long balance = 0l;
+    private long balance = 0L;
 
     public Address(String address) {
         this.addressString = address;
@@ -199,18 +197,6 @@ public class Address {
 
     public void setBalance(long balance) {
         this.balance = balance;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Address address = (Address) o;
-        return Objects.equals(addressString, address.addressString);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(addressString);
     }
 
     @Override

@@ -13,12 +13,12 @@ class PrivateKeyTest {
     void sign() {
         var pk = new PrivateKey(Hex.parse(Hash.hash256("my secret".getBytes())));
         var z = Hex.parse(Hash.hash256("my message".getBytes()));
-        var sig = pk.sign(z);
+        var sig = pk.sign(z, 0);
         assertTrue(pk.getPoint().verify(z, sig));
 
         pk = new PrivateKey(Hex.parse(Bytes.randomBytes(S256Point.N.toBytes(32).length)));
         z = Hex.parse(Bytes.randomBytes(Int.parse(2).pow(Int.parse(256)).toBytes(32).length));
-        sig = pk.sign(z);
+        sig = pk.sign(z, 0);
         assertTrue(pk.getPoint().verify(z, sig));
     }
 

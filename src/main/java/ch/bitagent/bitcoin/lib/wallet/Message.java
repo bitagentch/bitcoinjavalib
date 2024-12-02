@@ -29,16 +29,21 @@ public class Message {
     /**
      * sign
      *
-     * @param privateKey .
-     * @param message .
+     * @param privateKey  .
+     * @param message     .
      * @param addressType .
-     * @param electrum .
+     * @param electrum    .
      * @return .
      */
     public static String sign(PrivateKey privateKey, String message, String addressType, boolean electrum) {
         var messageFormatted = formatMessageForSigning(message);
         var z = Hex.parse(Hash.hash256(messageFormatted));
-        var signature = privateKey.sign(z);
+        int counter = 0;
+        var signature = privateKey.sign(z, counter);
+        while (signature.der().length >= 71) {
+            // A low R signature will have less than 71 bytes when encoded to DER
+            signature = privateKey.sign(z, ++counter);
+        }
         byte recoveryId = findRecoveryId(z, signature, privateKey.getPoint());
         if (electrum) {
             recoveryId -= 8;
@@ -54,10 +59,10 @@ public class Message {
     /**
      * verify
      *
-     * @param publicKey .
+     * @param publicKey    .
      * @param signatureB64 .
-     * @param message .
-     * @param electrum .
+     * @param message      .
+     * @param electrum     .
      * @return .
      */
     public static boolean verify(S256Point publicKey, String signatureB64, String message, boolean electrum) {
