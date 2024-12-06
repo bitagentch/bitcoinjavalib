@@ -1,6 +1,7 @@
 # release notes
 
 ## snapshot
+- electrum
 
 ## 0.1.1
 - mnemonic sentence (bip-0039)

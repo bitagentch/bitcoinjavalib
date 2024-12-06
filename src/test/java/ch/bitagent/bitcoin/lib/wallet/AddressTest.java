@@ -62,6 +62,10 @@ class AddressTest {
         var balance = electrum.getBalance(scripthash);
         assertTrue(balance.getLong("unconfirmed") >= 0);
         assertTrue(balance.getLong("confirmed") > 0);
+        var mempool = electrum.getMempool(scripthash);
+        assertFalse(mempool.isEmpty());
+        var unspentList = electrum.listUnspent(scripthash);
+        assertFalse(unspentList.isEmpty());
     }
 
     @Test
@@ -73,7 +77,11 @@ class AddressTest {
         var history = electrum.getHistory(scripthash);
         assertEquals(120, history.length());
         var balance = electrum.getBalance(scripthash);
-        assertEquals(0l, balance.getLong("unconfirmed"));
-        assertEquals(0l, balance.getLong("confirmed"));
+        assertEquals(0L, balance.getLong("unconfirmed"));
+        assertEquals(0L, balance.getLong("confirmed"));
+        var mempool = electrum.getMempool(scripthash);
+        assertTrue(mempool.isEmpty());
+        var unspentList = electrum.listUnspent(scripthash);
+        assertTrue(unspentList.isEmpty());
     }
 }

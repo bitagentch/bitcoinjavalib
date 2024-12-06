@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * https://electrumx-spesmilo.readthedocs.io/en/latest/protocol-methods.html
+ * https://electrumx-spesmilo.readthedocs.io/en/stable/protocol-methods.html
  */
 public class Electrum {
 
@@ -154,5 +154,25 @@ public class Electrum {
         var unconfirmed = balance.getLong("unconfirmed");
         var confirmed = balance.getLong("confirmed");
         return unconfirmed + confirmed;
+    }
+
+    public JSONArray getMempool(String scripthash) {
+        var jsonRequest = String.format("{\"jsonrpc\": \"2.0\", \"method\": \"blockchain.scripthash.get_mempool\", \"params\": [\"%s\"], \"id\": \"bitcoinjavalib\"}", scripthash);
+        var jsonResponse = callSocket(null, jsonRequest);
+        if (jsonResponse == null) {
+            return null;
+        }
+        var json = new JSONObject(jsonResponse);
+        return json.getJSONArray("result");
+    }
+
+    public JSONArray listUnspent(String scripthash) {
+        var jsonRequest = String.format("{\"jsonrpc\": \"2.0\", \"method\": \"blockchain.scripthash.listunspent\", \"params\": [\"%s\"], \"id\": \"bitcoinjavalib\"}", scripthash);
+        var jsonResponse = callSocket(null, jsonRequest);
+        if (jsonResponse == null) {
+            return null;
+        }
+        var json = new JSONObject(jsonResponse);
+        return json.getJSONArray("result");
     }
 }
