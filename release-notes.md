@@ -1,6 +1,8 @@
 # release notes
 
 ## snapshot
+
+## 0.1.2
 - electrum
 
 ## 0.1.1

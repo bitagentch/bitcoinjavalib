@@ -58,4 +58,39 @@ class ElectrumTest {
         var peers = electrum.peers();
         assertFalse(peers.isEmpty());
     }
+
+    @Test
+    void invalidScripthash() {
+        var electrum = new Electrum();
+        assertNull(electrum.getHistory("bla"));
+        assertNull(electrum.getBalance("bla"));
+        assertNull(electrum.getBalanceTotal("bla"));
+        assertNull(electrum.getMempool("bla"));
+        assertNull(electrum.listUnspent("bla"));
+    }
+
+    @Test
+    void estimateFee() {
+        var electrum = new Electrum();
+        var fee = electrum.estimateFee(0);
+        assertNull(fee);
+        fee = electrum.estimateFee(1);
+        assertTrue(fee > 0);
+    }
+
+    @Test
+    void invalidTxHash() {
+        var electrum = new Electrum();
+        var tx = electrum.getTransaction("bla");
+        assertNull(tx);
+        var txVerbose = electrum.getTransactionVerbose("bla");
+        assertNull(txVerbose);
+    }
+
+    @Test
+    void invalidTransaction() {
+        var electrum = new Electrum();
+        var txHash = electrum.broadcastTransaction("bla");
+        assertNull(txHash);
+    }
 }

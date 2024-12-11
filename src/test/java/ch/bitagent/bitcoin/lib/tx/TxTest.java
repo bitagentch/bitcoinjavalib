@@ -4,6 +4,7 @@ import ch.bitagent.bitcoin.lib.ecc.Hex;
 import ch.bitagent.bitcoin.lib.ecc.Int;
 import ch.bitagent.bitcoin.lib.ecc.PrivateKey;
 import ch.bitagent.bitcoin.lib.helper.Bytes;
+import ch.bitagent.bitcoin.lib.wallet.Electrum;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -108,9 +109,14 @@ class TxTest {
 
     @Test
     void sigHash() {
-        var tx = TxFetcher.fetch("452c629d67e41baec3ac6f04fe744b4b9617f8f859c63b3002f8684e7a4fee03", false, false);
+        var txId = "452c629d67e41baec3ac6f04fe744b4b9617f8f859c63b3002f8684e7a4fee03";
+        var tx = TxFetcher.fetch(txId, false, false);
         var want = Hex.parse("27e0c5994dec7824e56dec6b2fcb342eb7cdb0d0957c2fce9882f715e85d81a6");
         assertEquals(want, tx.sigHash(0, null));
+        var electrum = new Electrum();
+        assertNotNull(electrum.getTransaction(txId));
+        assertNotNull(electrum.getTransactionVerbose(txId));
+        assertNull(electrum.broadcastTransaction(Bytes.byteArrayToHexString(tx.serialize())));
     }
 
     @Test

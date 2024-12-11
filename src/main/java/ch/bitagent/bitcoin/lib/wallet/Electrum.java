@@ -87,9 +87,8 @@ public class Electrum {
 
     public List<JSONObject> ping() {
         List<JSONObject> pongs = new ArrayList<>();
-        var jsonRequest = "{\"jsonrpc\": \"2.0\", \"method\": \"server.ping\", \"params\": [], \"id\": \"bitcoinjavalib\"}";
         for (String socket : sockets) {
-            var jsonResponse = callSocket(socket, jsonRequest);
+            var jsonResponse = callSocket(socket, getJsonRequest("server.ping", null));
             if (jsonResponse != null && !jsonResponse.isEmpty()) {
                 pongs.add(new JSONObject(jsonResponse));
             }
@@ -99,9 +98,8 @@ public class Electrum {
 
     public List<JSONObject> features() {
         List<JSONObject> features = new ArrayList<>();
-        var jsonRequest = "{\"jsonrpc\": \"2.0\", \"method\": \"server.features\", \"params\": [], \"id\": \"bitcoinjavalib\"}";
         for (String socket : sockets) {
-            var jsonResponse = callSocket(socket, jsonRequest);
+            var jsonResponse = callSocket(socket, getJsonRequest("server.features", null));
             var json = new JSONObject(jsonResponse);
             features.add(json.getJSONObject("result"));
         }
@@ -110,9 +108,8 @@ public class Electrum {
 
     public List<JSONArray> versions() {
         List<JSONArray> versions = new ArrayList<>();
-        var jsonRequest = "{\"jsonrpc\": \"2.0\", \"method\": \"server.version\", \"params\": [\"\", \"1.4\"], \"id\": \"bitcoinjavalib\"}";
         for (String socket : sockets) {
-            var jsonResponse = callSocket(socket, jsonRequest);
+            var jsonResponse = callSocket(socket, getJsonRequest("server.version", List.of("", "1.4")));
             var json = new JSONObject(jsonResponse);
             versions.add(json.getJSONArray("result"));
         }
@@ -120,29 +117,34 @@ public class Electrum {
     }
 
     public JSONArray peers() {
-        var jsonRequest = "{\"jsonrpc\": \"2.0\", \"method\": \"server.peers.subscribe\", \"params\": [], \"id\": \"bitcoinjavalib\"}";
-        var jsonResponse = callSocket(null, jsonRequest);
+        var jsonResponse = callSocket(null, getJsonRequest("server.peers.subscribe", null));
         var json = new JSONObject(jsonResponse);
         return json.getJSONArray("result");
     }
 
     public JSONArray getHistory(String scripthash) {
-        var jsonRequest = String.format("{\"jsonrpc\": \"2.0\", \"method\": \"blockchain.scripthash.get_history\", \"params\": [\"%s\"], \"id\": \"bitcoinjavalib\"}", scripthash);
-        var jsonResponse = callSocket(null, jsonRequest);
+        var jsonResponse = callSocket(null, getJsonRequest("blockchain.scripthash.get_history", List.of(scripthash)));
         if (jsonResponse == null) {
             return null;
         }
         var json = new JSONObject(jsonResponse);
+        if (json.isNull("result")) {
+            log.severe(json.toString());
+            return null;
+        }
         return json.getJSONArray("result");
     }
 
     public JSONObject getBalance(String scripthash) {
-        var jsonRequest = String.format("{\"jsonrpc\": \"2.0\", \"method\": \"blockchain.scripthash.get_balance\", \"params\": [\"%s\"], \"id\": \"bitcoinjavalib\"}", scripthash);
-        var jsonResponse = callSocket(null, jsonRequest);
+        var jsonResponse = callSocket(null, getJsonRequest("blockchain.scripthash.get_balance", List.of(scripthash)));
         if (jsonResponse == null) {
             return null;
         }
         var json = new JSONObject(jsonResponse);
+        if (json.isNull("result")) {
+            log.severe(json.toString());
+            return null;
+        }
         return json.getJSONObject("result");
     }
 
@@ -157,22 +159,95 @@ public class Electrum {
     }
 
     public JSONArray getMempool(String scripthash) {
-        var jsonRequest = String.format("{\"jsonrpc\": \"2.0\", \"method\": \"blockchain.scripthash.get_mempool\", \"params\": [\"%s\"], \"id\": \"bitcoinjavalib\"}", scripthash);
-        var jsonResponse = callSocket(null, jsonRequest);
+        var jsonResponse = callSocket(null, getJsonRequest("blockchain.scripthash.get_mempool", List.of(scripthash)));
         if (jsonResponse == null) {
             return null;
         }
         var json = new JSONObject(jsonResponse);
+        if (json.isNull("result")) {
+            log.severe(json.toString());
+            return null;
+        }
         return json.getJSONArray("result");
     }
 
     public JSONArray listUnspent(String scripthash) {
-        var jsonRequest = String.format("{\"jsonrpc\": \"2.0\", \"method\": \"blockchain.scripthash.listunspent\", \"params\": [\"%s\"], \"id\": \"bitcoinjavalib\"}", scripthash);
-        var jsonResponse = callSocket(null, jsonRequest);
+        var jsonResponse = callSocket(null, getJsonRequest("blockchain.scripthash.listunspent", List.of(scripthash)));
         if (jsonResponse == null) {
             return null;
         }
         var json = new JSONObject(jsonResponse);
+        if (json.isNull("result")) {
+            log.severe(json.toString());
+            return null;
+        }
         return json.getJSONArray("result");
+    }
+
+    public Double estimateFee(int number) {
+        var jsonResponse = callSocket(null, getJsonRequest("blockchain.estimatefee", List.of(String.valueOf(number))));
+        if (jsonResponse == null) {
+            return null;
+        }
+        var json = new JSONObject(jsonResponse);
+        if (json.isNull("result")) {
+            log.severe(json.toString());
+            return null;
+        }
+        return json.getDouble("result");
+    }
+
+    public String getTransaction(String txHash) {
+        var jsonResponse = callSocket(null, getJsonRequest("blockchain.transaction.get", List.of(txHash, false)));
+        if (jsonResponse == null) {
+            return null;
+        }
+        var json = new JSONObject(jsonResponse);
+        if (json.isNull("result")) {
+            log.severe(json.toString());
+            return null;
+        }
+        return json.getString("result");
+    }
+
+    public JSONObject getTransactionVerbose(String txHash) {
+        var jsonResponse = callSocket(null, getJsonRequest("blockchain.transaction.get", List.of(txHash, true)));
+        if (jsonResponse == null) {
+            return null;
+        }
+        var json = new JSONObject(jsonResponse);
+        if (json.isNull("result")) {
+            log.severe(json.toString());
+            return null;
+        }
+        return json.getJSONObject("result");
+    }
+
+    public String broadcastTransaction(String rawTx) {
+        var jsonResponse = callSocket(null, getJsonRequest("blockchain.transaction.broadcast", List.of(rawTx)));
+        if (jsonResponse == null) {
+            return null;
+        }
+        var json = new JSONObject(jsonResponse);
+        if (json.isNull("result")) {
+            log.severe(json.toString());
+            return null;
+        }
+        return json.getString("result");
+    }
+
+    private String getJsonRequest(String method, List<Object> params) {
+        var jsonRequest = new JSONObject();
+        jsonRequest.put("jsonrpc", "2.0");
+        jsonRequest.put("method", method);
+        var paramsJson = new JSONArray();
+        if (params != null) {
+            for (Object param : params) {
+                paramsJson.put(param);
+            }
+        }
+        jsonRequest.put("params", paramsJson);
+        jsonRequest.put("id", "bitcoinjavalib");
+        return jsonRequest.toString();
     }
 }
