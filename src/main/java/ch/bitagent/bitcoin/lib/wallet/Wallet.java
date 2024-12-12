@@ -2,6 +2,7 @@ package ch.bitagent.bitcoin.lib.wallet;
 
 import ch.bitagent.bitcoin.lib.ecc.PrivateKey;
 import ch.bitagent.bitcoin.lib.ecc.S256Point;
+import ch.bitagent.bitcoin.lib.network.Electrum;
 
 import java.util.ArrayList;
 import java.util.Arrays;

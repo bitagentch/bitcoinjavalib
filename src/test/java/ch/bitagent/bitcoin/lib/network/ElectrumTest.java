@@ -1,4 +1,4 @@
-package ch.bitagent.bitcoin.lib.wallet;
+package ch.bitagent.bitcoin.lib.network;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;

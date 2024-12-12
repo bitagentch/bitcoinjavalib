@@ -2,6 +2,7 @@ package ch.bitagent.bitcoin.lib.tx;
 
 import ch.bitagent.bitcoin.lib.ecc.Hex;
 import ch.bitagent.bitcoin.lib.helper.*;
+import ch.bitagent.bitcoin.lib.network.Electrum;
 
 import java.io.*;
 import java.util.Arrays;
@@ -41,8 +42,10 @@ public class TxFetcher {
                 String txRaw;
                 if (Properties.getBitcoinRpcAuth() != null && Properties.getBitcoinRpcTestnet().equals(testnet)) {
                     txRaw = Http.postGetRawTransaction(txId64);
-                } else {
+                } else if (Boolean.TRUE.equals(testnet)) {
                     txRaw = Http.get(getUrlBlockstream(testnet, txId64));
+                } else {
+                    txRaw = new Electrum().getTransaction(txId64);
                 }
                 // make sure the tx we got matches to the hash we requested
                 Tx tx;

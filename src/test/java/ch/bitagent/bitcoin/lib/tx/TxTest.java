@@ -4,7 +4,7 @@ import ch.bitagent.bitcoin.lib.ecc.Hex;
 import ch.bitagent.bitcoin.lib.ecc.Int;
 import ch.bitagent.bitcoin.lib.ecc.PrivateKey;
 import ch.bitagent.bitcoin.lib.helper.Bytes;
-import ch.bitagent.bitcoin.lib.wallet.Electrum;
+import ch.bitagent.bitcoin.lib.network.Electrum;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;

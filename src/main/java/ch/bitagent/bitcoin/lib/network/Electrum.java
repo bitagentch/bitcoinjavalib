@@ -1,4 +1,4 @@
-package ch.bitagent.bitcoin.lib.wallet;
+package ch.bitagent.bitcoin.lib.network;
 
 import ch.bitagent.bitcoin.lib.helper.Properties;
 import ch.bitagent.bitcoin.lib.helper.Tcp;

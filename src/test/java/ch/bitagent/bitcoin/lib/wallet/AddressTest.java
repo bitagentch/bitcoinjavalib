@@ -1,5 +1,6 @@
 package ch.bitagent.bitcoin.lib.wallet;
 
+import ch.bitagent.bitcoin.lib.network.Electrum;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
