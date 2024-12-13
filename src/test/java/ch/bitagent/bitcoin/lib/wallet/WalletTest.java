@@ -14,6 +14,7 @@ class WalletTest {
     @Test
     void createMnemonic() {
         var sentence = Wallet.createMnemonic(128);
+        log.info(sentence);
         assertEquals(12, sentence.split(" ").length);
     }
 
@@ -46,6 +47,18 @@ class WalletTest {
         assertEquals("bc1qnp48lrju5sjwajt6hvwp932vlq28s7nrvnuxwg", address);
         var signature = wallet.signMessage(address, message);
         assertEquals("H2XnmPZT5aifKvmCQhOQta0OE4Sz/66COfZf9BZ/2ZJOOfOCJGX/VeAXS+dQpbtuDqhJ+jVczeUs9/nF4F6fj7s=", signature);
+        assertTrue(wallet.verifyMessage(address, signature, message));
+    }
+
+    @Test
+    void testWallet() {
+        var mnemonicSentence = "crowd surround reason item word jacket neither shoot find endorse gain snow";
+        var wallet = Wallet.parse(mnemonicSentence, null);
+        var address = wallet.getAddressList0().get(0).getAddressString();
+        log.info(address);
+        var message = "I confirm my iban and my bitcoin wallet. [test]";
+        var signature = wallet.signMessage(address, message);
+        log.info(signature);
         assertTrue(wallet.verifyMessage(address, signature, message));
     }
 }
