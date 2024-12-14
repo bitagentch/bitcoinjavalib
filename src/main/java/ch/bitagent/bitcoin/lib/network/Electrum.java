@@ -122,6 +122,12 @@ public class Electrum {
         return json.getJSONArray("result");
     }
 
+    public Integer height() {
+        var jsonResponse = callSocket(null, getJsonRequest("blockchain.headers.subscribe", null));
+        var json = new JSONObject(jsonResponse);
+        return json.getJSONObject("result").getInt("height");
+    }
+
     public JSONArray getHistory(String scripthash) {
         var jsonResponse = callSocket(null, getJsonRequest("blockchain.scripthash.get_history", List.of(scripthash)));
         if (jsonResponse == null) {

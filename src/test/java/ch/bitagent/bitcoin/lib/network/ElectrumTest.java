@@ -60,6 +60,13 @@ class ElectrumTest {
     }
 
     @Test
+    void height() {
+        var electrum = new Electrum();
+        var height = electrum.height();
+        assertNotNull(height);
+    }
+
+    @Test
     void invalidScripthash() {
         var electrum = new Electrum();
         assertNull(electrum.getHistory("bla"));
