@@ -17,6 +17,9 @@ public class TxIn {
 
     private static final Logger log = Logger.getLogger(TxIn.class.getSimpleName());
 
+    public static final Int SEQUENCE = Hex.parse("ffffffff");
+    public static final Int SEQUENCE_RBF = Hex.parse("fffffffd");
+
     private final Int prevTx;
     private final Int prevIndex;
     private Script scriptSig;
@@ -35,7 +38,7 @@ public class TxIn {
         this.prevTx = prevTx;
         this.prevIndex = prevIndex;
         this.scriptSig = Objects.requireNonNullElse(scriptSig, new Script(null));
-        this.sequence = Objects.requireNonNullElse(sequence, Hex.parse("ffffffff"));
+        this.sequence = Objects.requireNonNullElse(sequence, SEQUENCE);
         log.fine(this.toString());
     }
 

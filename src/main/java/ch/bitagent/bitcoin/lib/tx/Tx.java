@@ -229,6 +229,9 @@ public class Tx implements Message {
             result.writeBytes(txOut.serialize());
         }
         for (TxIn txIn : txIns) {
+            if (txIn.getWitness() == null) {
+                continue;
+            }
             result.writeBytes(Int.parse(txIn.getWitness().getCmds().size()).toBytesLittleEndian(1));
             for (ScriptCmd witness : txIn.getWitness().getCmds()) {
                 if (witness.isOpCode()) {
