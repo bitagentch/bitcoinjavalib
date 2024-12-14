@@ -53,11 +53,11 @@ public class TxFetcher {
                 if (rawBytes[4] == 0) {
                     // no inputs
                     rawBytes = Bytes.add(Arrays.copyOfRange(rawBytes, 0, 4), Arrays.copyOfRange(rawBytes, 6, rawBytes.length));
-                    tx = Tx.parse(new ByteArrayInputStream(rawBytes), testnet);
+                    tx = Tx.parse(rawBytes, testnet);
                     var locktime = Hex.parse(Bytes.changeOrder(Arrays.copyOfRange(rawBytes, rawBytes.length - 4, rawBytes.length)));
                     tx.setLocktime(locktime);
                 } else {
-                    tx = Tx.parse(new ByteArrayInputStream(rawBytes), testnet);
+                    tx = Tx.parse(rawBytes, testnet);
                 }
                 if (!tx.id().equals(txId64)) {
                     throw new IllegalStateException(String.format("not the same id: %s vs %s", tx.id(), txId));
@@ -71,8 +71,7 @@ public class TxFetcher {
             log.fine(String.format("time %sms", System.currentTimeMillis() - start));
         }
         var txBytes = Bytes.hexStringToByteArray(cache.get(txId64));
-        var txStream = new ByteArrayInputStream(txBytes);
-        Tx tx = Tx.parse(txStream, testnet);
+        Tx tx = Tx.parse(txBytes, testnet);
         // make sure the tx we got matches to the hash we requested
         String computed;
         if (Boolean.TRUE.equals(tx.getSegwit())) {

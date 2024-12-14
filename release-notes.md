@@ -1,6 +1,9 @@
 # release notes
 
 ## snapshot
+- electrum
+- wallet
+- tx
 
 ## 0.1.2
 - electrum

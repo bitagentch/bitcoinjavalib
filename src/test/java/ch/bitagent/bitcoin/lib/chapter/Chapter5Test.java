@@ -25,7 +25,7 @@ class Chapter5Test {
 
     @Test
     void exercise1() {
-        var hexTransaction = Hex.parse("010000000456919960ac691763688d3d3bcea9ad6ecaf875df5339e" +
+        var hexTransaction = "010000000456919960ac691763688d3d3bcea9ad6ecaf875df5339e" +
                 "148a1fc61c6ed7a069e010000006a47304402204585bcdef85e6b1c6af5c2669d4830ff86e42dd" +
                 "205c0e089bc2a821657e951c002201024a10366077f87d6bce1f7100ad8cfa8a064b39d4e8fe4e" +
                 "a13a7b71aa8180f012102f0da57e85eec2934a82a585ea337ce2f4998b50ae699dd79f5880e253" +
@@ -42,9 +42,8 @@ class Chapter5Test {
                 "852028751635dcee2be669c2a1686a4b5edf304012103ffd6f4a67e94aba353a00882e563ff272" +
                 "2eb4cff0ad6006e86ee20dfe7520d55feffffff0251430f00000000001976a914ab0c0b2e98b1a" +
                 "b6dbf67d4750b0a56244948a87988ac005a6202000000001976a9143c82d7df364eb6c75be8c80" +
-                "df2b3eda8db57397088ac46430600");
-        var stream = new ByteArrayInputStream(hexTransaction.toBytes());
-        var txObj = Tx.parse(stream, true);
+                "df2b3eda8db57397088ac46430600";
+        var txObj = Tx.parse(hexTransaction, true);
         var scriptSig = txObj.getTxIns().get(1).getScriptSig();
         log.fine(scriptSig.toString());
         assertEquals("304402207899531a52d59a6de200179928ca900254a36b8dff8bb75f5f5d71b1cdc26125022008b422690b8461cb52c3cc30330b23d574351872b7c361e9aae3649071c1a71601 035d5c93d9ac96881f19ba1f686f15f009ded7c62efe85a872e6a19b43c15a2937", scriptSig.toString());

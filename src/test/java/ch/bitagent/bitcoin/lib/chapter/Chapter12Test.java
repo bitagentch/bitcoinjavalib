@@ -191,7 +191,7 @@ class Chapter12Test {
                 }
                 imb++;
             } else if (message.isCommand(Tx.COMMAND)) {
-                var tx = Tx.parse(new ByteArrayInputStream(message.getPayload()), Properties.getBitcoinP2pTestnet());
+                var tx = Tx.parse(message.getPayload(), Properties.getBitcoinP2pTestnet());
                 for (int i = 0; i < tx.getTxOuts().size(); i++) {
                     var script = tx.getTxOuts().get(i).getScriptPubkey();
                     if (OpCodeNames.OP_106_RETURN.equals(script.getCmds().get(0).getOpCode())) {
@@ -295,7 +295,7 @@ class Chapter12Test {
             } else if (message.isCommand(Tx.COMMAND)) {
                 // else we have the tx command
                 // set the tx's testnet to be True
-                var tx = Tx.parse(new ByteArrayInputStream(message.getPayload()), Properties.getBitcoinP2pTestnet());
+                var tx = Tx.parse(message.getPayload(), Properties.getBitcoinP2pTestnet());
                 // loop through the tx outs
                 for (int i = 0; i < tx.getTxOuts().size(); i++) {
                     // if our output has the same address as our address we found it
@@ -327,7 +327,7 @@ class Chapter12Test {
             // sign the only input of the transaction
             assertTrue(txObj.signInput(0, privateKey));
             // serialize and hex to see what it looks like
-            log.fine(String.format("%s", Hex.parse(txObj.serialize())));
+            log.fine(String.format("%s", txObj.serializeHexString()));
             // send this signed transaction on the network
             node.send(txObj);
             // wait a sec so this message goes through with time.sleep(1)
@@ -345,7 +345,7 @@ class Chapter12Test {
             node.send(getdata);
             // now wait for a Tx response
             var receivedTx = node.waitFor(Set.of(Tx.COMMAND));
-            var receivedTxMessage = Tx.parse(new ByteArrayInputStream(receivedTx.getPayload()), Properties.getBitcoinP2pTestnet());
+            var receivedTxMessage = Tx.parse(receivedTx.getPayload(), Properties.getBitcoinP2pTestnet());
             // if the received tx has the same id as our tx, we are done!
             assertEquals(txObj.id(), receivedTxMessage.id());
         } else {

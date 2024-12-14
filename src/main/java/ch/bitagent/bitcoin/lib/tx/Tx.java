@@ -93,7 +93,7 @@ public class Tx implements Message {
      * @param testnet a {@link java.lang.Boolean} object
      * @return a {@link ch.bitagent.bitcoin.lib.tx.Tx} object
      */
-    public static Tx parse(ByteArrayInputStream stream, Boolean testnet) {
+    private static Tx parse(ByteArrayInputStream stream, Boolean testnet) {
         Bytes.read(stream, 4);
         var segwitMarker = Hex.parse(Bytes.read(stream, 1));
         stream.reset();
@@ -102,6 +102,14 @@ public class Tx implements Message {
         } else {
             return parseLegacy(stream, testnet);
         }
+    }
+
+    public static Tx parse(byte[] rawTx, Boolean testnet) {
+        return parse(new ByteArrayInputStream(rawTx), testnet);
+    }
+
+    public static Tx parse(String rawTx, Boolean testnet) {
+        return parse(Bytes.hexStringToByteArray(rawTx), testnet);
     }
 
     /**
@@ -176,6 +184,10 @@ public class Tx implements Message {
         } else {
             return serializeLegacy();
         }
+    }
+
+    public String serializeHexString() {
+        return Bytes.byteArrayToHexString(serialize());
     }
 
     /**
