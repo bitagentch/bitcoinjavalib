@@ -4,6 +4,8 @@
 - electrum
 - wallet
 - tx
+- address
+- script
 
 ## 0.1.2
 - electrum

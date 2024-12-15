@@ -37,7 +37,7 @@ public class Script {
      * @param h160 .
      * @return .
      */
-    public static Script p2pkhScriptPubkey(byte[] h160) {
+    public static Script p2pkhScriptOp20(byte[] h160) {
         return new Script(List.of(OpCodeNames.OP_118_DUP.toScriptCmd(), OpCodeNames.OP_169_HASH160.toScriptCmd(), OpCodeNames.OP_20_PUSHBYTES_20.toScriptCmd(), new ScriptCmd(h160), OpCodeNames.OP_136_EQUALVERIFY.toScriptCmd(), OpCodeNames.OP_172_CHECKSIG.toScriptCmd()));
     }
 
@@ -57,7 +57,7 @@ public class Script {
      * @param h160 .
      * @return .
      */
-    public static Script p2shScriptPubkey(byte[] h160) {
+    public static Script p2shScriptOp20(byte[] h160) {
         return new Script(List.of(OpCodeNames.OP_169_HASH160.toScriptCmd(), OpCodeNames.OP_20_PUSHBYTES_20.toScriptCmd(), new ScriptCmd(h160), OpCodeNames.OP_135_EQUAL.toScriptCmd()));
     }
 
@@ -77,7 +77,7 @@ public class Script {
      * @param h160 .
      * @return .
      */
-    public static Script p2wpkhScriptPubkey(byte[] h160) {
+    public static Script p2wpkhScriptOp20(byte[] h160) {
         return new Script(List.of(OpCodeNames.OP_0.toScriptCmd(), OpCodeNames.OP_20_PUSHBYTES_20.toScriptCmd(), new ScriptCmd(h160)));
     }
 

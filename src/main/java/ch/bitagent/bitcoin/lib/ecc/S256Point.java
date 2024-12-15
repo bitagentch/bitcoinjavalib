@@ -150,7 +150,7 @@ public class S256Point extends Point {
      * @return
      */
     public String addressBech32P2wpkh(boolean testnet) {
-        var script = Script.p2wpkhScriptPubkey(this.hash160(true));
+        var script = Script.p2wpkhScriptOp20(this.hash160(true));
         return Bech32.encodeSegwit(testnet ? "tb" : "bc", script.toHex());
     }
 

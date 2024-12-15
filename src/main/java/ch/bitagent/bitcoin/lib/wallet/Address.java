@@ -140,18 +140,30 @@ public class Address {
         }
     }
 
+    public Script scriptPubkey() {
+        if (this.isP2pkhAddress()) {
+            return Script.p2pkhScript(hash160());
+        } else if (this.isP2shAddress()) {
+            return Script.p2shScript(hash160());
+        } else if (this.isBech32Address()) {
+            return Script.p2wpkhScript(hash160());
+        } else {
+            throw new IllegalStateException();
+        }
+    }
+
     /**
      * https://electrumx-spesmilo.readthedocs.io/en/latest/protocol-basics.html#script-hashes
      */
     public String electrumScripthash() {
         if (this.isP2pkhAddress()) {
             var hash160 = Base58.decodeAddress(this.addressString);
-            var script = Script.p2pkhScriptPubkey(hash160);
+            var script = Script.p2pkhScriptOp20(hash160);
             var hash = Hash.sha256(Bytes.hexStringToByteArray(script.toHex()));
             return Bytes.byteArrayToHexString(Bytes.changeOrder(hash));
         } else if (this.isP2shAddress()) {
             var hash160 = Base58.decodeAddress(this.addressString);
-            var script = Script.p2shScriptPubkey(hash160);
+            var script = Script.p2shScriptOp20(hash160);
             var hash = Hash.sha256(Bytes.hexStringToByteArray(script.toHex()));
             return Bytes.byteArrayToHexString(Bytes.changeOrder(hash));
         } else if (this.isBech32Address()) {
