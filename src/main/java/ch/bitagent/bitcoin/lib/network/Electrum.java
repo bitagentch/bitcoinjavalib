@@ -1,5 +1,6 @@
 package ch.bitagent.bitcoin.lib.network;
 
+import ch.bitagent.bitcoin.lib.helper.Helper;
 import ch.bitagent.bitcoin.lib.helper.Properties;
 import ch.bitagent.bitcoin.lib.helper.Tcp;
 import org.json.JSONArray;
@@ -154,16 +155,6 @@ public class Electrum {
         return json.getJSONObject("result");
     }
 
-    public Long getBalanceTotal(String scripthash) {
-        var balance = this.getBalance(scripthash);
-        if (balance == null) {
-            return null;
-        }
-        var unconfirmed = balance.getLong("unconfirmed");
-        var confirmed = balance.getLong("confirmed");
-        return unconfirmed + confirmed;
-    }
-
     public JSONArray getMempool(String scripthash) {
         var jsonResponse = callSocket(null, getJsonRequest("blockchain.scripthash.get_mempool", List.of(scripthash)));
         if (jsonResponse == null) {
@@ -190,7 +181,7 @@ public class Electrum {
         return json.getJSONArray("result");
     }
 
-    public Double estimateFee(int number) {
+    public Long estimateFee(int number) {
         var jsonResponse = callSocket(null, getJsonRequest("blockchain.estimatefee", List.of(String.valueOf(number))));
         if (jsonResponse == null) {
             return null;
@@ -200,7 +191,8 @@ public class Electrum {
             log.severe(json.toString());
             return null;
         }
-        return json.getDouble("result");
+        var estimateFeeKB = json.getDouble("result");
+        return Long.parseLong(Helper.btcToSat(estimateFeeKB / 1024)) + 1;
     }
 
     public String getTransaction(String txHash) {

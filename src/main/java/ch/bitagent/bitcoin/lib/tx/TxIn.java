@@ -17,13 +17,13 @@ public class TxIn {
 
     private static final Logger log = Logger.getLogger(TxIn.class.getSimpleName());
 
-    public static final Int SEQUENCE = Hex.parse("ffffffff");
+    public static final Int SEQUENCE_DEF = Hex.parse("ffffffff");
     public static final Int SEQUENCE_RBF = Hex.parse("fffffffd");
 
     private final Int prevTx;
     private final Int prevIndex;
     private Script scriptSig;
-    private Int sequence;
+    private final Int sequence;
     private Script witness;
 
     /**
@@ -38,7 +38,7 @@ public class TxIn {
         this.prevTx = prevTx;
         this.prevIndex = prevIndex;
         this.scriptSig = Objects.requireNonNullElse(scriptSig, new Script(null));
-        this.sequence = Objects.requireNonNullElse(sequence, SEQUENCE);
+        this.sequence = Objects.requireNonNullElse(sequence, SEQUENCE_DEF);
         log.fine(this.toString());
     }
 
@@ -108,7 +108,7 @@ public class TxIn {
     /** {@inheritDoc} */
     @Override
     public String toString() {
-        return String.format("txin %s:%s:%s:%s", prevTx, prevIndex, scriptSig, sequence);
+        return String.format("txin %s:%s:%s:%s:%s", prevTx, prevIndex.intValue(), scriptSig, sequence, witness != null ? witness : "");
     }
 
     /**

@@ -22,7 +22,7 @@ public class TxOut {
     /**
      * <p>Constructor for TxOut.</p>
      *
-     * @param amount a {@link ch.bitagent.bitcoin.lib.ecc.Int} object
+     * @param amount       a {@link ch.bitagent.bitcoin.lib.ecc.Int} object
      * @param scriptPubkey a {@link ch.bitagent.bitcoin.lib.script.Script} object
      */
     public TxOut(Int amount, Script scriptPubkey) {
@@ -39,7 +39,7 @@ public class TxOut {
      * @return a {@link ch.bitagent.bitcoin.lib.tx.TxOut} object
      */
     public static TxOut parse(ByteArrayInputStream stream) {
-        var amount = Hex.parse(Bytes.changeOrder(Bytes.read(stream,8)));
+        var amount = Hex.parse(Bytes.changeOrder(Bytes.read(stream, 8)));
         var scriptPubkey = Script.parse(stream);
         return new TxOut(amount, scriptPubkey);
     }
@@ -56,10 +56,12 @@ public class TxOut {
         return result.toByteArray();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
-        return String.format("txout %s:%s", amount, scriptPubkey);
+        return String.format("txout %s:%s", amount.intValue(), scriptPubkey);
     }
 
     /**

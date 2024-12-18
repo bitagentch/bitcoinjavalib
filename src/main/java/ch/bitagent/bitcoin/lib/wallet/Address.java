@@ -16,11 +16,11 @@ public class Address {
     public static final String BECH32 = "bech32";
 
     private final String addressString;
+    private AddressChangeIndex changeIndex;
 
-    private int change = -1;
-    private int addressIndex = -1;
     private int historyCount = 0;
-    private long balance = 0L;
+    private long unconfirmed = 0L;
+    private long confirmed = 0L;
 
     public Address(String address) {
         this.addressString = address;
@@ -179,20 +179,12 @@ public class Address {
         return addressString;
     }
 
-    public int getChange() {
-        return change;
+    public AddressChangeIndex getChangeIndex() {
+        return changeIndex;
     }
 
-    public void setChange(int change) {
-        this.change = change;
-    }
-
-    public int getAddressIndex() {
-        return addressIndex;
-    }
-
-    public void setAddressIndex(int addressIndex) {
-        this.addressIndex = addressIndex;
+    public void setChangeIndex(AddressChangeIndex changeIndex) {
+        this.changeIndex = changeIndex;
     }
 
     public int getHistoryCount() {
@@ -203,18 +195,26 @@ public class Address {
         this.historyCount = historyCount;
     }
 
-    public long getBalance() {
-        return balance;
+    public long getUnconfirmed() {
+        return unconfirmed;
     }
 
-    public void setBalance(long balance) {
-        this.balance = balance;
+    public void setUnconfirmed(long unconfirmed) {
+        this.unconfirmed = unconfirmed;
+    }
+
+    public long getConfirmed() {
+        return confirmed;
+    }
+
+    public void setConfirmed(long confirmed) {
+        this.confirmed = confirmed;
     }
 
     @Override
     public String toString() {
-        if (change >= 0 && addressIndex >= 0) {
-            return String.format("/%s/%s/%s/%s/%s", change, addressIndex, addressString, historyCount, balance);
+        if (changeIndex != null) {
+            return String.format("/%s/%s/%s/%s/%s/%s", changeIndex.getChange(), changeIndex.getIndex(), addressString, historyCount, unconfirmed, confirmed);
         } else {
             return addressString;
         }

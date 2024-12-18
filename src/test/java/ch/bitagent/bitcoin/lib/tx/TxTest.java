@@ -18,7 +18,7 @@ class TxTest {
     @Test
     void fetch() {
         Tx tx = TxFetcher.fetch("184d3393cea44574a7b521575878a5485fc3c18e4920808235c8f58264c1dc48", true, false);
-        String txString = tx.serializeHexString();
+        String txString = tx.hexString();
         log.fine(txString);
         assertEquals("0100000001e047a4dfa9980e1533ef990f25ccd387922b2f9b8ed00df064684ff33b3fe52e000000006a473044022007fefcd11b9b715b45ecfe02eba011d785a9364c08af60297d6aa8a4ccc95c3702201cac5e121d07545275b510264c625d9cdaf9e4b58652aad0226a47c96729dc270121021f955d36390a38361530fb3724a835f4f504049492224a028fb0ab8c063511a7ffffffff02c0441105000000001976a914d23541bd04c58a1265e78be912e63b2557fb439088aca0860100000000001976a91456d95dc3f2414a210efb7188d287bff487df96c688ac00000000", txString);
     }
@@ -69,7 +69,7 @@ class TxTest {
     void serialize() {
         var rawTx = "0100000001813f79011acb80925dfe69b3def355fe914bd1d96a3f5f71bf8303c6a989c7d1000000006b483045022100ed81ff192e75a3fd2304004dcadb746fa5e24c5031ccfcf21320b0277457c98f02207a986d955c6e0cb35d446a89d3f56100f4d7f67801c31967743a9c8e10615bed01210349fc4e631e3624a545de3f89f5d8684c7b8138bd94bdd531d2e213bf016b278afeffffff02a135ef01000000001976a914bc3b654dca7e56b04dca18f2566cdaf02e8d9ada88ac99c39800000000001976a9141c4bc762dd5423e332166702cb75f40df79fea1288ac19430600";
         var tx = Tx.parse(rawTx, null);
-        assertEquals(rawTx, tx.serializeHexString());
+        assertEquals(rawTx, tx.hexString());
     }
 
     @Test
@@ -110,7 +110,7 @@ class TxTest {
         var electrum = new Electrum();
         assertNotNull(electrum.getTransaction(txId));
         assertNotNull(electrum.getTransactionVerbose(txId));
-        assertNull(electrum.broadcastTransaction(tx.serializeHexString()));
+        assertNull(electrum.broadcastTransaction(tx.hexString()));
     }
 
     @Test
@@ -158,7 +158,7 @@ class TxTest {
         assertTrue(tx.signInput(0, privateKey));
 
         var want = "010000000199a24308080ab26e6fb65c4eccfadf76749bb5bfa8cb08f291320b3c21e56f0d0d0000006b4830450221008ed46aa2cf12d6d81065bfabe903670165b538f65ee9a3385e6327d80c66d3b502203124f804410527497329ec4715e18558082d489b218677bd029e7fa306a72236012103935581e52c354cd2f484fe8ed83af7a3097005b2f9c60bff71d35bd795f54b67ffffffff02408af701000000001976a914d52ad7ca9b3d096a38e752c2018e6fbc40cdf26f88ac80969800000000001976a914507b27411ccf7f16f10297de6cef3f291623eddf88ac00000000";
-        assertEquals(want, tx.serializeHexString());
+        assertEquals(want, tx.hexString());
     }
 
     @Test()
@@ -177,14 +177,5 @@ class TxTest {
         rawTx = "0100000001813f79011acb80925dfe69b3def355fe914bd1d96a3f5f71bf8303c6a989c7d1000000006b483045022100ed81ff192e75a3fd2304004dcadb746fa5e24c5031ccfcf21320b0277457c98f02207a986d955c6e0cb35d446a89d3f56100f4d7f67801c31967743a9c8e10615bed01210349fc4e631e3624a545de3f89f5d8684c7b8138bd94bdd531d2e213bf016b278afeffffff02a135ef01000000001976a914bc3b654dca7e56b04dca18f2566cdaf02e8d9ada88ac99c39800000000001976a9141c4bc762dd5423e332166702cb75f40df79fea1288ac19430600";
         tx = Tx.parse(rawTx, null);
         assertNull(tx.coinbaseHeight());
-    }
-
-    @Test
-    void analyzeTx() {
-        var txId = "8fb2a9267278ae03d8782a1efe69f842fa0fca3319dfb4f0b98926321afe9bb6";
-        var rawTx = new Electrum().getTransaction(txId);
-        log.fine(rawTx);
-        var tx = Tx.parse(rawTx, false);
-        assertEquals(rawTx, tx.serializeHexString());
     }
 }

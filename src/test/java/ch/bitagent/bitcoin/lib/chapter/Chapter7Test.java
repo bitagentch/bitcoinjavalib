@@ -84,7 +84,7 @@ class Chapter7Test {
         log.fine(String.format("tx %s", tx));
         assertEquals("cd30a8da777d28ef0e61efe68a9f7c559c1d3e5bcd7b265c850ccb4068598d11", tx.id());
         assertEquals(Int.parse(1), tx.getVersion());
-        assertEquals("[txin 0d6fe5213c0b3291f208cba8bfb59b7476dffacc4e5cb66f6eb20a080843a299:13::ffffffff]", tx.getTxIns().toString());
+        assertEquals("[txin 0d6fe5213c0b3291f208cba8bfb59b7476dffacc4e5cb66f6eb20a080843a299:13::ffffffff:]", tx.getTxIns().toString());
         assertEquals("[txout 33000000:OP_DUP OP_HASH160 d52ad7ca9b3d096a38e752c2018e6fbc40cdf26f OP_EQUALVERIFY OP_CHECKSIG, txout 10000000:OP_DUP OP_HASH160 507b27411ccf7f16f10297de6cef3f291623eddf OP_EQUALVERIFY OP_CHECKSIG]", tx.getTxOuts().toString());
         assertEquals(Int.parse(0), tx.getLocktime());
     }
@@ -101,7 +101,7 @@ class Chapter7Test {
         var sec = new ScriptCmd(privateKey.getPoint().sec(null));
         var scriptSig = new Script(List.of(sig, sec));
         transaction.getTxIns().get(0).setScriptSig(scriptSig);
-        assertEquals("0100000001813f79011acb80925dfe69b3def355fe914bd1d96a3f5f71bf8303c6a989c7d1000000006a47304402207db2402a3311a3b845b038885e3dd889c08126a8570f26a844e3e4049c482a11022010178cdca4129eacbeab7c44648bf5ac1f9cac217cd609d216ec2ebc8d242c0a012103935581e52c354cd2f484fe8ed83af7a3097005b2f9c60bff71d35bd795f54b67feffffff02a135ef01000000001976a914bc3b654dca7e56b04dca18f2566cdaf02e8d9ada88ac99c39800000000001976a9141c4bc762dd5423e332166702cb75f40df79fea1288ac19430600", transaction.serializeHexString());
+        assertEquals("0100000001813f79011acb80925dfe69b3def355fe914bd1d96a3f5f71bf8303c6a989c7d1000000006a47304402207db2402a3311a3b845b038885e3dd889c08126a8570f26a844e3e4049c482a11022010178cdca4129eacbeab7c44648bf5ac1f9cac217cd609d216ec2ebc8d242c0a012103935581e52c354cd2f484fe8ed83af7a3097005b2f9c60bff71d35bd795f54b67feffffff02a135ef01000000001976a914bc3b654dca7e56b04dca18f2566cdaf02e8d9ada88ac99c39800000000001976a9141c4bc762dd5423e332166702cb75f40df79fea1288ac19430600", transaction.hexString());
     }
 
     /**
@@ -165,6 +165,6 @@ class Chapter7Test {
         }
         assertEquals(txWant.getLocktime(), tx.getLocktime());
         assertEquals(txWant.getTestnet(), tx.getTestnet());
-        assertEquals(want, tx.serializeHexString());
+        assertEquals(want, tx.hexString());
     }
 }

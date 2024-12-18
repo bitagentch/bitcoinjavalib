@@ -71,7 +71,6 @@ class ElectrumTest {
         var electrum = new Electrum();
         assertNull(electrum.getHistory("bla"));
         assertNull(electrum.getBalance("bla"));
-        assertNull(electrum.getBalanceTotal("bla"));
         assertNull(electrum.getMempool("bla"));
         assertNull(electrum.listUnspent("bla"));
     }

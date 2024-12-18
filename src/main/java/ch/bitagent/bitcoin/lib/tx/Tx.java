@@ -40,6 +40,8 @@ public class Tx implements Message {
     }
 
     private final Int version;
+    private Int marker;
+    private Int flag;
     private final List<TxIn> txIns;
     private final List<TxOut> txOuts;
     private Int locktime;
@@ -66,6 +68,10 @@ public class Tx implements Message {
         this.locktime = locktime;
         this.testnet = Objects.requireNonNullElse(testnet, false);
         this.segwit = Objects.requireNonNullElse(segwit, false);
+        if (this.segwit) {
+            this.marker = Hex.parse("00");
+            this.flag = Hex.parse("01");
+        }
     }
 
     /**
@@ -142,9 +148,11 @@ public class Tx implements Message {
 
     private static Tx parseSegwit(ByteArrayInputStream stream, Boolean testnet) {
         var version = Hex.parse(Bytes.changeOrder(Bytes.read(stream, 4)));
-        var marker = Hex.parse(Bytes.read(stream, 2));
-        if (!marker.eq(Hex.parse("0001"))) {
-            throw new IllegalArgumentException(String.format("Not a segwit transaction %s", marker));
+        var marker = Hex.parse(Bytes.read(stream, 1));
+        var flag = Hex.parse(Bytes.read(stream, 1));
+        var markerFlag = Hex.parse(Bytes.add(marker.toBytes(), flag.toBytes()));
+        if (!markerFlag.eq(Hex.parse("0001"))) {
+            throw new IllegalArgumentException(String.format("Not a segwit transaction %s", markerFlag));
         }
         var numInputs = Varint.read(stream).intValue();
         var inputs = new ArrayList<TxIn>();
@@ -170,7 +178,10 @@ public class Tx implements Message {
             txIn.setWitness(new Script(items));
         }
         var locktime = Hex.parse(Bytes.changeOrder(Bytes.read(stream, 4)));
-        return new Tx(version, inputs, outputs, locktime, testnet, true);
+        var tx = new Tx(version, inputs, outputs, locktime, testnet, true);
+        tx.setMarker(marker);
+        tx.setFlag(flag);
+        return tx;
     }
 
     /**
@@ -186,8 +197,36 @@ public class Tx implements Message {
         }
     }
 
-    public String serializeHexString() {
+    public String hexString() {
         return Bytes.byteArrayToHexString(serialize());
+    }
+
+    public int sizeBytes() {
+        return serialize().length;
+    }
+
+    public int sizeWeightUnits() {
+        var weight = 0;
+        weight += this.version.toBytes(4).length * 4;
+        weight += this.marker != null ? 1 : 0;
+        weight += this.flag != null ? 1 : 0;
+        weight += 4;
+        for (TxIn txIn : txIns) {
+            weight += txIn.serialize().length * 4;
+            if (txIn.getWitness() != null) {
+                weight += txIn.getWitness().serialize().length;
+            }
+        }
+        weight += 4;
+        for (TxOut txOut : txOuts) {
+            weight += txOut.serialize().length * 4;
+        }
+        weight += this.locktime.toBytes(4).length * 4;
+        return weight;
+    }
+
+    public int sizeVirtualBytes() {
+        return sizeWeightUnits() / 4 + 1;
     }
 
     /**
@@ -219,7 +258,8 @@ public class Tx implements Message {
     private byte[] serializeSegwit() {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         result.writeBytes(this.version.toBytesLittleEndian(4));
-        result.writeBytes(new byte[]{0x00, 0x01});
+        result.writeBytes(this.marker.toBytes(1));
+        result.writeBytes(this.flag.toBytes(1));
         result.writeBytes(Varint.encode(Int.parse(this.txIns.size())));
         for (TxIn txIn : txIns) {
             result.writeBytes(txIn.serialize());
@@ -482,7 +522,12 @@ public class Tx implements Message {
      */
     public boolean signInput(int inputIndex, PrivateKey privateKey) {
         // get the signature hash (z)
-        var z = this.sigHash(inputIndex, null);
+        Int z;
+        if (Boolean.TRUE.equals(this.segwit)) {
+            z = this.sigHashBip143(inputIndex, null, null);
+        } else {
+            z = this.sigHash(inputIndex, null);
+        }
         // get der signature of z from private key
         var der = privateKey.sign(z, 0).der();
         // append the SIGHASH_ALL to der
@@ -490,9 +535,14 @@ public class Tx implements Message {
         // calculate the sec
         var sec = privateKey.getPoint().sec(null);
         // initialize a new script with [sig, sec] as the cmds
-        var scriptSig = new Script(List.of(new ScriptCmd(sig), new ScriptCmd(sec)));
-        // change input's script_sig to new script
-        this.txIns.get(inputIndex).setScriptSig(scriptSig);
+        var script = new Script(List.of(new ScriptCmd(sig), new ScriptCmd(sec)));
+        if (Boolean.TRUE.equals(this.segwit)) {
+            // change input's witness to new script
+            this.txIns.get(inputIndex).setWitness(script);
+        } else {
+            // change input's script_sig to new script
+            this.txIns.get(inputIndex).setScriptSig(script);
+        }
         // return whether sig is valid using self.verify_input
         return this.verifyInput(inputIndex);
     }
@@ -542,12 +592,11 @@ public class Tx implements Message {
      */
     @Override
     public String toString() {
-        return String.format("tx %s:%s:\n%s:\n%s:%s",
-                this.id(),
-                this.version,
+        return String.format("\ntx %s:%s:\n%s:\n%s:\n%s",
+                this.id(), this.version.intValue(),
                 this.txIns.stream().map(TxIn::toString).collect(Collectors.joining("\n")),
                 this.txOuts.stream().map(TxOut::toString).collect(Collectors.joining("\n")),
-                this.locktime);
+                this.locktime.intValue());
     }
 
     /**
@@ -611,5 +660,21 @@ public class Tx implements Message {
      */
     public Boolean getTestnet() {
         return testnet;
+    }
+
+    public Int getMarker() {
+        return marker;
+    }
+
+    public void setMarker(Int marker) {
+        this.marker = marker;
+    }
+
+    public Int getFlag() {
+        return flag;
+    }
+
+    public void setFlag(Int flag) {
+        this.flag = flag;
     }
 }

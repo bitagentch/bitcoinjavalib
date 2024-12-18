@@ -1,11 +1,19 @@
 package ch.bitagent.bitcoin.lib.wallet;
 
+import ch.bitagent.bitcoin.lib.ecc.Hex;
+import ch.bitagent.bitcoin.lib.ecc.Int;
+import ch.bitagent.bitcoin.lib.network.Electrum;
+import ch.bitagent.bitcoin.lib.tx.Tx;
+import ch.bitagent.bitcoin.lib.tx.TxIn;
+import ch.bitagent.bitcoin.lib.tx.TxOut;
+import ch.bitagent.bitcoin.lib.tx.Utxo;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.logging.Logger;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class WalletTest {
 
@@ -60,5 +68,52 @@ class WalletTest {
         var signature = wallet.signMessage(address, message);
         log.info(signature);
         assertTrue(wallet.verifyMessage(address, signature, message));
+    }
+
+    @Disabled(value = "manual test")
+    @Test
+    void
+    createSegwitTx() {
+        var mnemonicSentence = "";
+        var wallet = Wallet.parse(mnemonicSentence, null);
+        wallet.history();
+        assertFalse(wallet.getUtxoList().isEmpty());
+        for (Utxo utxo : wallet.getUtxoList()) {
+            log.info(utxo.toString());
+        }
+
+        var inUtxo = wallet.getUtxoList().get(0);
+        var inTx = new TxIn(Hex.parse(inUtxo.getTxHash()), Int.parse(inUtxo.getTxPos()), null, TxIn.SEQUENCE_RBF);
+
+        var spendAmount = 10000;
+        var spendAddress = wallet.nextReceiveAddress();
+        var spendTxOut = new TxOut(Int.parse(spendAmount), spendAddress.scriptPubkey());
+
+        var changeAddress = wallet.nextChangeAddress();
+        var changeAmount = inUtxo.getValue() - spendAmount;
+        var changeTxOut = new TxOut(Int.parse(changeAmount), changeAddress.scriptPubkey());
+
+        var version = 2;
+        var electrum = new Electrum();
+        var heigth = electrum.height();
+        var tx = new Tx(Int.parse(version), List.of(inTx), List.of(spendTxOut, changeTxOut), Int.parse(heigth), false, true);
+        var inPrivkey = wallet.getPrivateKeyForChangeIndex(inUtxo.getChangeIndex());
+        assertTrue(tx.signInput(0, inPrivkey));
+        log.info(String.format("size %sB/%swu/%svB", tx.sizeBytes(), tx.sizeWeightUnits(), tx.sizeVirtualBytes()));
+
+        var feeEstimate = electrum.estimateFee(1);
+        var feeAmount = tx.sizeVirtualBytes() * feeEstimate;
+        log.info(String.format("fee %s/%s", feeEstimate, feeAmount));
+        changeAmount = inUtxo.getValue() - spendAmount - feeAmount;
+        changeTxOut = new TxOut(Int.parse(changeAmount), changeAddress.scriptPubkey());
+        tx = new Tx(Int.parse(version), List.of(inTx), List.of(spendTxOut, changeTxOut), Int.parse(heigth), false, true);
+        assertTrue(tx.signInput(0, inPrivkey));
+
+        log.info(tx.toString());
+
+        log.info(String.format("broadcast transaction%n%s", tx.hexString()));
+        var txId = ""; // electrum.broadcastTransaction(tx.hexString());
+        log.info(txId);
+        assertNotNull(txId);
     }
 }

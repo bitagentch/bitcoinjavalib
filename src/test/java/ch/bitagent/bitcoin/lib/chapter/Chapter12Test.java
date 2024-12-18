@@ -327,7 +327,7 @@ class Chapter12Test {
             // sign the only input of the transaction
             assertTrue(txObj.signInput(0, privateKey));
             // serialize and hex to see what it looks like
-            log.fine(String.format("%s", txObj.serializeHexString()));
+            log.fine(String.format("%s", txObj.hexString()));
             // send this signed transaction on the network
             node.send(txObj);
             // wait a sec so this message goes through with time.sleep(1)
