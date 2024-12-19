@@ -1,6 +1,5 @@
 package ch.bitagent.bitcoin.lib.wallet;
 
-import ch.bitagent.bitcoin.lib.ecc.Hex;
 import ch.bitagent.bitcoin.lib.ecc.Int;
 import ch.bitagent.bitcoin.lib.network.Electrum;
 import ch.bitagent.bitcoin.lib.tx.Tx;
@@ -10,6 +9,7 @@ import ch.bitagent.bitcoin.lib.tx.Utxo;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -78,42 +78,44 @@ class WalletTest {
         var wallet = Wallet.parse(mnemonicSentence, null);
         wallet.history();
         assertFalse(wallet.getUtxoList().isEmpty());
+
+        long inTxAmount = 0L;
+        List<TxIn> inTxList = new ArrayList<>();
         for (Utxo utxo : wallet.getUtxoList()) {
             log.info(utxo.toString());
+            if (utxo.getHeight() > 0) {
+                inTxList.add(new TxIn(utxo));
+                inTxAmount += utxo.getValue();
+            }
         }
-
-        var inUtxo = wallet.getUtxoList().get(0);
-        var inTx = new TxIn(Hex.parse(inUtxo.getTxHash()), Int.parse(inUtxo.getTxPos()), null, TxIn.SEQUENCE_RBF);
-
-        var spendAmount = 10000;
         var spendAddress = wallet.nextReceiveAddress();
-        var spendTxOut = new TxOut(Int.parse(spendAmount), spendAddress.scriptPubkey());
-
-        var changeAddress = wallet.nextChangeAddress();
-        var changeAmount = inUtxo.getValue() - spendAmount;
-        var changeTxOut = new TxOut(Int.parse(changeAmount), changeAddress.scriptPubkey());
+        var spendTxOut = new TxOut(Int.parse(inTxAmount), spendAddress.scriptPubkey());
 
         var version = 2;
         var electrum = new Electrum();
         var heigth = electrum.height();
-        var tx = new Tx(Int.parse(version), List.of(inTx), List.of(spendTxOut, changeTxOut), Int.parse(heigth), false, true);
-        var inPrivkey = wallet.getPrivateKeyForChangeIndex(inUtxo.getChangeIndex());
-        assertTrue(tx.signInput(0, inPrivkey));
+        var tx = new Tx(Int.parse(version), inTxList, List.of(spendTxOut), Int.parse(heigth), false, true);
+        for (int i = 0; i < inTxList.size(); i++) {
+            assertTrue(tx.signInput(i, wallet.getPrivateKeyForChangeIndex(inTxList.get(i).getUtxo().getChangeIndex())));
+        }
         log.info(String.format("size %sB/%swu/%svB", tx.sizeBytes(), tx.sizeWeightUnits(), tx.sizeVirtualBytes()));
 
         var feeEstimate = electrum.estimateFee(1);
         var feeAmount = tx.sizeVirtualBytes() * feeEstimate;
-        log.info(String.format("fee %s/%s", feeEstimate, feeAmount));
-        changeAmount = inUtxo.getValue() - spendAmount - feeAmount;
-        changeTxOut = new TxOut(Int.parse(changeAmount), changeAddress.scriptPubkey());
-        tx = new Tx(Int.parse(version), List.of(inTx), List.of(spendTxOut, changeTxOut), Int.parse(heigth), false, true);
-        assertTrue(tx.signInput(0, inPrivkey));
-
+        spendTxOut = new TxOut(Int.parse(inTxAmount - feeAmount), spendAddress.scriptPubkey());
+        tx = new Tx(Int.parse(version), inTxList, List.of(spendTxOut), Int.parse(heigth), false, true);
+        for (int i = 0; i < inTxList.size(); i++) {
+            assertTrue(tx.signInput(i, wallet.getPrivateKeyForChangeIndex(inTxList.get(i).getUtxo().getChangeIndex())));
+        }
+        log.info(String.format("fee %s/%s/%s", feeEstimate, feeAmount, tx.fee()));
+        assertTrue(feeAmount > 0);
+        assertEquals(feeAmount, tx.fee().intValue());
         log.info(tx.toString());
 
         log.info(String.format("broadcast transaction%n%s", tx.hexString()));
-        var txId = ""; // electrum.broadcastTransaction(tx.hexString());
+        fail();
+        var txId = electrum.broadcastTransaction(tx.hexString());
         log.info(txId);
-        assertNotNull(txId);
+        assertEquals(tx.id(), txId);
     }
 }

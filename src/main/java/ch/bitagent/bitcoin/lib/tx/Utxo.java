@@ -45,8 +45,8 @@ public class Utxo {
                 "height=" + height +
                 ", value=" + value +
                 ", txPos=" + txPos +
-                ", txHash='" + txHash + '\'' +
                 ", address='" + String.format("/%s/%s", changeIndex.getChange(), changeIndex.getIndex()) + '\'' +
+                ", txHash='" + txHash + '\'' +
                 '}';
     }
 }
