@@ -73,7 +73,7 @@ class WalletTest {
         assertTrue(wallet.verifyMessage(address, signature, message));
     }
 
-    @Disabled(value = "manual test")
+    @Disabled(value = "manual")
     @Test
     void
     createSegwitTx() {
@@ -91,6 +91,8 @@ class WalletTest {
                 utxoAmount += utxo.getValue();
             }
         }
+        assertTrue(utxoAmount > 0);
+
         var spendAddress = wallet.nextReceiveAddress();
         var spendTxOut = new TxOut(Int.parse(utxoAmount), spendAddress.scriptPubkey());
 
@@ -103,22 +105,28 @@ class WalletTest {
         }
         log.info(String.format("size %sB/%swu/%svB", tx.sizeBytes(), tx.sizeWeightUnits(), tx.sizeVirtualBytes()));
 
-        var feeEstimate = electrum.estimateFee(1);
-        var feeAmount = tx.sizeVirtualBytes() * feeEstimate;
+        var satsVB = electrum.estimateFee(1);
+        var feeAmount = tx.sizeVirtualBytes() * satsVB;
         spendTxOut = new TxOut(Int.parse(utxoAmount - feeAmount), spendAddress.scriptPubkey());
         tx = new Tx(Int.parse(version), utxoList, List.of(spendTxOut), Int.parse(heigth), false, true);
         for (int i = 0; i < utxoList.size(); i++) {
             assertTrue(tx.signInput(i, wallet.getPrivateKeyForChangeIndex(utxoList.get(i).getUtxo().getChangeIndex())));
         }
-        log.info(String.format("fee %s/%s/%s", feeEstimate, feeAmount, tx.fee()));
+        log.info(String.format("fee %ssatsVB/%ssats", satsVB, feeAmount));
         assertTrue(feeAmount > 0);
         assertEquals(feeAmount, tx.fee().intValue());
         log.info(tx.toString());
 
         log.info(String.format("broadcast transaction%n%s", tx.hexString()));
-        fail();
-        var txId = electrum.broadcastTransaction(tx.hexString());
+    }
+
+    @Disabled(value = "manual")
+    @Test
+    void
+    broadcastTransaction() {
+        var electrum = new Electrum();
+        var txId = electrum.broadcastTransaction("");
         log.info(txId);
-        assertEquals(tx.id(), txId);
+        assertNotNull(txId);
     }
 }

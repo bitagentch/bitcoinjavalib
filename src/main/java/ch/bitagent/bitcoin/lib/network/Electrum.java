@@ -222,6 +222,9 @@ public class Electrum {
     }
 
     public String broadcastTransaction(String rawTx) {
+        if (rawTx == null || rawTx.isEmpty()) {
+            return null;
+        }
         var jsonResponse = callSocket(null, getJsonRequest("blockchain.transaction.broadcast", List.of(rawTx)));
         if (jsonResponse == null) {
             return null;
