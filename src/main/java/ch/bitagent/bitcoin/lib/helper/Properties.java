@@ -15,33 +15,40 @@ public class Properties {
 
     private static final Logger log = Logger.getLogger(Properties.class.getSimpleName());
 
-    private static final String PATH = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "bitcoinjavalib.properties";
+    private static final String FILENAME = "bitcoinjavalib.properties";
+    public static final String WALLET_FILENAME = "wallet.properties";
 
     private static final java.util.Properties bitcoinjavalibProperties = new java.util.Properties();
+    private static final java.util.Properties walletProperties = new java.util.Properties();
 
-    private static String getProperty(String property) {
-        try (var fileInputStream = new FileInputStream(PATH)) {
-            if (bitcoinjavalibProperties.isEmpty()) {
-                bitcoinjavalibProperties.load(fileInputStream);
-                for (Object keyObject : bitcoinjavalibProperties.keySet().stream().sorted().toArray()) {
+    private static String getPath(String filename) {
+        return Thread.currentThread().getContextClassLoader().getResource("").getPath() + filename;
+    }
+
+    private static String getProperty(java.util.Properties properties, String filename, String property) {
+        var path = getPath(filename);
+        try (var fileInputStream = new FileInputStream(path)) {
+            if (properties.isEmpty()) {
+                properties.load(fileInputStream);
+                for (Object keyObject : properties.keySet().stream().sorted().toArray()) {
                     String key = (String) keyObject;
-                    log.fine(String.format("%s=%s", key, bitcoinjavalibProperties.getProperty(key)));
+                    log.fine(String.format("%s=%s", key, properties.getProperty(key)));
                 }
             }
-            return bitcoinjavalibProperties.getProperty(property);
+            return properties.getProperty(property);
         } catch (Exception e) {
             log.severe(e.getMessage());
             throw new IllegalStateException(e.getMessage());
         }
     }
 
-    private static List<String> getPropertyList(String property) {
+    private static List<String> getPropertyList(java.util.Properties properties, String path, String property) {
         List<String> list = new ArrayList<>();
         int i = 0;
-        var propertyI = getProperty(property + i++);
+        var propertyI = getProperty(properties, path, property + i++);
         while (propertyI != null && !propertyI.isEmpty()) {
             list.add(propertyI);
-            propertyI = getProperty(property + i++);
+            propertyI = getProperty(properties, path, property + i++);
         }
         return list;
     }
@@ -52,7 +59,7 @@ public class Properties {
      * @return a {@link java.lang.String} object
      */
     public static String getBitcoinP2pUrl() {
-        return getProperty("bitcoin.p2p.url");
+        return getProperty(bitcoinjavalibProperties, FILENAME, "bitcoin.p2p.url");
     }
 
     /**
@@ -79,7 +86,7 @@ public class Properties {
      * @return a {@link java.lang.Boolean} object
      */
     public static Boolean getBitcoinP2pTestnet() {
-        return Boolean.parseBoolean(getProperty("bitcoin.p2p.testnet"));
+        return Boolean.parseBoolean(getProperty(bitcoinjavalibProperties, FILENAME, "bitcoin.p2p.testnet"));
     }
 
     /**
@@ -88,7 +95,7 @@ public class Properties {
      * @return a {@link java.lang.String} object
      */
     public static String getBitcoinRpcUrl() {
-        return getProperty("bitcoin.rpc.url");
+        return getProperty(bitcoinjavalibProperties, FILENAME, "bitcoin.rpc.url");
     }
 
     /**
@@ -97,7 +104,7 @@ public class Properties {
      * @return a {@link java.lang.Boolean} object
      */
     public static Boolean getBitcoinRpcTestnet() {
-        return Boolean.parseBoolean(getProperty("bitcoin.rpc.testnet"));
+        return Boolean.parseBoolean(getProperty(bitcoinjavalibProperties, FILENAME, "bitcoin.rpc.testnet"));
     }
 
     /**
@@ -106,7 +113,7 @@ public class Properties {
      * @return a {@link java.lang.String} object
      */
     public static String getBitcoinRpcAuth() {
-        String auth = getProperty("bitcoin.rpc.auth");
+        String auth = getProperty(bitcoinjavalibProperties, FILENAME, "bitcoin.rpc.auth");
         if (auth != null && !auth.trim().isEmpty()) {
             return auth;
         } else {
@@ -120,7 +127,7 @@ public class Properties {
      * @return a {@link java.lang.String} object
      */
     public static String getBlockstreamMainnetUrl() {
-        return getProperty("blockstream.mainnet.url");
+        return getProperty(bitcoinjavalibProperties, FILENAME, "blockstream.mainnet.url");
     }
 
     /**
@@ -129,7 +136,7 @@ public class Properties {
      * @return a {@link java.lang.String} object
      */
     public static String getBlockstreamTestnetUrl() {
-        return getProperty("blockstream.testnet.url");
+        return getProperty(bitcoinjavalibProperties, FILENAME, "blockstream.testnet.url");
     }
 
     /**
@@ -138,7 +145,7 @@ public class Properties {
      * @return a {@link java.lang.Boolean} object
      */
     public static Boolean getTxFresh() {
-        return Boolean.parseBoolean(getProperty("tx.fresh"));
+        return Boolean.parseBoolean(getProperty(bitcoinjavalibProperties, FILENAME, "tx.fresh"));
     }
 
     /**
@@ -147,10 +154,34 @@ public class Properties {
      * @return a {@link java.lang.String} object
      */
     public static String getTxCachefile() {
-        return getProperty("tx.cachefile");
+        return getProperty(bitcoinjavalibProperties, FILENAME, "tx.cachefile");
     }
 
     public static List<String> getElectrumRpcSockets() {
-        return getPropertyList("electrum.rpc.socket.");
+        return getPropertyList(bitcoinjavalibProperties, FILENAME, "electrum.rpc.socket.");
+    }
+
+    public static List<String> getWallets(String filename) {
+        return getPropertyList(walletProperties, filename, "wallet.");
+    }
+
+    public static String getWalletMnemonic(String filename, int index) {
+        var wallet = getWallets(filename);
+        if (wallet.size() > index) {
+            var walletArray = wallet.get(index).split(":");
+            return walletArray[0];
+        }
+        return null;
+    }
+
+    public static String getWalletPassphrase(String filename, int index) {
+        var wallet = getWallets(filename);
+        if (wallet.size() > index) {
+            var walletArray = wallet.get(index).split(":");
+            if (walletArray.length > 1) {
+                return walletArray[1];
+            }
+        }
+        return null;
     }
 }

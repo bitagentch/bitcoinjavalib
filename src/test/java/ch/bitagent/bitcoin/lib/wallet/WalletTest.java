@@ -1,6 +1,7 @@
 package ch.bitagent.bitcoin.lib.wallet;
 
 import ch.bitagent.bitcoin.lib.ecc.Int;
+import ch.bitagent.bitcoin.lib.helper.Properties;
 import ch.bitagent.bitcoin.lib.network.Electrum;
 import ch.bitagent.bitcoin.lib.tx.Tx;
 import ch.bitagent.bitcoin.lib.tx.TxIn;
@@ -18,6 +19,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class WalletTest {
 
     private static final Logger log = Logger.getLogger(WalletTest.class.getSimpleName());
+
+    private static final String WALLET_DEV_FILENAME = "walletdev.properties";
 
     @Test
     void createMnemonic() {
@@ -46,7 +49,7 @@ class WalletTest {
 
     @Test
     void mnemonicSentenceSignVerify() {
-        var mnemonicSentence = "dove labor word syrup speed panther flash episode forest dice measure ankle";
+        var mnemonicSentence = Properties.getWalletMnemonic(Properties.WALLET_FILENAME, 1);
         var wallet = Wallet.parse(mnemonicSentence, null);
         assertEquals(20, wallet.getAddressList0().size());
         assertEquals(10, wallet.getAddressList1().size());
@@ -60,7 +63,7 @@ class WalletTest {
 
     @Test
     void testWallet() {
-        var mnemonicSentence = "crowd surround reason item word jacket neither shoot find endorse gain snow";
+        var mnemonicSentence = Properties.getWalletMnemonic(Properties.WALLET_FILENAME, 1);
         var wallet = Wallet.parse(mnemonicSentence, null);
         var address = wallet.getAddressList0().get(0).getAddressString();
         log.info(address);
@@ -74,38 +77,38 @@ class WalletTest {
     @Test
     void
     createSegwitTx() {
-        var mnemonicSentence = "";
+        var mnemonicSentence = Properties.getWalletMnemonic(WALLET_DEV_FILENAME, 0);
         var wallet = Wallet.parse(mnemonicSentence, null);
         wallet.history();
         assertFalse(wallet.getUtxoList().isEmpty());
 
-        long inTxAmount = 0L;
-        List<TxIn> inTxList = new ArrayList<>();
+        long utxoAmount = 0L;
+        List<TxIn> utxoList = new ArrayList<>();
         for (Utxo utxo : wallet.getUtxoList()) {
             log.info(utxo.toString());
             if (utxo.getHeight() > 0) {
-                inTxList.add(new TxIn(utxo));
-                inTxAmount += utxo.getValue();
+                utxoList.add(new TxIn(utxo));
+                utxoAmount += utxo.getValue();
             }
         }
         var spendAddress = wallet.nextReceiveAddress();
-        var spendTxOut = new TxOut(Int.parse(inTxAmount), spendAddress.scriptPubkey());
+        var spendTxOut = new TxOut(Int.parse(utxoAmount), spendAddress.scriptPubkey());
 
         var version = 2;
         var electrum = new Electrum();
         var heigth = electrum.height();
-        var tx = new Tx(Int.parse(version), inTxList, List.of(spendTxOut), Int.parse(heigth), false, true);
-        for (int i = 0; i < inTxList.size(); i++) {
-            assertTrue(tx.signInput(i, wallet.getPrivateKeyForChangeIndex(inTxList.get(i).getUtxo().getChangeIndex())));
+        var tx = new Tx(Int.parse(version), utxoList, List.of(spendTxOut), Int.parse(heigth), false, true);
+        for (int i = 0; i < utxoList.size(); i++) {
+            assertTrue(tx.signInput(i, wallet.getPrivateKeyForChangeIndex(utxoList.get(i).getUtxo().getChangeIndex())));
         }
         log.info(String.format("size %sB/%swu/%svB", tx.sizeBytes(), tx.sizeWeightUnits(), tx.sizeVirtualBytes()));
 
         var feeEstimate = electrum.estimateFee(1);
         var feeAmount = tx.sizeVirtualBytes() * feeEstimate;
-        spendTxOut = new TxOut(Int.parse(inTxAmount - feeAmount), spendAddress.scriptPubkey());
-        tx = new Tx(Int.parse(version), inTxList, List.of(spendTxOut), Int.parse(heigth), false, true);
-        for (int i = 0; i < inTxList.size(); i++) {
-            assertTrue(tx.signInput(i, wallet.getPrivateKeyForChangeIndex(inTxList.get(i).getUtxo().getChangeIndex())));
+        spendTxOut = new TxOut(Int.parse(utxoAmount - feeAmount), spendAddress.scriptPubkey());
+        tx = new Tx(Int.parse(version), utxoList, List.of(spendTxOut), Int.parse(heigth), false, true);
+        for (int i = 0; i < utxoList.size(); i++) {
+            assertTrue(tx.signInput(i, wallet.getPrivateKeyForChangeIndex(utxoList.get(i).getUtxo().getChangeIndex())));
         }
         log.info(String.format("fee %s/%s/%s", feeEstimate, feeAmount, tx.fee()));
         assertTrue(feeAmount > 0);
