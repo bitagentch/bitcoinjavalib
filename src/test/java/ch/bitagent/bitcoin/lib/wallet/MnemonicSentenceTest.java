@@ -3,7 +3,7 @@ package ch.bitagent.bitcoin.lib.wallet;
 import ch.bitagent.bitcoin.lib.helper.Bytes;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class MnemonicSentenceTest {
 
@@ -188,5 +188,15 @@ class MnemonicSentenceTest {
         assertEquals(entropy, Bytes.byteArrayToHexString(MnemonicSentence.mnemonicToEntropy(mnemonic)));
         assertEquals(seed, Bytes.byteArrayToHexString(MnemonicSentence.mnemonicToSeed(mnemonic, passphrase)));
         assertEquals(xprv, MnemonicSentence.seedToExtendedKey(Bytes.hexStringToByteArray(seed), ExtendedKey.PREFIX_XPRV));
+    }
+
+    @Test
+    void isValid() {
+        assertFalse(MnemonicSentence.isValid(null));
+        assertFalse(MnemonicSentence.isValid(""));
+        assertFalse(MnemonicSentence.isValid(" "));
+        assertFalse(MnemonicSentence.isValid("abandon"));
+        assertFalse(MnemonicSentence.isValid("abandon abandon"));
+        assertTrue(MnemonicSentence.isValid("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon"));
     }
 }
