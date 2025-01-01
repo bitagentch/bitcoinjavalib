@@ -16,11 +16,11 @@ public class Address {
     public static final String BECH32 = "bech32";
 
     private final String addressString;
+    private AddressChangeIndex changeIndex;
 
-    private int change = -1;
-    private int addressIndex = -1;
     private int historyCount = 0;
-    private long balance = 0L;
+    private long unconfirmed = 0L;
+    private long confirmed = 0L;
 
     public Address(String address) {
         this.addressString = address;
@@ -140,18 +140,30 @@ public class Address {
         }
     }
 
+    public Script scriptPubkey() {
+        if (this.isP2pkhAddress()) {
+            return Script.p2pkhScript(hash160());
+        } else if (this.isP2shAddress()) {
+            return Script.p2shScript(hash160());
+        } else if (this.isBech32Address()) {
+            return Script.p2wpkhScript(hash160());
+        } else {
+            throw new IllegalStateException();
+        }
+    }
+
     /**
      * https://electrumx-spesmilo.readthedocs.io/en/latest/protocol-basics.html#script-hashes
      */
     public String electrumScripthash() {
         if (this.isP2pkhAddress()) {
             var hash160 = Base58.decodeAddress(this.addressString);
-            var script = Script.p2pkhScriptPubkey(hash160);
+            var script = Script.p2pkhScriptOp20(hash160);
             var hash = Hash.sha256(Bytes.hexStringToByteArray(script.toHex()));
             return Bytes.byteArrayToHexString(Bytes.changeOrder(hash));
         } else if (this.isP2shAddress()) {
             var hash160 = Base58.decodeAddress(this.addressString);
-            var script = Script.p2shScriptPubkey(hash160);
+            var script = Script.p2shScriptOp20(hash160);
             var hash = Hash.sha256(Bytes.hexStringToByteArray(script.toHex()));
             return Bytes.byteArrayToHexString(Bytes.changeOrder(hash));
         } else if (this.isBech32Address()) {
@@ -167,20 +179,12 @@ public class Address {
         return addressString;
     }
 
-    public int getChange() {
-        return change;
+    public AddressChangeIndex getChangeIndex() {
+        return changeIndex;
     }
 
-    public void setChange(int change) {
-        this.change = change;
-    }
-
-    public int getAddressIndex() {
-        return addressIndex;
-    }
-
-    public void setAddressIndex(int addressIndex) {
-        this.addressIndex = addressIndex;
+    public void setChangeIndex(AddressChangeIndex changeIndex) {
+        this.changeIndex = changeIndex;
     }
 
     public int getHistoryCount() {
@@ -191,18 +195,26 @@ public class Address {
         this.historyCount = historyCount;
     }
 
-    public long getBalance() {
-        return balance;
+    public long getUnconfirmed() {
+        return unconfirmed;
     }
 
-    public void setBalance(long balance) {
-        this.balance = balance;
+    public void setUnconfirmed(long unconfirmed) {
+        this.unconfirmed = unconfirmed;
+    }
+
+    public long getConfirmed() {
+        return confirmed;
+    }
+
+    public void setConfirmed(long confirmed) {
+        this.confirmed = confirmed;
     }
 
     @Override
     public String toString() {
-        if (change >= 0 && addressIndex >= 0) {
-            return String.format("/%s/%s/%s/%s/%s", change, addressIndex, addressString, historyCount, balance);
+        if (changeIndex != null) {
+            return String.format("/%s/%s/%s/%s/%s/%s", changeIndex.getChange(), changeIndex.getIndex(), addressString, historyCount, unconfirmed, confirmed);
         } else {
             return addressString;
         }

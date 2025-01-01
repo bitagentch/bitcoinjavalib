@@ -148,6 +148,19 @@ public class MnemonicSentence {
         return wordIndex;
     }
 
+    public static boolean isValid(String mnemonicSentence) {
+        try {
+            var mnemonicArray = getMnemonicArray(mnemonicSentence);
+            var wordlist = Helper.loadWordlist(RESOURCE_ENGLISH);
+            for (int i = 0; i < mnemonicArray.length; i++) {
+                getWordIndex(wordlist, mnemonicArray, i);
+            }
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public static String seedToExtendedKey(byte[] seed, Int xkeyPrefix) {
         if (seed.length != DERIVED_KEY_LENGTH) {
             log.warning(String.format("Provided seed should have length of %s, not %s.", DERIVED_KEY_LENGTH, seed.length));

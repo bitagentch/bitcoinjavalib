@@ -14,7 +14,6 @@ import ch.bitagent.bitcoin.lib.tx.TxOut;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 
-import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -28,8 +27,8 @@ class Chapter7Test {
 
     @Test
     void example1() {
-        var rawTx = Hex.parse("0100000001813f79011acb80925dfe69b3def355fe914bd1d96a3f5f71bf8303c6a989c7d1000000006b483045022100ed81ff192e75a3fd2304004dcadb746fa5e24c5031ccfcf21320b0277457c98f02207a986d955c6e0cb35d446a89d3f56100f4d7f67801c31967743a9c8e10615bed01210349fc4e631e3624a545de3f89f5d8684c7b8138bd94bdd531d2e213bf016b278afeffffff02a135ef01000000001976a914bc3b654dca7e56b04dca18f2566cdaf02e8d9ada88ac99c39800000000001976a9141c4bc762dd5423e332166702cb75f40df79fea1288ac19430600");
-        var transaction = Tx.parse(new ByteArrayInputStream(rawTx.toBytes()), false);
+        var rawTx = "0100000001813f79011acb80925dfe69b3def355fe914bd1d96a3f5f71bf8303c6a989c7d1000000006b483045022100ed81ff192e75a3fd2304004dcadb746fa5e24c5031ccfcf21320b0277457c98f02207a986d955c6e0cb35d446a89d3f56100f4d7f67801c31967743a9c8e10615bed01210349fc4e631e3624a545de3f89f5d8684c7b8138bd94bdd531d2e213bf016b278afeffffff02a135ef01000000001976a914bc3b654dca7e56b04dca18f2566cdaf02e8d9ada88ac99c39800000000001976a9141c4bc762dd5423e332166702cb75f40df79fea1288ac19430600";
+        var transaction = Tx.parse(rawTx, false);
         assertTrue(transaction.fee().ge(Int.parse(0)));
     }
 
@@ -85,7 +84,7 @@ class Chapter7Test {
         log.fine(String.format("tx %s", tx));
         assertEquals("cd30a8da777d28ef0e61efe68a9f7c559c1d3e5bcd7b265c850ccb4068598d11", tx.id());
         assertEquals(Int.parse(1), tx.getVersion());
-        assertEquals("[txin 0d6fe5213c0b3291f208cba8bfb59b7476dffacc4e5cb66f6eb20a080843a299:13::ffffffff]", tx.getTxIns().toString());
+        assertEquals("[txin 0d6fe5213c0b3291f208cba8bfb59b7476dffacc4e5cb66f6eb20a080843a299:13::ffffffff:]", tx.getTxIns().toString());
         assertEquals("[txout 33000000:OP_DUP OP_HASH160 d52ad7ca9b3d096a38e752c2018e6fbc40cdf26f OP_EQUALVERIFY OP_CHECKSIG, txout 10000000:OP_DUP OP_HASH160 507b27411ccf7f16f10297de6cef3f291623eddf OP_EQUALVERIFY OP_CHECKSIG]", tx.getTxOuts().toString());
         assertEquals(Int.parse(0), tx.getLocktime());
     }
@@ -93,8 +92,8 @@ class Chapter7Test {
     @Test
     void example6() {
         // see example1
-        var rawTx = Hex.parse("0100000001813f79011acb80925dfe69b3def355fe914bd1d96a3f5f71bf8303c6a989c7d1000000006b483045022100ed81ff192e75a3fd2304004dcadb746fa5e24c5031ccfcf21320b0277457c98f02207a986d955c6e0cb35d446a89d3f56100f4d7f67801c31967743a9c8e10615bed01210349fc4e631e3624a545de3f89f5d8684c7b8138bd94bdd531d2e213bf016b278afeffffff02a135ef01000000001976a914bc3b654dca7e56b04dca18f2566cdaf02e8d9ada88ac99c39800000000001976a9141c4bc762dd5423e332166702cb75f40df79fea1288ac19430600");
-        var transaction = Tx.parse(new ByteArrayInputStream(rawTx.toBytes()), false);
+        var rawTx = "0100000001813f79011acb80925dfe69b3def355fe914bd1d96a3f5f71bf8303c6a989c7d1000000006b483045022100ed81ff192e75a3fd2304004dcadb746fa5e24c5031ccfcf21320b0277457c98f02207a986d955c6e0cb35d446a89d3f56100f4d7f67801c31967743a9c8e10615bed01210349fc4e631e3624a545de3f89f5d8684c7b8138bd94bdd531d2e213bf016b278afeffffff02a135ef01000000001976a914bc3b654dca7e56b04dca18f2566cdaf02e8d9ada88ac99c39800000000001976a9141c4bc762dd5423e332166702cb75f40df79fea1288ac19430600";
+        var transaction = Tx.parse(rawTx, false);
         var z = transaction.sigHash(0, null);
         var privateKey = new PrivateKey(Int.parse(8675309));
         var der = privateKey.sign(z, 0).der();
@@ -102,8 +101,7 @@ class Chapter7Test {
         var sec = new ScriptCmd(privateKey.getPoint().sec(null));
         var scriptSig = new Script(List.of(sig, sec));
         transaction.getTxIns().get(0).setScriptSig(scriptSig);
-        var tser = Hex.parse(transaction.serialize());
-        assertEquals("0100000001813f79011acb80925dfe69b3def355fe914bd1d96a3f5f71bf8303c6a989c7d1000000006a47304402207db2402a3311a3b845b038885e3dd889c08126a8570f26a844e3e4049c482a11022010178cdca4129eacbeab7c44648bf5ac1f9cac217cd609d216ec2ebc8d242c0a012103935581e52c354cd2f484fe8ed83af7a3097005b2f9c60bff71d35bd795f54b67feffffff02a135ef01000000001976a914bc3b654dca7e56b04dca18f2566cdaf02e8d9ada88ac99c39800000000001976a9141c4bc762dd5423e332166702cb75f40df79fea1288ac19430600", tser.toString());
+        assertEquals("0100000001813f79011acb80925dfe69b3def355fe914bd1d96a3f5f71bf8303c6a989c7d1000000006a47304402207db2402a3311a3b845b038885e3dd889c08126a8570f26a844e3e4049c482a11022010178cdca4129eacbeab7c44648bf5ac1f9cac217cd609d216ec2ebc8d242c0a012103935581e52c354cd2f484fe8ed83af7a3097005b2f9c60bff71d35bd795f54b67feffffff02a135ef01000000001976a914bc3b654dca7e56b04dca18f2566cdaf02e8d9ada88ac99c39800000000001976a9141c4bc762dd5423e332166702cb75f40df79fea1288ac19430600", transaction.hexString());
     }
 
     /**
@@ -147,7 +145,7 @@ class Chapter7Test {
         assertTrue(tx.signInput(0, priv));
 
         String want = "01000000011c5fb4a35c40647bcacfeffcb8686f1e9925774c07a1dd26f6551f67bcc4a175010000006b4830450221009bd8eef2adadce92d61ae58fdd87c7337ef9f6bdc6e99222e1ba92a48ce9e07302206fd765e299fcf24bb6482d8f8ee269dd3fe0c944fe34d168cf4436b0b0891890012103935581e52c354cd2f484fe8ed83af7a3097005b2f9c60bff71d35bd795f54b67ffffffff0240420f00000000001976a914ad346f8eb57dee9a37981716e498120ae80e44f788aca0bb0d00000000001976a914e2b35e4ac771118a46d0c731e1dd7efcd7d9b6a388ac00000000";
-        Tx txWant = Tx.parse(new ByteArrayInputStream(Hex.parse(want).toBytes()), true);
+        Tx txWant = Tx.parse(want, true);
         assertEquals(txWant.getVersion(), tx.getVersion());
         assertEquals(txWant.getTxIns().size(), tx.getTxIns().size());
         for (int i = 0; i < txWant.getTxIns().size(); i++) {
@@ -167,6 +165,6 @@ class Chapter7Test {
         }
         assertEquals(txWant.getLocktime(), tx.getLocktime());
         assertEquals(txWant.getTestnet(), tx.getTestnet());
-        assertEquals(want, Bytes.byteArrayToHexString(tx.serialize()));
+        assertEquals(want, tx.hexString());
     }
 }

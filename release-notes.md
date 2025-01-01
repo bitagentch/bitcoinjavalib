@@ -1,6 +1,11 @@
 # release notes
 
 ## snapshot
+- wallet
+- segwit tx
+- address
+- script
+- electrum
 
 ## 0.1.2
 - electrum

@@ -1,4 +1,4 @@
-package ch.bitagent.bitcoin.lib.wallet;
+package ch.bitagent.bitcoin.lib.network;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -60,11 +60,17 @@ class ElectrumTest {
     }
 
     @Test
+    void height() {
+        var electrum = new Electrum();
+        var height = electrum.height();
+        assertNotNull(height);
+    }
+
+    @Test
     void invalidScripthash() {
         var electrum = new Electrum();
         assertNull(electrum.getHistory("bla"));
         assertNull(electrum.getBalance("bla"));
-        assertNull(electrum.getBalanceTotal("bla"));
         assertNull(electrum.getMempool("bla"));
         assertNull(electrum.listUnspent("bla"));
     }

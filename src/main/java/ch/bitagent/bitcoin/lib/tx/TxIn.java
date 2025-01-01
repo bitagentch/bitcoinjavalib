@@ -17,25 +17,39 @@ public class TxIn {
 
     private static final Logger log = Logger.getLogger(TxIn.class.getSimpleName());
 
+    public static final Int SEQUENCE_DEF = Hex.parse("ffffffff");
+    public static final Int SEQUENCE_RBF = Hex.parse("fffffffd");
+
+    private final Utxo utxo;
     private final Int prevTx;
     private final Int prevIndex;
     private Script scriptSig;
-    private Int sequence;
+    private final Int sequence;
     private Script witness;
 
     /**
      * <p>Constructor for TxIn.</p>
      *
-     * @param prevTx a {@link ch.bitagent.bitcoin.lib.ecc.Int} object
+     * @param prevTx    a {@link ch.bitagent.bitcoin.lib.ecc.Int} object
      * @param prevIndex a {@link ch.bitagent.bitcoin.lib.ecc.Int} object
      * @param scriptSig a {@link ch.bitagent.bitcoin.lib.script.Script} object
-     * @param sequence a {@link ch.bitagent.bitcoin.lib.ecc.Int} object
+     * @param sequence  a {@link ch.bitagent.bitcoin.lib.ecc.Int} object
      */
     public TxIn(Int prevTx, Int prevIndex, Script scriptSig, Int sequence) {
+        this.utxo = null;
         this.prevTx = prevTx;
         this.prevIndex = prevIndex;
         this.scriptSig = Objects.requireNonNullElse(scriptSig, new Script(null));
-        this.sequence = Objects.requireNonNullElse(sequence, Hex.parse("ffffffff"));
+        this.sequence = Objects.requireNonNullElse(sequence, SEQUENCE_DEF);
+        log.fine(this.toString());
+    }
+
+    public TxIn(Utxo utxo) {
+        this.utxo = utxo;
+        this.prevTx = Hex.parse(utxo.getTxHash());
+        this.prevIndex = Int.parse(utxo.getTxPos());
+        this.scriptSig = new Script(null);
+        this.sequence = SEQUENCE_RBF;
         log.fine(this.toString());
     }
 
@@ -102,10 +116,12 @@ public class TxIn {
         return tx.getTxOuts().get(this.prevIndex.intValue()).getScriptPubkey();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
-        return String.format("txin %s:%s:%s:%s", prevTx, prevIndex, scriptSig, sequence);
+        return String.format("txin %s:%s:%s:%s:%s", prevTx, prevIndex.intValue(), scriptSig, sequence, witness != null ? witness : "");
     }
 
     /**
@@ -169,5 +185,9 @@ public class TxIn {
      */
     public void setWitness(Script witness) {
         this.witness = witness;
+    }
+
+    public Utxo getUtxo() {
+        return utxo;
     }
 }

@@ -2,6 +2,8 @@ package ch.bitagent.bitcoin.lib.wallet;
 
 import ch.bitagent.bitcoin.lib.ecc.PrivateKey;
 import ch.bitagent.bitcoin.lib.ecc.S256Point;
+import ch.bitagent.bitcoin.lib.network.Electrum;
+import ch.bitagent.bitcoin.lib.tx.Utxo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +15,7 @@ public class Wallet {
 
     private final List<Address> addressList0 = new ArrayList<>();
     private final List<Address> addressList1 = new ArrayList<>();
+    private final List<Utxo> utxoList = new ArrayList<>();
 
     public static String createMnemonic(int entropyStrength) {
         var entropy = MnemonicSentence.generateEntropy(entropyStrength);
@@ -57,15 +60,17 @@ public class Wallet {
                 publicKeyi = S256Point.parse(extendedKeyi.getKey());
             }
             var addressi = Address.parse(publicKeyi.addressBech32P2wpkh(false));
-            addressi.setChange(change);
-            addressi.setAddressIndex(i);
+            addressi.setChangeIndex(new AddressChangeIndex(change, i));
             addressList.add(addressi);
         }
     }
 
     public void history() {
         var electrum = new Electrum();
-        for (Address address : addressList0) {
+        List<Address> addressList = new ArrayList<>();
+        addressList.addAll(addressList0);
+        addressList.addAll(addressList1);
+        for (Address address : addressList) {
             var scripthash = address.electrumScripthash();
             var history = electrum.getHistory(scripthash);
             if (history == null) {
@@ -73,12 +78,45 @@ public class Wallet {
             }
             address.setHistoryCount(history.length());
             if (!history.isEmpty()) {
-                var balance = electrum.getBalanceTotal(scripthash);
+                var balance = electrum.getBalance(scripthash);
                 if (balance == null) {
                     continue;
                 }
-                address.setBalance(balance);
+                address.setUnconfirmed(balance.getLong("unconfirmed"));
+                address.setConfirmed(balance.getLong("confirmed"));
+                if (address.getUnconfirmed() > 0 || address.getConfirmed() > 0) {
+                    var unspent = electrum.listUnspent(address.electrumScripthash());
+                    for (int i = 0; i < unspent.length(); i++) {
+                        utxoList.add(new Utxo(unspent.getJSONObject(i), address.getChangeIndex()));
+                    }
+                }
             }
+        }
+    }
+
+    public Address nextReceiveAddress() {
+        for (Address address : addressList0) {
+            if (address.getHistoryCount() == 0) {
+                return address;
+            }
+        }
+        return null;
+    }
+
+    public Address nextChangeAddress() {
+        for (Address address : addressList1) {
+            if (address.getHistoryCount() == 0) {
+                return address;
+            }
+        }
+        return null;
+    }
+
+    public PrivateKey getPrivateKeyForChangeIndex(AddressChangeIndex changeIndex) {
+        if (ExtendedKey.isKeyPrivate(this.extendedKey.getPrefix())) {
+            return PrivateKey.parse(this.extendedKey.derive(changeIndex.getChange()).derive(changeIndex.getIndex()).getKey());
+        } else {
+            throw new IllegalArgumentException("Private key is not available");
         }
     }
 
@@ -125,14 +163,17 @@ public class Wallet {
         return addressList1;
     }
 
+    public List<Utxo> getUtxoList() {
+        return utxoList;
+    }
+
     @Override
     public String toString() {
         var string = new StringBuilder();
-        for (Address address : addressList0) {
-            string.append("\n");
-            string.append(address);
-        }
-        for (Address address : addressList1) {
+        List<Address> addressList = new ArrayList<>();
+        addressList.addAll(addressList0);
+        addressList.addAll(addressList1);
+        for (Address address : addressList) {
             string.append("\n");
             string.append(address);
         }

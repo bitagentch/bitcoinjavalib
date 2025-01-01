@@ -1,5 +1,6 @@
 package ch.bitagent.bitcoin.lib.wallet;
 
+import ch.bitagent.bitcoin.lib.network.Electrum;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -63,7 +64,11 @@ class AddressTest {
         assertTrue(balance.getLong("unconfirmed") >= 0);
         assertTrue(balance.getLong("confirmed") > 0);
         var mempool = electrum.getMempool(scripthash);
-        assertFalse(mempool.isEmpty());
+        if (balance.getLong("unconfirmed") == 0) {
+            assertTrue(mempool.isEmpty());
+        } else {
+            assertFalse(mempool.isEmpty());
+        }
         var unspentList = electrum.listUnspent(scripthash);
         assertFalse(unspentList.isEmpty());
     }

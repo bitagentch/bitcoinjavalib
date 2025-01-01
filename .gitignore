@@ -3,3 +3,4 @@
 target/
 tx.cache
 todo.md
+src/test/resources/walletdev.properties
