@@ -80,7 +80,7 @@ public class MnemonicSentence {
         var wordlist = Helper.loadWordlist(RESOURCE_ENGLISH);
 
         for (int i = 0; i < mnemonicArray.length; i++) {
-            int wordIndex = getWordIndex(wordlist, mnemonicArray, i);
+            int wordIndex = getWordIndex(wordlist, mnemonicArray[i]);
             for (int j = 0; j < 11; ++j) {
                 concatenatedBin[(i * 11) + j] = (wordIndex & (1 << (10 - j))) != 0;
             }
@@ -121,7 +121,7 @@ public class MnemonicSentence {
 
         var wordlist = Helper.loadWordlist(RESOURCE_ENGLISH);
         for (int i = 0; i < mnemonicArray.length; i++) {
-            getWordIndex(wordlist, mnemonicArray, i);
+            getWordIndex(wordlist, mnemonicArray[i]);
         }
 
         if (passphrase == null) {
@@ -140,20 +140,30 @@ public class MnemonicSentence {
         return mnemonicArray;
     }
 
-    private static int getWordIndex(ArrayList<String> wordlist, String[] mnemonicArray, int i) {
-        int wordIndex = Collections.binarySearch(wordlist, mnemonicArray[i]);
+    private static int getWordIndex(ArrayList<String> wordlist, String mnemonicWord) {
+        int wordIndex = Collections.binarySearch(wordlist, mnemonicWord);
         if (wordIndex < 0) {
-            throw new IllegalArgumentException(String.format("Unable to find '%s' in word list.", mnemonicArray[i]));
+            throw new IllegalArgumentException(String.format("Unable to find '%s' in word list.", mnemonicWord));
         }
         return wordIndex;
     }
 
-    public static boolean isValid(String mnemonicSentence) {
+    public static boolean isWordValid(String mnemonicWord) {
+        try {
+            var wordlist = Helper.loadWordlist(RESOURCE_ENGLISH);
+            getWordIndex(wordlist, mnemonicWord);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public static boolean isSentenceValid(String mnemonicSentence) {
         try {
             var mnemonicArray = getMnemonicArray(mnemonicSentence);
             var wordlist = Helper.loadWordlist(RESOURCE_ENGLISH);
             for (int i = 0; i < mnemonicArray.length; i++) {
-                getWordIndex(wordlist, mnemonicArray, i);
+                getWordIndex(wordlist, mnemonicArray[i]);
             }
             return true;
         } catch (Exception e) {
