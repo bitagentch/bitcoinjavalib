@@ -191,12 +191,21 @@ class MnemonicSentenceTest {
     }
 
     @Test
-    void isValid() {
-        assertFalse(MnemonicSentence.isValid(null));
-        assertFalse(MnemonicSentence.isValid(""));
-        assertFalse(MnemonicSentence.isValid(" "));
-        assertFalse(MnemonicSentence.isValid("abandon"));
-        assertFalse(MnemonicSentence.isValid("abandon abandon"));
-        assertTrue(MnemonicSentence.isValid("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon"));
+    void isWordValid() {
+        assertFalse(MnemonicSentence.isWordValid(null));
+        assertFalse(MnemonicSentence.isWordValid(""));
+        assertFalse(MnemonicSentence.isWordValid(" "));
+        assertFalse(MnemonicSentence.isWordValid("abando"));
+        assertTrue(MnemonicSentence.isWordValid("abandon"));
+    }
+
+    @Test
+    void isSentenceValid() {
+        assertFalse(MnemonicSentence.isSentenceValid(null));
+        assertFalse(MnemonicSentence.isSentenceValid(""));
+        assertFalse(MnemonicSentence.isSentenceValid(" "));
+        assertFalse(MnemonicSentence.isSentenceValid("abandon"));
+        assertFalse(MnemonicSentence.isSentenceValid("abandon abandon"));
+        assertTrue(MnemonicSentence.isSentenceValid("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon"));
     }
 }

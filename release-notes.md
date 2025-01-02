@@ -1,6 +1,9 @@
 # release notes
 
-## snapshot
+## 0.1.4
+- is mnemonic word valid
+
+## 0.1.3
 - wallet
 - segwit tx
 - address
