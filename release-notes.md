@@ -1,5 +1,8 @@
 # release notes
 
+## snapshot
+- ten receive addresses
+
 ## 0.1.4
 - is mnemonic word valid
 

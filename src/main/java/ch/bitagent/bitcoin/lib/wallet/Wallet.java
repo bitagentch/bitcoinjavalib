@@ -30,7 +30,7 @@ public class Wallet {
         this.extendedKey = extendedKey;
 
         var extendedKey0 = this.extendedKey.derive(0);
-        deriveAddresses(extendedKey0, 0, 0, 19, this.addressList0);
+        deriveAddresses(extendedKey0, 0, 0, 9, this.addressList0);
 
         var extendedKey1 = this.extendedKey.derive(1);
         deriveAddresses(extendedKey1, 1, 0, 9, this.addressList1);

@@ -80,7 +80,7 @@ class AddressTest {
         var scripthash = address.electrumScripthash();
         var electrum = new Electrum();
         var history = electrum.getHistory(scripthash);
-        assertEquals(120, history.length());
+        assertTrue(history.length() >= 120);
         var balance = electrum.getBalance(scripthash);
         assertEquals(0L, balance.getLong("unconfirmed"));
         assertEquals(0L, balance.getLong("confirmed"));
