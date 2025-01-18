@@ -18,39 +18,43 @@ public class Electrum {
     private static final Logger log = Logger.getLogger(Electrum.class.getSimpleName());
 
     private final List<String> sockets = new ArrayList<>();
+    private String defaultSocket;
 
-    public List<String> getSockets() {
-        return sockets;
+    public Electrum() {
+        this.initSockets();
     }
 
-    public String defaultSocket() {
-        var electrumRpcSockets = Properties.getElectrumRpcSockets();
-        if (electrumRpcSockets.isEmpty()) {
-            var error = "Please configure a default electrum rpc socket in bitcoinjavalib.properties";
-            log.severe(error);
-            throw new IllegalStateException(error);
-        }
-        String electrumRpcSocket = electrumRpcSockets.get(0);
-        log.fine(electrumRpcSocket);
-        sockets.clear();
-        sockets.add(electrumRpcSocket);
-        return electrumRpcSocket;
-    }
-
-    public void allSockets() {
+    private void initSockets() {
         sockets.clear();
         for (String electrumRpcSocket : Properties.getElectrumRpcSockets()) {
             log.fine(electrumRpcSocket);
             sockets.add(electrumRpcSocket);
         }
+        if (sockets.isEmpty()) {
+            var error = "Please configure a electrum rpc socket in bitcoinjavalib.properties";
+            log.severe(error);
+            throw new IllegalStateException(error);
+        }
+        for (String socket : sockets) {
+            if (ping(socket)) {
+                defaultSocket = socket;
+                break;
+            }
+        }
+        if (defaultSocket == null) {
+            var error = "Please configure a working electrum rpc socket in bitcoinjavalib.properties";
+            log.severe(error);
+            throw new IllegalStateException(error);
+        }
+    }
+
+    public List<String> getSockets() {
+        return sockets;
     }
 
     public String callSocket(String socket, String jsonRequest) {
         var start = System.currentTimeMillis();
         try {
-            if (socket == null) {
-                socket = defaultSocket();
-            }
             log.fine(String.format(">> %s", jsonRequest));
             var socketData = socket.split(":");
             if (socketData.length != 3) {
@@ -86,15 +90,13 @@ public class Electrum {
         }
     }
 
-    public List<JSONObject> ping() {
-        List<JSONObject> pongs = new ArrayList<>();
-        for (String socket : sockets) {
-            var jsonResponse = callSocket(socket, getJsonRequest("server.ping", null));
-            if (jsonResponse != null && !jsonResponse.isEmpty()) {
-                pongs.add(new JSONObject(jsonResponse));
-            }
+    public boolean ping(String socket) {
+        var jsonResponse = callSocket(socket, getJsonRequest("server.ping", null));
+        if (jsonResponse != null && !jsonResponse.isEmpty()) {
+            return true;
+        } else {
+            return false;
         }
-        return pongs;
     }
 
     public List<JSONObject> features() {
@@ -118,19 +120,19 @@ public class Electrum {
     }
 
     public JSONArray peers() {
-        var jsonResponse = callSocket(null, getJsonRequest("server.peers.subscribe", null));
+        var jsonResponse = callSocket(defaultSocket, getJsonRequest("server.peers.subscribe", null));
         var json = new JSONObject(jsonResponse);
         return json.getJSONArray("result");
     }
 
     public Integer height() {
-        var jsonResponse = callSocket(null, getJsonRequest("blockchain.headers.subscribe", null));
+        var jsonResponse = callSocket(defaultSocket, getJsonRequest("blockchain.headers.subscribe", null));
         var json = new JSONObject(jsonResponse);
         return json.getJSONObject("result").getInt("height");
     }
 
     public JSONArray getHistory(String scripthash) {
-        var jsonResponse = callSocket(null, getJsonRequest("blockchain.scripthash.get_history", List.of(scripthash)));
+        var jsonResponse = callSocket(defaultSocket, getJsonRequest("blockchain.scripthash.get_history", List.of(scripthash)));
         if (jsonResponse == null) {
             return null;
         }
@@ -143,7 +145,7 @@ public class Electrum {
     }
 
     public JSONObject getBalance(String scripthash) {
-        var jsonResponse = callSocket(null, getJsonRequest("blockchain.scripthash.get_balance", List.of(scripthash)));
+        var jsonResponse = callSocket(defaultSocket, getJsonRequest("blockchain.scripthash.get_balance", List.of(scripthash)));
         if (jsonResponse == null) {
             return null;
         }
@@ -156,7 +158,7 @@ public class Electrum {
     }
 
     public JSONArray getMempool(String scripthash) {
-        var jsonResponse = callSocket(null, getJsonRequest("blockchain.scripthash.get_mempool", List.of(scripthash)));
+        var jsonResponse = callSocket(defaultSocket, getJsonRequest("blockchain.scripthash.get_mempool", List.of(scripthash)));
         if (jsonResponse == null) {
             return null;
         }
@@ -169,7 +171,7 @@ public class Electrum {
     }
 
     public JSONArray listUnspent(String scripthash) {
-        var jsonResponse = callSocket(null, getJsonRequest("blockchain.scripthash.listunspent", List.of(scripthash)));
+        var jsonResponse = callSocket(defaultSocket, getJsonRequest("blockchain.scripthash.listunspent", List.of(scripthash)));
         if (jsonResponse == null) {
             return null;
         }
@@ -182,7 +184,7 @@ public class Electrum {
     }
 
     public Long estimateFee(int number) {
-        var jsonResponse = callSocket(null, getJsonRequest("blockchain.estimatefee", List.of(String.valueOf(number))));
+        var jsonResponse = callSocket(defaultSocket, getJsonRequest("blockchain.estimatefee", List.of(String.valueOf(number))));
         if (jsonResponse == null) {
             return null;
         }
@@ -196,7 +198,7 @@ public class Electrum {
     }
 
     public String getTransaction(String txHash) {
-        var jsonResponse = callSocket(null, getJsonRequest("blockchain.transaction.get", List.of(txHash, false)));
+        var jsonResponse = callSocket(defaultSocket, getJsonRequest("blockchain.transaction.get", List.of(txHash, false)));
         if (jsonResponse == null) {
             return null;
         }
@@ -209,7 +211,7 @@ public class Electrum {
     }
 
     public JSONObject getTransactionVerbose(String txHash) {
-        var jsonResponse = callSocket(null, getJsonRequest("blockchain.transaction.get", List.of(txHash, true)));
+        var jsonResponse = callSocket(defaultSocket, getJsonRequest("blockchain.transaction.get", List.of(txHash, true)));
         if (jsonResponse == null) {
             return null;
         }
@@ -225,7 +227,7 @@ public class Electrum {
         if (rawTx == null || rawTx.isEmpty()) {
             return null;
         }
-        var jsonResponse = callSocket(null, getJsonRequest("blockchain.transaction.broadcast", List.of(rawTx)));
+        var jsonResponse = callSocket(defaultSocket, getJsonRequest("blockchain.transaction.broadcast", List.of(rawTx)));
         if (jsonResponse == null) {
             return null;
         }

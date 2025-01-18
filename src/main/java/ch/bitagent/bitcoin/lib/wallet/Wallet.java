@@ -77,11 +77,8 @@ public class Wallet {
         }
     }
 
-    public void history() {
+    public void history(List<Address> addressList) {
         var electrum = new Electrum();
-        List<Address> addressList = new ArrayList<>();
-        addressList.addAll(addressList0);
-        addressList.addAll(addressList1);
         for (Address address : addressList) {
             var scripthash = address.electrumScripthash();
             var history = electrum.getHistory(scripthash);

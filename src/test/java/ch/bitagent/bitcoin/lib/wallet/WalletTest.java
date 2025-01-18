@@ -35,7 +35,8 @@ class WalletTest {
         var wallet = Wallet.parse(extendedPrivkey);
         assertEquals(10, wallet.getAddressList0().size());
         assertEquals(10, wallet.getAddressList1().size());
-        wallet.history();
+        wallet.history(wallet.getAddressList0());
+        wallet.history(wallet.getAddressList1());
         log.info(wallet.toString());
     }
 
@@ -79,7 +80,8 @@ class WalletTest {
     createSegwitTx() {
         var mnemonicSentence = Properties.getWalletMnemonic(WALLET_DEV_FILENAME, 0);
         var wallet = Wallet.parse(mnemonicSentence, null, Wallet.PURPOSE_NATIVE_SEGWIT, Wallet.COIN_TYPE_BITCOIN, 0);
-        wallet.history();
+        wallet.history(wallet.getAddressList0());
+        wallet.history(wallet.getAddressList1());
         assertFalse(wallet.getUtxoList().isEmpty());
 
         long utxoAmount = 0L;
