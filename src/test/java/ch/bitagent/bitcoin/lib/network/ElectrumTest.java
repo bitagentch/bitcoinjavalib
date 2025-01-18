@@ -3,9 +3,13 @@ package ch.bitagent.bitcoin.lib.network;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
+import java.util.logging.Logger;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class ElectrumTest {
+
+    private static final Logger log = Logger.getLogger(ElectrumTest.class.getSimpleName());
 
     @Test
     void pingDefault() {
@@ -45,6 +49,9 @@ class ElectrumTest {
         var electrum = new Electrum();
         var peers = electrum.peers();
         assertFalse(peers.isEmpty());
+        for (Object peer : peers) {
+            log.fine(peer.toString());
+        }
     }
 
     @Test

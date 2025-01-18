@@ -6,6 +6,7 @@
 - wallet history
 - wallet derive addresses
 - electrum sockets
+- electrum logging
 
 ## 0.1.4
 - is mnemonic word valid

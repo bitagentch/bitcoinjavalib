@@ -73,7 +73,7 @@ public class Electrum {
                 jsonResponse = Tcp.socket(host, port, jsonRequest);
             }
             if (jsonResponse == null) {
-                log.severe(String.format("jsonResponse == null\n%s %sms", socket, System.currentTimeMillis() - start));
+                log.severe(String.format("jsonResponse == null - %s %sms", socket, System.currentTimeMillis() - start));
                 return null;
             }
             var responseLog = jsonResponse.toString();
@@ -84,7 +84,7 @@ public class Electrum {
             log.info(String.format("%s %sms", socket, System.currentTimeMillis() - start));
             return jsonResponse;
         } catch (Exception e) {
-            log.severe(String.format("%s\n%s %sms", e, socket, System.currentTimeMillis() - start));
+            log.severe(String.format("%s - %s %sms", e, socket, System.currentTimeMillis() - start));
             e.printStackTrace();
             return null;
         }
