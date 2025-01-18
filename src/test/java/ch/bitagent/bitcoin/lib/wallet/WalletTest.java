@@ -33,9 +33,10 @@ class WalletTest {
     void privkey() {
         var extendedPrivkey = ExtendedKey.parse("zprvAdG4iTXWBoARxkkzNpNh8r6Qag3irQB8PzEMkAFeTRXxHpbF9z4QgEvBRmfvqWvGp42t42nvgGpNgYSJA9iefm1yYNZKEm7z6qUWCroSQnE");
         var wallet = Wallet.parse(extendedPrivkey);
-        assertEquals(20, wallet.getAddressList0().size());
+        assertEquals(10, wallet.getAddressList0().size());
         assertEquals(10, wallet.getAddressList1().size());
-        wallet.history();
+        wallet.history(wallet.getAddressList0());
+        wallet.history(wallet.getAddressList1());
         log.info(wallet.toString());
     }
 
@@ -43,15 +44,15 @@ class WalletTest {
     void pubkey() {
         var extendedPubkey = ExtendedKey.parse("zpub6rFR7y4Q2AijBEqTUquhVz398htDFrtymD9xYYfG1m4wAcvPhXNfE3EfH1r1ADqtfSdVCToUG868RvUUkgDKf31mGDtKsAYz2oz2AGutZYs");
         var wallet = Wallet.parse(extendedPubkey);
-        assertEquals(20, wallet.getAddressList0().size());
+        assertEquals(10, wallet.getAddressList0().size());
         assertEquals(10, wallet.getAddressList1().size());
     }
 
     @Test
     void mnemonicSentenceSignVerify() {
         var mnemonicSentence = Properties.getWalletMnemonic(Properties.WALLET_FILENAME, 1);
-        var wallet = Wallet.parse(mnemonicSentence, null);
-        assertEquals(20, wallet.getAddressList0().size());
+        var wallet = Wallet.parse(mnemonicSentence, null, Wallet.PURPOSE_NATIVE_SEGWIT, Wallet.COIN_TYPE_BITCOIN, 0);
+        assertEquals(10, wallet.getAddressList0().size());
         assertEquals(10, wallet.getAddressList1().size());
         var address = wallet.getAddressList0().get(0).getAddressString();
         var message = "Test";
@@ -64,7 +65,7 @@ class WalletTest {
     @Test
     void testWallet() {
         var mnemonicSentence = Properties.getWalletMnemonic(Properties.WALLET_FILENAME, 1);
-        var wallet = Wallet.parse(mnemonicSentence, null);
+        var wallet = Wallet.parse(mnemonicSentence, null, Wallet.PURPOSE_NATIVE_SEGWIT, Wallet.COIN_TYPE_BITCOIN, 0);
         var address = wallet.getAddressList0().get(0).getAddressString();
         log.info(address);
         var message = "I confirm my iban and my bitcoin wallet. [test]";
@@ -78,8 +79,9 @@ class WalletTest {
     void
     createSegwitTx() {
         var mnemonicSentence = Properties.getWalletMnemonic(WALLET_DEV_FILENAME, 0);
-        var wallet = Wallet.parse(mnemonicSentence, null);
-        wallet.history();
+        var wallet = Wallet.parse(mnemonicSentence, null, Wallet.PURPOSE_NATIVE_SEGWIT, Wallet.COIN_TYPE_BITCOIN, 0);
+        wallet.history(wallet.getAddressList0());
+        wallet.history(wallet.getAddressList1());
         assertFalse(wallet.getUtxoList().isEmpty());
 
         long utxoAmount = 0L;

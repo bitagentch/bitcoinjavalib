@@ -11,6 +11,9 @@ import java.util.List;
 
 public class Wallet {
 
+    public static final int PURPOSE_NATIVE_SEGWIT = 84;
+    public static final int COIN_TYPE_BITCOIN = 0;
+
     private final ExtendedKey extendedKey;
 
     private final List<Address> addressList0 = new ArrayList<>();
@@ -28,31 +31,38 @@ public class Wallet {
             throw new IllegalArgumentException("Prefix not supported");
         }
         this.extendedKey = extendedKey;
-
-        var extendedKey0 = this.extendedKey.derive(0);
-        deriveAddresses(extendedKey0, 0, 0, 19, this.addressList0);
-
-        var extendedKey1 = this.extendedKey.derive(1);
-        deriveAddresses(extendedKey1, 1, 0, 9, this.addressList1);
+        this.addressList0.addAll(deriveAddresses(extendedKey, 0, 0, 9));
+        this.addressList1.addAll(deriveAddresses(extendedKey, 1, 0, 9));
     }
 
     public static Wallet parse(ExtendedKey extendedKey) {
         return new Wallet(extendedKey);
     }
 
-    public static Wallet parse(String mnemonicSentence, String passphrase) {
+    public static Wallet parse(String mnemonicSentence, String passphrase, int purpose, int coinType, int account) {
+        if (purpose != PURPOSE_NATIVE_SEGWIT) {
+            throw new IllegalArgumentException("Purpose not supported!");
+        }
+        if (coinType != COIN_TYPE_BITCOIN) {
+            throw new IllegalArgumentException("Coin type not supported!");
+        }
+        if (account < 0) {
+            throw new IllegalArgumentException("Account not supported!");
+        }
         var seed = MnemonicSentence.mnemonicToSeed(mnemonicSentence, passphrase);
         var zprv = MnemonicSentence.seedToExtendedKey(seed, ExtendedKey.PREFIX_ZPRV);
         var m = ExtendedKey.parse(zprv);
-        var m84h0h0h = m.derive(84, true, false)
-                .derive(0, true, false)
-                .derive(0, true, false);
+        var m84h0h0h = m.derive(purpose, true, false)
+                .derive(coinType, true, false)
+                .derive(account, true, false);
         return new Wallet(m84h0h0h);
     }
 
-    private void deriveAddresses(ExtendedKey extendedKey, int change, int indexFrom, int indexTo, List<Address> addressList) {
+    public static List<Address> deriveAddresses(ExtendedKey extendedKey, int change, int indexFrom, int indexTo) {
+        var extendedKeyChange = extendedKey.derive(change);
+        List<Address> addressList = new ArrayList<>();
         for (int i = indexFrom; i <= indexTo; i++) {
-            var extendedKeyi = extendedKey.derive(i);
+            var extendedKeyi = extendedKeyChange.derive(i);
             S256Point publicKeyi;
             if (ExtendedKey.isKeyPrivate(extendedKeyi.getPrefix())) {
                 publicKeyi = PrivateKey.parse(extendedKeyi.getKey()).getPoint();
@@ -63,13 +73,11 @@ public class Wallet {
             addressi.setChangeIndex(new AddressChangeIndex(change, i));
             addressList.add(addressi);
         }
+        return addressList;
     }
 
-    public void history() {
+    public void history(List<Address> addressList) {
         var electrum = new Electrum();
-        List<Address> addressList = new ArrayList<>();
-        addressList.addAll(addressList0);
-        addressList.addAll(addressList1);
         for (Address address : addressList) {
             var scripthash = address.electrumScripthash();
             var history = electrum.getHistory(scripthash);

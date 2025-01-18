@@ -1,5 +1,15 @@
 # release notes
 
+## snapshot
+
+## 0.2.0
+- wallet ten receive addresses
+- wallet purpose, coin type and account
+- wallet history
+- wallet derive addresses
+- electrum sockets
+- electrum logging
+
 ## 0.1.4
 - is mnemonic word valid
 
