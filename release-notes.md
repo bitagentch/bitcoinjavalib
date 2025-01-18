@@ -1,9 +1,10 @@
 # release notes
 
 ## snapshot
-- ten receive addresses
+- wallet ten receive addresses
 - wallet purpose, coin type and account
 - wallet history
+- wallet derive addresses
 - electrum sockets
 
 ## 0.1.4

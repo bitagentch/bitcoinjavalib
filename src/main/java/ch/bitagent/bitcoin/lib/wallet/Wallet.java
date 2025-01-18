@@ -31,12 +31,8 @@ public class Wallet {
             throw new IllegalArgumentException("Prefix not supported");
         }
         this.extendedKey = extendedKey;
-
-        var extendedKey0 = this.extendedKey.derive(0);
-        deriveAddresses(extendedKey0, 0, 0, 9, this.addressList0);
-
-        var extendedKey1 = this.extendedKey.derive(1);
-        deriveAddresses(extendedKey1, 1, 0, 9, this.addressList1);
+        this.addressList0.addAll(deriveAddresses(extendedKey, 0, 0, 9));
+        this.addressList1.addAll(deriveAddresses(extendedKey, 1, 0, 9));
     }
 
     public static Wallet parse(ExtendedKey extendedKey) {
@@ -62,9 +58,11 @@ public class Wallet {
         return new Wallet(m84h0h0h);
     }
 
-    private void deriveAddresses(ExtendedKey extendedKey, int change, int indexFrom, int indexTo, List<Address> addressList) {
+    public static List<Address> deriveAddresses(ExtendedKey extendedKey, int change, int indexFrom, int indexTo) {
+        var extendedKeyChange = extendedKey.derive(change);
+        List<Address> addressList = new ArrayList<>();
         for (int i = indexFrom; i <= indexTo; i++) {
-            var extendedKeyi = extendedKey.derive(i);
+            var extendedKeyi = extendedKeyChange.derive(i);
             S256Point publicKeyi;
             if (ExtendedKey.isKeyPrivate(extendedKeyi.getPrefix())) {
                 publicKeyi = PrivateKey.parse(extendedKeyi.getKey()).getPoint();
@@ -75,6 +73,7 @@ public class Wallet {
             addressi.setChangeIndex(new AddressChangeIndex(change, i));
             addressList.add(addressi);
         }
+        return addressList;
     }
 
     public void history(List<Address> addressList) {
