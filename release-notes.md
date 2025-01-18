@@ -1,6 +1,8 @@
 # release notes
 
 ## snapshot
+
+## 0.2.0
 - wallet ten receive addresses
 - wallet purpose, coin type and account
 - wallet history
