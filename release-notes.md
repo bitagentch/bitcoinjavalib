@@ -2,6 +2,7 @@
 
 ## snapshot
 - ten receive addresses
+- wallet purpose, coin type and account
 
 ## 0.1.4
 - is mnemonic word valid

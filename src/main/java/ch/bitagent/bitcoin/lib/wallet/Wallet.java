@@ -11,6 +11,9 @@ import java.util.List;
 
 public class Wallet {
 
+    public static final int PURPOSE_NATIVE_SEGWIT = 84;
+    public static final int COIN_TYPE_BITCOIN = 0;
+
     private final ExtendedKey extendedKey;
 
     private final List<Address> addressList0 = new ArrayList<>();
@@ -40,13 +43,22 @@ public class Wallet {
         return new Wallet(extendedKey);
     }
 
-    public static Wallet parse(String mnemonicSentence, String passphrase) {
+    public static Wallet parse(String mnemonicSentence, String passphrase, int purpose, int coinType, int account) {
+        if (purpose != PURPOSE_NATIVE_SEGWIT) {
+            throw new IllegalArgumentException("Purpose not supported!");
+        }
+        if (coinType != COIN_TYPE_BITCOIN) {
+            throw new IllegalArgumentException("Coin type not supported!");
+        }
+        if (account < 0) {
+            throw new IllegalArgumentException("Account not supported!");
+        }
         var seed = MnemonicSentence.mnemonicToSeed(mnemonicSentence, passphrase);
         var zprv = MnemonicSentence.seedToExtendedKey(seed, ExtendedKey.PREFIX_ZPRV);
         var m = ExtendedKey.parse(zprv);
-        var m84h0h0h = m.derive(84, true, false)
-                .derive(0, true, false)
-                .derive(0, true, false);
+        var m84h0h0h = m.derive(purpose, true, false)
+                .derive(coinType, true, false)
+                .derive(account, true, false);
         return new Wallet(m84h0h0h);
     }
 

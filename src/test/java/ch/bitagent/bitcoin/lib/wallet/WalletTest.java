@@ -50,7 +50,7 @@ class WalletTest {
     @Test
     void mnemonicSentenceSignVerify() {
         var mnemonicSentence = Properties.getWalletMnemonic(Properties.WALLET_FILENAME, 1);
-        var wallet = Wallet.parse(mnemonicSentence, null);
+        var wallet = Wallet.parse(mnemonicSentence, null, Wallet.PURPOSE_NATIVE_SEGWIT, Wallet.COIN_TYPE_BITCOIN, 0);
         assertEquals(10, wallet.getAddressList0().size());
         assertEquals(10, wallet.getAddressList1().size());
         var address = wallet.getAddressList0().get(0).getAddressString();
@@ -64,7 +64,7 @@ class WalletTest {
     @Test
     void testWallet() {
         var mnemonicSentence = Properties.getWalletMnemonic(Properties.WALLET_FILENAME, 1);
-        var wallet = Wallet.parse(mnemonicSentence, null);
+        var wallet = Wallet.parse(mnemonicSentence, null, Wallet.PURPOSE_NATIVE_SEGWIT, Wallet.COIN_TYPE_BITCOIN, 0);
         var address = wallet.getAddressList0().get(0).getAddressString();
         log.info(address);
         var message = "I confirm my iban and my bitcoin wallet. [test]";
@@ -78,7 +78,7 @@ class WalletTest {
     void
     createSegwitTx() {
         var mnemonicSentence = Properties.getWalletMnemonic(WALLET_DEV_FILENAME, 0);
-        var wallet = Wallet.parse(mnemonicSentence, null);
+        var wallet = Wallet.parse(mnemonicSentence, null, Wallet.PURPOSE_NATIVE_SEGWIT, Wallet.COIN_TYPE_BITCOIN, 0);
         wallet.history();
         assertFalse(wallet.getUtxoList().isEmpty());
 
