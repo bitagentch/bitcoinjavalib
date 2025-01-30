@@ -1,4 +1,6 @@
-package ch.bitagent.bitcoin.lib.helper;
+package ch.bitagent.bitcoin.lib.network;
+
+import ch.bitagent.bitcoin.lib.helper.Properties;
 
 import java.net.URI;
 import java.net.http.HttpClient;

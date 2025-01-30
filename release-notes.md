@@ -2,6 +2,9 @@
 
 ## snapshot
 
+## 0.3.0
+- wallet gap limit
+
 ## 0.2.0
 - wallet ten receive addresses
 - wallet purpose, coin type and account
