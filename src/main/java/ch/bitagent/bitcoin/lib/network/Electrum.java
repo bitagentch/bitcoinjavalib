@@ -2,7 +2,6 @@ package ch.bitagent.bitcoin.lib.network;
 
 import ch.bitagent.bitcoin.lib.helper.Helper;
 import ch.bitagent.bitcoin.lib.helper.Properties;
-import ch.bitagent.bitcoin.lib.helper.Tcp;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

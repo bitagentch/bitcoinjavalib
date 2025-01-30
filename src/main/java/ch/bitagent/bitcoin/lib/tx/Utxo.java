@@ -41,12 +41,6 @@ public class Utxo {
 
     @Override
     public String toString() {
-        return "Utxo{" +
-                "height=" + height +
-                ", value=" + value +
-                ", txPos=" + txPos +
-                ", address='" + String.format("/%s/%s", changeIndex.getChange(), changeIndex.getIndex()) + '\'' +
-                ", txHash='" + txHash + '\'' +
-                '}';
+        return String.format("/%s/%s/%s/%s/%s/%s", changeIndex.getChange(), changeIndex.getIndex(), height, value, txPos, txHash);
     }
 }

@@ -8,13 +8,17 @@ import ch.bitagent.bitcoin.lib.tx.Utxo;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class Wallet {
+
+    private static final Logger log = Logger.getLogger(Wallet.class.getSimpleName());
 
     public static final int PURPOSE_NATIVE_SEGWIT = 84;
     public static final int COIN_TYPE_BITCOIN = 0;
 
     private final ExtendedKey extendedKey;
+    private final int gapLimit;
 
     private final List<Address> addressList0 = new ArrayList<>();
     private final List<Address> addressList1 = new ArrayList<>();
@@ -25,21 +29,25 @@ public class Wallet {
         return MnemonicSentence.entropyToMnemonic(entropy);
     }
 
-    public Wallet(ExtendedKey extendedKey) {
+    public Wallet(ExtendedKey extendedKey, int gapLimit) {
         if (Arrays.compare(extendedKey.getPrefix(), ExtendedKey.PREFIX_ZPRV.toBytes()) != 0
                 && Arrays.compare(extendedKey.getPrefix(), ExtendedKey.PREFIX_ZPUB.toBytes()) != 0) {
             throw new IllegalArgumentException("Prefix not supported");
         }
+        if (gapLimit < 1) {
+            throw new IllegalArgumentException("Minimal gap limit is 1");
+        }
         this.extendedKey = extendedKey;
-        this.addressList0.addAll(deriveAddresses(extendedKey, 0, 0, 9));
-        this.addressList1.addAll(deriveAddresses(extendedKey, 1, 0, 9));
+        this.gapLimit = gapLimit;
+        this.addressList0.addAll(deriveAddresses(extendedKey, 0, 0, gapLimit - 1));
+        this.addressList1.addAll(deriveAddresses(extendedKey, 1, 0, gapLimit - 1));
     }
 
-    public static Wallet parse(ExtendedKey extendedKey) {
-        return new Wallet(extendedKey);
+    public static Wallet parse(ExtendedKey extendedKey, int gapLimit) {
+        return new Wallet(extendedKey, gapLimit);
     }
 
-    public static Wallet parse(String mnemonicSentence, String passphrase, int purpose, int coinType, int account) {
+    public static Wallet parse(String mnemonicSentence, String passphrase, int purpose, int coinType, int account, int gapLimit) {
         if (purpose != PURPOSE_NATIVE_SEGWIT) {
             throw new IllegalArgumentException("Purpose not supported!");
         }
@@ -55,10 +63,11 @@ public class Wallet {
         var m84h0h0h = m.derive(purpose, true, false)
                 .derive(coinType, true, false)
                 .derive(account, true, false);
-        return new Wallet(m84h0h0h);
+        return new Wallet(m84h0h0h, gapLimit);
     }
 
     public static List<Address> deriveAddresses(ExtendedKey extendedKey, int change, int indexFrom, int indexTo) {
+        log.fine(String.format("derive %s/%s/%s", change, indexFrom, indexTo));
         var extendedKeyChange = extendedKey.derive(change);
         List<Address> addressList = new ArrayList<>();
         for (int i = indexFrom; i <= indexTo; i++) {
@@ -76,12 +85,31 @@ public class Wallet {
         return addressList;
     }
 
-    public void history(List<Address> addressList) {
+    public void history(int change) {
         var electrum = new Electrum();
-        for (Address address : addressList) {
+        int gap = 0;
+        var addressList = getAddressList0();
+        if (change == 0) {
+            // NOP
+        } else if (change == 1) {
+            addressList = getAddressList1();
+        } else {
+            throw new IllegalArgumentException("Invalid change");
+        }
+        for (int i = 0; i < addressList.size(); i++) {
+            var address = addressList.get(i);
             var scripthash = address.electrumScripthash();
             var history = electrum.getHistory(scripthash);
-            if (history == null) {
+            if (history.isEmpty()) {
+                gap++;
+            }
+            if (i == addressList.size() - 1 && gap < gapLimit) {
+                int indexFrom = i + 1;
+                int indexTo = i + gapLimit - gap;
+                var derviedAddresses = deriveAddresses(this.extendedKey, change, indexFrom, indexTo);
+                addressList.addAll(derviedAddresses);
+            }
+            if (history.isEmpty()) {
                 continue;
             }
             address.setHistoryCount(history.length());
@@ -94,8 +122,8 @@ public class Wallet {
                 address.setConfirmed(balance.getLong("confirmed"));
                 if (address.getUnconfirmed() > 0 || address.getConfirmed() > 0) {
                     var unspent = electrum.listUnspent(address.electrumScripthash());
-                    for (int i = 0; i < unspent.length(); i++) {
-                        utxoList.add(new Utxo(unspent.getJSONObject(i), address.getChangeIndex()));
+                    for (int j = 0; j < unspent.length(); j++) {
+                        utxoList.add(new Utxo(unspent.getJSONObject(j), address.getChangeIndex()));
                     }
                 }
             }
@@ -184,6 +212,10 @@ public class Wallet {
         for (Address address : addressList) {
             string.append("\n");
             string.append(address);
+        }
+        for (Utxo utxo : utxoList) {
+            string.append("\n");
+            string.append(utxo);
         }
         return string.toString();
     }

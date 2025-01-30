@@ -1,4 +1,4 @@
-package ch.bitagent.bitcoin.lib.helper;
+package ch.bitagent.bitcoin.lib.network;
 
 import javax.net.ssl.*;
 import java.io.*;

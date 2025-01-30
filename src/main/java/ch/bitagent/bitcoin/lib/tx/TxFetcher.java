@@ -3,6 +3,7 @@ package ch.bitagent.bitcoin.lib.tx;
 import ch.bitagent.bitcoin.lib.ecc.Hex;
 import ch.bitagent.bitcoin.lib.helper.*;
 import ch.bitagent.bitcoin.lib.network.Electrum;
+import ch.bitagent.bitcoin.lib.network.Http;
 
 import java.io.*;
 import java.util.Arrays;
