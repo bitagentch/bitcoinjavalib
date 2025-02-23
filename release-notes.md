@@ -2,6 +2,9 @@
 
 ## snapshot
 
+## 0.4.0
+- tx fetcher cache
+
 ## 0.3.0
 - wallet gap limit
 

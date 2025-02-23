@@ -15,6 +15,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -291,7 +292,7 @@ public class Tx implements Message {
      *
      * @return a {@link ch.bitagent.bitcoin.lib.ecc.Int} object
      */
-    public Int fee() {
+    public Int fee(Map<String, String> cache) {
         log.fine(String.format("txIns: %s, txOuts: %s", txIns.size(), txOuts.size()));
         long start = System.currentTimeMillis();
         // initialize input sum and output sum
@@ -301,7 +302,7 @@ public class Tx implements Message {
         int txin = 0;
         for (TxIn txIn : txIns) {
             log.info(String.format("txin %s/%s", ++txin, txIns.size()));
-            inputSum = inputSum.add(txIn.value(this.testnet));
+            inputSum = inputSum.add(txIn.value(this.testnet, cache));
             if (txin % 100 == 0) {
                 try {
                     Thread.sleep(1000);
@@ -327,7 +328,7 @@ public class Tx implements Message {
      * @param redeemScript a {@link ch.bitagent.bitcoin.lib.script.Script} object
      * @return a {@link ch.bitagent.bitcoin.lib.ecc.Int} object
      */
-    public Int sigHash(int inputIndex, Script redeemScript) {
+    public Int sigHash(int inputIndex, Script redeemScript, Map<String, String> cache) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         // start the serialization with version
         // use int_to_little_endian in 4 bytes
@@ -344,7 +345,7 @@ public class Tx implements Message {
                     scriptSig = redeemScript;
                 } else {
                     // if the input index is the one we're signing
-                    scriptSig = txIn.scriptPubkey(this.testnet);
+                    scriptSig = txIn.scriptPubkey(this.testnet, cache);
                 }
             } else {
                 // Otherwise, the ScriptSig is empty
@@ -410,7 +411,7 @@ public class Tx implements Message {
      * @param witnessScript a {@link ch.bitagent.bitcoin.lib.script.Script} object
      * @return a {@link ch.bitagent.bitcoin.lib.ecc.Int} object
      */
-    public Int sigHashBip143(int inputIndex, Script redeemScript, Script witnessScript) {
+    public Int sigHashBip143(int inputIndex, Script redeemScript, Script witnessScript, Map<String, String> cache) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         var txIn = this.txIns.get(inputIndex);
         // per BIP143 spec
@@ -425,10 +426,10 @@ public class Tx implements Message {
         } else if (redeemScript != null) {
             scriptCode = Script.p2pkhScript(redeemScript.getCmds().get(1).getElement()).serialize();
         } else {
-            scriptCode = Script.p2pkhScript(txIn.scriptPubkey(this.testnet).getCmds().get(1).getElement()).serialize();
+            scriptCode = Script.p2pkhScript(txIn.scriptPubkey(this.testnet, cache).getCmds().get(1).getElement()).serialize();
         }
         stream.writeBytes(scriptCode);
-        stream.writeBytes(txIn.value(this.testnet).toBytesLittleEndian(8));
+        stream.writeBytes(txIn.value(this.testnet, cache).toBytesLittleEndian(8));
         stream.writeBytes(txIn.getSequence().toBytesLittleEndian(4));
         stream.writeBytes(this.hashOutputs());
         stream.writeBytes(this.locktime.toBytesLittleEndian(4));
@@ -442,11 +443,11 @@ public class Tx implements Message {
      * @param inputIndex a int
      * @return a boolean
      */
-    public boolean verifyInput(int inputIndex) {
+    public boolean verifyInput(int inputIndex, Map<String, String> cache) {
         // get the relevant input
         var txIn = this.txIns.get(inputIndex);
         // grab the previous ScriptPubKey
-        var scriptPubkey = txIn.scriptPubkey(this.testnet);
+        var scriptPubkey = txIn.scriptPubkey(this.testnet, cache);
         Int z = null;
         Script witness = null;
         // check to see if the ScriptPubkey is a p2sh
@@ -458,31 +459,31 @@ public class Tx implements Message {
             var redeemScript = Script.parse(new ByteArrayInputStream(rawRedeem));
             // the RedeemScript might be p2wpkh or p2wsh
             if (redeemScript.isP2wpkhScriptPubkey()) {
-                z = this.sigHashBip143(inputIndex, redeemScript, null);
+                z = this.sigHashBip143(inputIndex, redeemScript, null, cache);
                 witness = txIn.getWitness();
             } else if (redeemScript.isP2wshScriptPubkey()) {
                 cmd = txIn.getWitness().getCmds().get(txIn.getWitness().getCmds().size() - 1);
                 var rawWitness = Bytes.add(Varint.encode(Int.parse(cmd.getElement().length)), cmd.getElement());
                 var witnessScript = Script.parse(new ByteArrayInputStream(rawWitness));
-                z = this.sigHashBip143(inputIndex, null, witnessScript);
+                z = this.sigHashBip143(inputIndex, null, witnessScript, cache);
                 witness = txIn.getWitness();
             } else {
-                z = this.sigHash(inputIndex, redeemScript);
+                z = this.sigHash(inputIndex, redeemScript, cache);
                 witness = null;
             }
         } else {
             // ScriptPubkey might be a p2wpkh or p2wsh
             if (scriptPubkey.isP2wpkhScriptPubkey()) {
-                z = this.sigHashBip143(inputIndex, null, null);
+                z = this.sigHashBip143(inputIndex, null, null, cache);
                 witness = txIn.getWitness();
             } else if (scriptPubkey.isP2wshScriptPubkey()) {
                 var cmd = txIn.getWitness().getCmds().get(txIn.getWitness().getCmds().size() - 1);
                 var rawWitness = Bytes.add(Varint.encode(Int.parse(cmd.getElement().length)), cmd.getElement());
                 var witnessScript = Script.parse(new ByteArrayInputStream(rawWitness));
-                z = this.sigHashBip143(inputIndex, null, witnessScript);
+                z = this.sigHashBip143(inputIndex, null, witnessScript, cache);
                 witness = txIn.getWitness();
             } else {
-                z = this.sigHash(inputIndex, null);
+                z = this.sigHash(inputIndex, null, cache);
                 witness = null;
             }
         }
@@ -497,15 +498,15 @@ public class Tx implements Message {
      *
      * @return a boolean
      */
-    public boolean verify() {
+    public boolean verify(Map<String, String> cache) {
         // check that we're not creating money
-        if (this.fee().lt(Int.parse(0))) {
+        if (this.fee(cache).lt(Int.parse(0))) {
             return false;
         }
         // check that each input has a valid ScriptSig
         for (int i = 0; i < this.txIns.size(); i++) {
             log.info(String.format("txin %s/%s", i + 1, this.txIns.size()));
-            if (!this.verifyInput(i)) {
+            if (!this.verifyInput(i, cache)) {
                 log.warning(String.format("TxIn has no valid signature - %s", this.txIns.get(i)));
                 return false;
             }
@@ -520,13 +521,13 @@ public class Tx implements Message {
      * @param privateKey a {@link ch.bitagent.bitcoin.lib.ecc.PrivateKey} object
      * @return a boolean
      */
-    public boolean signInput(int inputIndex, PrivateKey privateKey) {
+    public boolean signInput(int inputIndex, PrivateKey privateKey, Map<String, String> cache) {
         // get the signature hash (z)
         Int z;
         if (Boolean.TRUE.equals(this.segwit)) {
-            z = this.sigHashBip143(inputIndex, null, null);
+            z = this.sigHashBip143(inputIndex, null, null, cache);
         } else {
-            z = this.sigHash(inputIndex, null);
+            z = this.sigHash(inputIndex, null, cache);
         }
         // get der signature of z from private key
         var der = privateKey.sign(z, 0).der();
@@ -544,7 +545,7 @@ public class Tx implements Message {
             this.txIns.get(inputIndex).setScriptSig(script);
         }
         // return whether sig is valid using self.verify_input
-        return this.verifyInput(inputIndex);
+        return this.verifyInput(inputIndex, cache);
     }
 
     /**

@@ -1,14 +1,15 @@
 package ch.bitagent.bitcoin.lib.tx;
 
 import ch.bitagent.bitcoin.lib.ecc.Hex;
-import ch.bitagent.bitcoin.lib.helper.*;
+import ch.bitagent.bitcoin.lib.helper.Bytes;
+import ch.bitagent.bitcoin.lib.helper.Hash;
+import ch.bitagent.bitcoin.lib.helper.Helper;
+import ch.bitagent.bitcoin.lib.helper.Properties;
 import ch.bitagent.bitcoin.lib.network.Electrum;
 import ch.bitagent.bitcoin.lib.network.Http;
 
-import java.io.*;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 /**
@@ -18,29 +19,23 @@ public class TxFetcher {
 
     private static final Logger log = Logger.getLogger(TxFetcher.class.getSimpleName());
 
-    private static Map<String, String> cache = new ConcurrentHashMap<>();
-
-    private static final String CACHE_FILE = Properties.getTxCachefile();
-
     private TxFetcher() {
     }
 
     /**
-     * <p>fetch.</p>
+     * <p>fetch a tx</p>
      *
-     * @param txId    a {@link java.lang.String} object
-     * @param testnet a {@link java.lang.Boolean} object
-     * @param fresh   a boolean
-     * @return a {@link ch.bitagent.bitcoin.lib.tx.Tx} object
+     * @param txId    .
+     * @param testnet .
+     * @param cache   .
+     * @return a tx
      */
-    public static Tx fetch(String txId, Boolean testnet, boolean fresh) {
+    public static Tx fetch(String txId, Boolean testnet, Map<String, String> cache) {
         String txId64 = Helper.zfill(64, txId);
-        var doFresh = fresh || Properties.getTxFresh();
-        loadCache(doFresh);
-        if (doFresh || !cache.containsKey(txId64)) {
+        String txRaw = null;
+        if (cache == null || !cache.containsKey(txId64)) {
             long start = System.currentTimeMillis();
             try {
-                String txRaw;
                 if (Properties.getBitcoinRpcAuth() != null && Properties.getBitcoinRpcTestnet().equals(testnet)) {
                     txRaw = Http.postGetRawTransaction(txId64);
                 } else if (Boolean.TRUE.equals(testnet)) {
@@ -63,15 +58,20 @@ public class TxFetcher {
                 if (!tx.id().equals(txId64)) {
                     throw new IllegalStateException(String.format("not the same id: %s vs %s", tx.id(), txId));
                 }
-                cache.put(txId64, txRaw);
-                dumpCache(doFresh);
+                if (cache != null) {
+                    cache.put(txId64, txRaw);
+                    log.fine(String.format("tx %s to cache.", txId64));
+                }
             } catch (Exception e) {
                 log.severe(e.getMessage());
                 throw new IllegalStateException(e.getMessage());
             }
             log.fine(String.format("time %sms", System.currentTimeMillis() - start));
+        } else {
+            log.fine(String.format("tx %s from cache.", txId64));
+            txRaw = cache.get(txId64);
         }
-        var txBytes = Bytes.hexStringToByteArray(cache.get(txId64));
+        var txBytes = Bytes.hexStringToByteArray(txRaw);
         Tx tx = Tx.parse(txBytes, testnet);
         // make sure the tx we got matches to the hash we requested
         String computed;
@@ -95,38 +95,5 @@ public class TxFetcher {
             baseUrl = Properties.getBlockstreamMainnetUrl();
         }
         return String.format("%s/tx/%s/hex", baseUrl, txId64);
-    }
-
-    private static void loadCache(Boolean fresh) {
-        if (Boolean.TRUE.equals(fresh)) {
-            TxFetcher.cache = new ConcurrentHashMap<>();
-            return;
-        }
-        try {
-            File fileToReadObject = new File(TxFetcher.CACHE_FILE);
-            FileInputStream fileIn = new FileInputStream(fileToReadObject);
-            ObjectInputStream in = new ObjectInputStream(fileIn);
-            TxFetcher.cache = (Map<String, String>) in.readObject();
-            in.close();
-            fileIn.close();
-        } catch (Exception e) {
-            log.severe(e.getMessage());
-        }
-    }
-
-    private static void dumpCache(Boolean fresh) {
-        if (Boolean.TRUE.equals(fresh)) {
-            return;
-        }
-        try {
-            File fileToSaveObject = new File(TxFetcher.CACHE_FILE);
-            FileOutputStream fileOut = new FileOutputStream(fileToSaveObject);
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            out.writeObject(TxFetcher.cache);
-            out.close();
-            fileOut.close();
-        } catch (IOException e) {
-            log.severe(e.getMessage());
-        }
     }
 }
