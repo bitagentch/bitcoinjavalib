@@ -15,7 +15,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,7 +31,7 @@ class Chapter7Test {
     void example1() {
         var rawTx = "0100000001813f79011acb80925dfe69b3def355fe914bd1d96a3f5f71bf8303c6a989c7d1000000006b483045022100ed81ff192e75a3fd2304004dcadb746fa5e24c5031ccfcf21320b0277457c98f02207a986d955c6e0cb35d446a89d3f56100f4d7f67801c31967743a9c8e10615bed01210349fc4e631e3624a545de3f89f5d8684c7b8138bd94bdd531d2e213bf016b278afeffffff02a135ef01000000001976a914bc3b654dca7e56b04dca18f2566cdaf02e8d9ada88ac99c39800000000001976a9141c4bc762dd5423e332166702cb75f40df79fea1288ac19430600";
         var transaction = Tx.parse(rawTx, false);
-        assertTrue(transaction.fee().ge(Int.parse(0)));
+        assertTrue(transaction.fee(null).ge(Int.parse(0)));
     }
 
     @Test
@@ -63,8 +65,9 @@ class Chapter7Test {
     @DisabledIfSystemProperty(named = "disabled", matches = "true", disabledReason = "long running, see [^1] page 135")
     @Test
     void verifyBiggestTransaction() {
-        var tx = TxFetcher.fetch("bb41a757f405890fb0f5856228e23b715702d714d59bf2b1feb70d8b2b4e3e08", false, false);
-        assertTrue(tx.verify());
+        Map<String, String> cache = new HashMap<>();
+        var tx = TxFetcher.fetch("bb41a757f405890fb0f5856228e23b715702d714d59bf2b1feb70d8b2b4e3e08", false, cache);
+        assertTrue(tx.verify(cache));
     }
 
     @Test
@@ -94,7 +97,7 @@ class Chapter7Test {
         // see example1
         var rawTx = "0100000001813f79011acb80925dfe69b3def355fe914bd1d96a3f5f71bf8303c6a989c7d1000000006b483045022100ed81ff192e75a3fd2304004dcadb746fa5e24c5031ccfcf21320b0277457c98f02207a986d955c6e0cb35d446a89d3f56100f4d7f67801c31967743a9c8e10615bed01210349fc4e631e3624a545de3f89f5d8684c7b8138bd94bdd531d2e213bf016b278afeffffff02a135ef01000000001976a914bc3b654dca7e56b04dca18f2566cdaf02e8d9ada88ac99c39800000000001976a9141c4bc762dd5423e332166702cb75f40df79fea1288ac19430600";
         var transaction = Tx.parse(rawTx, false);
-        var z = transaction.sigHash(0, null);
+        var z = transaction.sigHash(0, null, null);
         var privateKey = new PrivateKey(Int.parse(8675309));
         var der = privateKey.sign(z, 0).der();
         var sig = new ScriptCmd(Bytes.add(der, Hash.SIGHASH_ALL.toBytes(1)));
@@ -142,7 +145,7 @@ class Chapter7Test {
         var changeSatoshis = Int.parse(Helper.btcToSat(changeAmount));
         txOuts.add(new TxOut(changeSatoshis, scriptPubkey));
         var tx = new Tx(Int.parse(1), txIns, txOuts, Int.parse(0), true, null);
-        assertTrue(tx.signInput(0, priv));
+        assertTrue(tx.signInput(0, priv, null));
 
         String want = "01000000011c5fb4a35c40647bcacfeffcb8686f1e9925774c07a1dd26f6551f67bcc4a175010000006b4830450221009bd8eef2adadce92d61ae58fdd87c7337ef9f6bdc6e99222e1ba92a48ce9e07302206fd765e299fcf24bb6482d8f8ee269dd3fe0c944fe34d168cf4436b0b0891890012103935581e52c354cd2f484fe8ed83af7a3097005b2f9c60bff71d35bd795f54b67ffffffff0240420f00000000001976a914ad346f8eb57dee9a37981716e498120ae80e44f788aca0bb0d00000000001976a914e2b35e4ac771118a46d0c731e1dd7efcd7d9b6a388ac00000000";
         Tx txWant = Tx.parse(want, true);

@@ -325,7 +325,7 @@ class Chapter12Test {
             // create a new transaction with the one input and one output
             var txObj = new Tx(Int.parse(1), List.of(txIn), List.of(txOut), Int.parse(0), Properties.getBitcoinP2pTestnet(), null);
             // sign the only input of the transaction
-            assertTrue(txObj.signInput(0, privateKey));
+            assertTrue(txObj.signInput(0, privateKey, null));
             // serialize and hex to see what it looks like
             log.fine(String.format("%s", txObj.hexString()));
             // send this signed transaction on the network

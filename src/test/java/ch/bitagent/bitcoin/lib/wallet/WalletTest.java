@@ -11,7 +11,9 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -102,25 +104,29 @@ class WalletTest {
         var version = 2;
         var electrum = new Electrum();
         var heigth = electrum.height();
+        Map<String, String> cache = new HashMap<>();
+
         var tx = new Tx(Int.parse(version), utxoList, List.of(spendTxOut), Int.parse(heigth), false, true);
-        for (int i = 0; i < utxoList.size(); i++) {
-            assertTrue(tx.signInput(i, wallet.getPrivateKeyForChangeIndex(utxoList.get(i).getUtxo().getChangeIndex())));
-        }
+        txSignInput(wallet, tx, utxoList, cache);
         log.info(String.format("size %sB/%swu/%svB", tx.sizeBytes(), tx.sizeWeightUnits(), tx.sizeVirtualBytes()));
 
         var satsVB = electrum.estimateFee(1);
         var feeAmount = tx.sizeVirtualBytes() * satsVB;
         spendTxOut = new TxOut(Int.parse(utxoAmount - feeAmount), spendAddress.scriptPubkey());
         tx = new Tx(Int.parse(version), utxoList, List.of(spendTxOut), Int.parse(heigth), false, true);
-        for (int i = 0; i < utxoList.size(); i++) {
-            assertTrue(tx.signInput(i, wallet.getPrivateKeyForChangeIndex(utxoList.get(i).getUtxo().getChangeIndex())));
-        }
+        txSignInput(wallet, tx, utxoList, cache);
         log.info(String.format("fee %ssatsVB/%ssats", satsVB, feeAmount));
         assertTrue(feeAmount > 0);
-        assertEquals(feeAmount, tx.fee().intValue());
+        assertEquals(feeAmount, tx.fee(cache).intValue());
         log.info(tx.toString());
 
         log.info(String.format("broadcast transaction%n%s", tx.hexString()));
+    }
+
+    private void txSignInput(Wallet wallet, Tx tx, List<TxIn> utxoList, Map<String, String> cache) {
+        for (int i = 0; i < utxoList.size(); i++) {
+            assertTrue(tx.signInput(i, wallet.getPrivateKeyForChangeIndex(utxoList.get(i).getUtxo().getChangeIndex()), cache));
+        }
     }
 
     @Disabled(value = "manual")

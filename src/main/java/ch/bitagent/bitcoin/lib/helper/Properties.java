@@ -139,24 +139,6 @@ public class Properties {
         return getProperty(bitcoinjavalibProperties, FILENAME, "blockstream.testnet.url");
     }
 
-    /**
-     * <p>getTxFresh.</p>
-     *
-     * @return a {@link java.lang.Boolean} object
-     */
-    public static Boolean getTxFresh() {
-        return Boolean.parseBoolean(getProperty(bitcoinjavalibProperties, FILENAME, "tx.fresh"));
-    }
-
-    /**
-     * <p>getTxCachefile.</p>
-     *
-     * @return a {@link java.lang.String} object
-     */
-    public static String getTxCachefile() {
-        return getProperty(bitcoinjavalibProperties, FILENAME, "tx.cachefile");
-    }
-
     public static List<String> getElectrumRpcSockets() {
         return getPropertyList(bitcoinjavalibProperties, FILENAME, "electrum.rpc.socket.");
     }

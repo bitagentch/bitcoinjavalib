@@ -7,6 +7,7 @@ import ch.bitagent.bitcoin.lib.script.Script;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
 
@@ -82,8 +83,8 @@ public class TxIn {
         return result.toByteArray();
     }
 
-    private Tx fetchPrevTx(Boolean testnet) {
-        return TxFetcher.fetch(this.prevTx.toHex().toString(), testnet, false);
+    private Tx fetchPrevTx(Boolean testnet, Map<String, String> cache) {
+        return TxFetcher.fetch(this.prevTx.toHex().toString(), testnet, cache);
     }
 
     /**
@@ -93,9 +94,9 @@ public class TxIn {
      * @param testnet a {@link java.lang.Boolean} object
      * @return a {@link ch.bitagent.bitcoin.lib.ecc.Int} object
      */
-    public Int value(Boolean testnet) {
+    public Int value(Boolean testnet, Map<String, String> cache) {
         // use self.fetch_tx to get the transaction
-        var tx = this.fetchPrevTx(testnet);
+        var tx = this.fetchPrevTx(testnet, cache);
         // get the output at self.prev_index
         // return the amount property
         return tx.getTxOuts().get(this.prevIndex.intValue()).getAmount();
@@ -108,9 +109,9 @@ public class TxIn {
      * @param testnet a {@link java.lang.Boolean} object
      * @return a {@link ch.bitagent.bitcoin.lib.script.Script} object
      */
-    public Script scriptPubkey(Boolean testnet) {
+    public Script scriptPubkey(Boolean testnet, Map<String, String> cache) {
         // use self.fetch_tx to get the transaction
-        var tx = this.fetchPrevTx(testnet);
+        var tx = this.fetchPrevTx(testnet, cache);
         // get the output at self.prev_index
         // return the script_pubkey property
         return tx.getTxOuts().get(this.prevIndex.intValue()).getScriptPubkey();
