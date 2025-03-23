@@ -2,6 +2,7 @@
 
 ## snapshot
 - docs
+- latest versions
 
 ## 0.4.0
 - tx fetcher cache
