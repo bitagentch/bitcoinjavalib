@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * https://electrumx-spesmilo.readthedocs.io/en/stable/protocol-methods.html
+ * https://electrum-protocol.readthedocs.io/en/latest/
  */
 public class Electrum {
 

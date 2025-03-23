@@ -1,6 +1,7 @@
 # release notes
 
 ## snapshot
+- docs
 
 ## 0.4.0
 - tx fetcher cache
