@@ -1,6 +1,8 @@
 # release notes
 
 ## snapshot
+
+## 0.4.1
 - docs
 - latest versions
 - electrum testnet
