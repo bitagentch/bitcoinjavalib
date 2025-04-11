@@ -3,6 +3,7 @@ package ch.bitagent.bitcoin.lib.wallet;
 import ch.bitagent.bitcoin.lib.ecc.Int;
 import ch.bitagent.bitcoin.lib.helper.Properties;
 import ch.bitagent.bitcoin.lib.network.Electrum;
+import ch.bitagent.bitcoin.lib.script.Script;
 import ch.bitagent.bitcoin.lib.tx.Tx;
 import ch.bitagent.bitcoin.lib.tx.TxIn;
 import ch.bitagent.bitcoin.lib.tx.TxOut;
@@ -100,20 +101,21 @@ class WalletTest {
 
         var spendAddress = wallet.nextReceiveAddress();
         var spendTxOut = new TxOut(Int.parse(utxoAmount), spendAddress.scriptPubkey());
+        var opReturnTxOut = new TxOut(Int.parse(0), Script.opReturn("bitcoinjavalib"));
 
         var version = 2;
         var electrum = new Electrum();
         var heigth = electrum.height();
         Map<String, String> cache = new HashMap<>();
 
-        var tx = new Tx(Int.parse(version), utxoList, List.of(spendTxOut), Int.parse(heigth), false, true);
+        var tx = new Tx(Int.parse(version), utxoList, List.of(spendTxOut, opReturnTxOut), Int.parse(heigth), false, true);
         txSignInput(wallet, tx, utxoList, cache);
         log.info(String.format("size %sB/%swu/%svB", tx.sizeBytes(), tx.sizeWeightUnits(), tx.sizeVirtualBytes()));
 
         var satsVB = electrum.estimateFee(1);
         var feeAmount = tx.sizeVirtualBytes() * satsVB;
         spendTxOut = new TxOut(Int.parse(utxoAmount - feeAmount), spendAddress.scriptPubkey());
-        tx = new Tx(Int.parse(version), utxoList, List.of(spendTxOut), Int.parse(heigth), false, true);
+        tx = new Tx(Int.parse(version), utxoList, List.of(spendTxOut, opReturnTxOut), Int.parse(heigth), false, true);
         txSignInput(wallet, tx, utxoList, cache);
         log.info(String.format("fee %ssatsVB/%ssats", satsVB, feeAmount));
         assertTrue(feeAmount > 0);
@@ -131,8 +133,7 @@ class WalletTest {
 
     @Disabled(value = "manual")
     @Test
-    void
-    broadcastTransaction() {
+    void broadcastTransaction() {
         var electrum = new Electrum();
         var txId = electrum.broadcastTransaction("");
         log.info(txId);

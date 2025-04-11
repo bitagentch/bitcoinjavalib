@@ -71,4 +71,12 @@ class ScriptTest {
         var combinedScript = scriptSig.add(scriptPubkey);
         assertFalse(combinedScript.evaluate(Hex.parse("00"), null));
     }
+
+    @Test
+    void opReturn() {
+        assertEquals("6a68656c6c6f20776f726c64", Script.opReturn("hello world").toHex());
+        assertEquals("6a636861726c6579206c6f766573206865696469", Script.opReturn("charley loves heidi").toHex());
+        assertEquals("6a416d617a696e6721", Script.opReturn("Amazing!").toHex());
+        assertEquals("6a4669727374204f5052657475726e204d6573736167652049207761732068657265203a29", Script.opReturn("First OPReturn Message I was here :)").toHex());
+    }
 }

@@ -142,11 +142,24 @@ public class Address {
 
     public Script scriptPubkey() {
         if (this.isP2pkhAddress()) {
-            return Script.p2pkhScript(hash160());
+            throw new IllegalStateException();
         } else if (this.isP2shAddress()) {
-            return Script.p2shScript(hash160());
+            throw new IllegalStateException();
         } else if (this.isBech32Address()) {
-            return Script.p2wpkhScript(hash160());
+            if (this.addressString.startsWith("bc1q")) {
+                var scriptPubkey = Bech32.decodeSegwit(this.addressString);
+                if (scriptPubkey.startsWith("0014")) {
+                    return Script.p2wpkhScript(hash160());
+                } else if (scriptPubkey.startsWith("0020")) {
+                    throw new IllegalStateException();
+                } else {
+                    throw new IllegalStateException();
+                }
+            } else if (this.addressString.startsWith("bc1p")) {
+                throw new IllegalStateException();
+            } else {
+                throw new IllegalStateException();
+            }
         } else {
             throw new IllegalStateException();
         }
@@ -158,12 +171,12 @@ public class Address {
     public String electrumScripthash() {
         if (this.isP2pkhAddress()) {
             var hash160 = Base58.decodeAddress(this.addressString);
-            var script = Script.p2pkhScriptOp20(hash160);
+            var script = Script.p2pkhScript(hash160, true);
             var hash = Hash.sha256(Bytes.hexStringToByteArray(script.toHex()));
             return Bytes.byteArrayToHexString(Bytes.changeOrder(hash));
         } else if (this.isP2shAddress()) {
             var hash160 = Base58.decodeAddress(this.addressString);
-            var script = Script.p2shScriptOp20(hash160);
+            var script = Script.p2shScript(hash160, true);
             var hash = Hash.sha256(Bytes.hexStringToByteArray(script.toHex()));
             return Bytes.byteArrayToHexString(Bytes.changeOrder(hash));
         } else if (this.isBech32Address()) {

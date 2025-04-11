@@ -3,6 +3,8 @@
 ## snapshot
 - docs
 - latest versions
+- electrum testnet
+- op return
 
 ## 0.4.0
 - tx fetcher cache

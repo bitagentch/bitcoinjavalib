@@ -39,7 +39,7 @@ public class TxFetcher {
                 if (Properties.getBitcoinRpcAuth() != null && Properties.getBitcoinRpcTestnet().equals(testnet)) {
                     txRaw = Http.postGetRawTransaction(txId64);
                 } else if (Boolean.TRUE.equals(testnet)) {
-                    txRaw = Http.get(getUrlBlockstream(testnet, txId64));
+                    txRaw = new Electrum(true).getTransaction(txId64);
                 } else {
                     txRaw = new Electrum().getTransaction(txId64);
                 }
@@ -85,15 +85,5 @@ public class TxFetcher {
         }
         log.fine(String.format("tx %s", tx));
         return tx;
-    }
-
-    private static String getUrlBlockstream(Boolean testnet, String txId64) {
-        String baseUrl;
-        if (Boolean.TRUE.equals(testnet)) {
-            baseUrl = Properties.getBlockstreamTestnetUrl();
-        } else {
-            baseUrl = Properties.getBlockstreamMainnetUrl();
-        }
-        return String.format("%s/tx/%s/hex", baseUrl, txId64);
     }
 }
