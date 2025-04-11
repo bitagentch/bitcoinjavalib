@@ -10,8 +10,6 @@ public enum OpCodeNames {
 
     /** op 0 */
     OP_0(Hex.parse("00"), "OP_0"),
-    /** op 20 */
-    OP_20_PUSHBYTES_20(Hex.parse("14"), "OP_PUSHBYTES_20"),
     /** op 81 */
     OP_81(Hex.parse("51"), "OP_1"),
     /** op 82 */

@@ -5,8 +5,15 @@
 writes Jimmy Song in [Programming Bitcoin](https://github.com/jimmysong/programmingbitcoin) [^1] on page 250.<br>
 So this is a Java implementation of it.
 
+> As this is the most popular application of Bitcoin, creating a wallet will give you a lot of insight into users' needs.
+
+writes Jimmy Song in [Programming Bitcoin](https://github.com/jimmysong/programmingbitcoin) [^1] on page 249.<br>
+So there is also a wallet, based on the Electrum protocol, included.
+
 ---
 [^1]: Programming Bitcoin by Jimmy Song (O'Reilly). Copyright 2019 Jimmy Song. 978-1-492-03149-9.
+
+## [maven central](https://central.sonatype.com/artifact/ch.bitagent/bitcoinjavalib)
 
 ## [release notes](release-notes.md)
 

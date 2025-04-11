@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * https://electrumx-spesmilo.readthedocs.io/en/stable/protocol-methods.html
+ * https://electrum-protocol.readthedocs.io/en/latest/
  */
 public class Electrum {
 
@@ -20,14 +20,25 @@ public class Electrum {
     private String defaultSocket;
 
     public Electrum() {
-        this.initSockets();
+        this.initSockets(false);
     }
 
-    private void initSockets() {
+    public Electrum(boolean testnet) {
+        this.initSockets(testnet);
+    }
+
+    private void initSockets(boolean testnet) {
         sockets.clear();
-        for (String electrumRpcSocket : Properties.getElectrumRpcSockets()) {
-            log.fine(electrumRpcSocket);
-            sockets.add(electrumRpcSocket);
+        if (testnet) {
+            for (String electrumRpcSocket : Properties.getElectrumTestnetRpcSockets()) {
+                log.fine(electrumRpcSocket);
+                sockets.add(electrumRpcSocket);
+            }
+        } else {
+            for (String electrumRpcSocket : Properties.getElectrumMainnetRpcSockets()) {
+                log.fine(electrumRpcSocket);
+                sockets.add(electrumRpcSocket);
+            }
         }
         if (sockets.isEmpty()) {
             var error = "Please configure a electrum rpc socket in bitcoinjavalib.properties";

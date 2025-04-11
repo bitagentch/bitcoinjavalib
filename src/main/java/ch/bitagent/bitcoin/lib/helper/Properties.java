@@ -121,26 +121,12 @@ public class Properties {
         }
     }
 
-    /**
-     * <p>getBlockstreamMainnetUrl.</p>
-     *
-     * @return a {@link java.lang.String} object
-     */
-    public static String getBlockstreamMainnetUrl() {
-        return getProperty(bitcoinjavalibProperties, FILENAME, "blockstream.mainnet.url");
+    public static List<String> getElectrumMainnetRpcSockets() {
+        return getPropertyList(bitcoinjavalibProperties, FILENAME, "electrum.mainnet.rpc.socket.");
     }
 
-    /**
-     * <p>getBlockstreamTestnetUrl.</p>
-     *
-     * @return a {@link java.lang.String} object
-     */
-    public static String getBlockstreamTestnetUrl() {
-        return getProperty(bitcoinjavalibProperties, FILENAME, "blockstream.testnet.url");
-    }
-
-    public static List<String> getElectrumRpcSockets() {
-        return getPropertyList(bitcoinjavalibProperties, FILENAME, "electrum.rpc.socket.");
+    public static List<String> getElectrumTestnetRpcSockets() {
+        return getPropertyList(bitcoinjavalibProperties, FILENAME, "electrum.testnet.rpc.socket.");
     }
 
     public static List<String> getWallets(String filename) {

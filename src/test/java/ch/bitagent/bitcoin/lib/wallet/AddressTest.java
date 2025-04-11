@@ -89,4 +89,22 @@ class AddressTest {
         var unspentList = electrum.listUnspent(scripthash);
         assertTrue(unspentList.isEmpty());
     }
+
+    @Test
+    void scriptPubkey() {
+        var p2pkhAddress = Address.parse("18p3G8gQ3oKy4U9EqnWs7UZswdqAMhE3r8");
+        assertThrowsExactly(IllegalStateException.class, () -> p2pkhAddress.scriptPubkey().toHex());
+
+        var p2shAddress = Address.parse("3CK4fEwbMP7heJarmU4eqA3sMbVJyEnU3V");
+        assertThrowsExactly(IllegalStateException.class, () -> p2shAddress.scriptPubkey().toHex());
+
+        var p2wshAddress = Address.parse("bc1qvhu3557twysq2ldn6dut6rmaj3qk04p60h9l79wk4lzgy0ca8mfsnffz65");
+        assertThrowsExactly(IllegalStateException.class, () -> p2wshAddress.scriptPubkey().toHex());
+
+        var p2wpkhAddress = Address.parse("bc1qssdcp5kvwh6nghzg9tuk99xsflwkdv4hgvq58q");
+        assertEquals("00841b80d2cc75f5345c482af96294d04fdd66b2b7", p2wpkhAddress.scriptPubkey().toHex());
+
+        var p2trAddress = Address.parse("bc1ppuxgmd6n4j73wdp688p08a8rte97dkn5n70r2ym6kgsw0v3c5ensrytduf");
+        assertThrowsExactly(IllegalStateException.class, () -> p2trAddress.scriptPubkey().toHex());
+    }
 }
