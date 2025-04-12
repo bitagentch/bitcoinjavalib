@@ -3,15 +3,12 @@ package ch.bitagent.bitcoin.lib.wallet;
 import ch.bitagent.bitcoin.lib.ecc.Int;
 import ch.bitagent.bitcoin.lib.helper.Properties;
 import ch.bitagent.bitcoin.lib.network.Electrum;
-import ch.bitagent.bitcoin.lib.script.Script;
 import ch.bitagent.bitcoin.lib.tx.Tx;
 import ch.bitagent.bitcoin.lib.tx.TxIn;
 import ch.bitagent.bitcoin.lib.tx.TxOut;
-import ch.bitagent.bitcoin.lib.tx.Utxo;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,8 +76,7 @@ class WalletTest {
 
     @Disabled(value = "manual")
     @Test
-    void
-    createSegwitTx() {
+    void createNativeSegwitTx() {
         var mnemonicSentence = Properties.getWalletMnemonic(WALLET_DEV_FILENAME, 0);
         var wallet = Wallet.parse(mnemonicSentence, null, Wallet.PURPOSE_NATIVE_SEGWIT, Wallet.COIN_TYPE_BITCOIN, 0, 3);
         wallet.history(0);
@@ -88,47 +84,85 @@ class WalletTest {
         log.info(wallet.toString());
         assertFalse(wallet.getUtxoList().isEmpty());
 
-        long utxoAmount = 0L;
-        List<TxIn> utxoList = new ArrayList<>();
-        for (Utxo utxo : wallet.getUtxoList()) {
-            log.info(utxo.toString());
-            if (utxo.getHeight() > 0) {
-                utxoList.add(new TxIn(utxo));
-                utxoAmount += utxo.getValue();
-            }
-        }
+        long utxoAmount = wallet.getUtxoAmount();
         assertTrue(utxoAmount > 0);
-
+        var spendAmount = utxoAmount;
         var spendAddress = wallet.nextReceiveAddress();
-        var spendTxOut = new TxOut(Int.parse(utxoAmount), spendAddress.scriptPubkey());
-        var opReturnTxOut = new TxOut(Int.parse(0), Script.opReturn("bitcoinjavalib"));
+        var spendTxOut = new TxOut(Int.parse(spendAmount), spendAddress.scriptPubkey());
 
         var version = 2;
         var electrum = new Electrum();
         var heigth = electrum.height();
         Map<String, String> cache = new HashMap<>();
 
-        var tx = new Tx(Int.parse(version), utxoList, List.of(spendTxOut, opReturnTxOut), Int.parse(heigth), false, true);
-        txSignInput(wallet, tx, utxoList, cache);
-        log.info(String.format("size %sB/%swu/%svB", tx.sizeBytes(), tx.sizeWeightUnits(), tx.sizeVirtualBytes()));
+        List<TxIn> txInList = wallet.getTxInList();
+        var tx = new Tx(Int.parse(version), txInList, List.of(spendTxOut), Int.parse(heigth), false, true);
+        wallet.txSignInput(tx, txInList, cache);
 
         var satsVB = electrum.estimateFee(1);
         var feeAmount = tx.sizeVirtualBytes() * satsVB;
-        spendTxOut = new TxOut(Int.parse(utxoAmount - feeAmount), spendAddress.scriptPubkey());
-        tx = new Tx(Int.parse(version), utxoList, List.of(spendTxOut, opReturnTxOut), Int.parse(heigth), false, true);
-        txSignInput(wallet, tx, utxoList, cache);
-        log.info(String.format("fee %ssatsVB/%ssats", satsVB, feeAmount));
+        spendAmount = utxoAmount - feeAmount;
+        spendTxOut = new TxOut(Int.parse(spendAmount), spendAddress.scriptPubkey());
+        tx = new Tx(Int.parse(version), txInList, List.of(spendTxOut), Int.parse(heigth), false, true);
+        wallet.txSignInput(tx, txInList, cache);
         assertTrue(feeAmount > 0);
         assertEquals(feeAmount, tx.fee(cache).intValue());
         log.info(tx.toString());
 
+        log.info(String.format("tx %svB", tx.sizeVirtualBytes()));
+        log.info(String.format("%s sats/vB", satsVB));
+        log.info(String.format("utxo %s", utxoAmount));
+        log.info(String.format("spend %s", spendAmount));
+        log.info(String.format("fee %s", feeAmount));
         log.info(String.format("broadcast transaction%n%s", tx.hexString()));
     }
 
-    private void txSignInput(Wallet wallet, Tx tx, List<TxIn> utxoList, Map<String, String> cache) {
-        for (int i = 0; i < utxoList.size(); i++) {
-            assertTrue(tx.signInput(i, wallet.getPrivateKeyForChangeIndex(utxoList.get(i).getUtxo().getChangeIndex()), cache));
-        }
+    @Disabled(value = "manual")
+    @Test
+    void createChangeTx() {
+        var mnemonicSentence = Properties.getWalletMnemonic(WALLET_DEV_FILENAME, 0);
+        var wallet = Wallet.parse(mnemonicSentence, null, Wallet.PURPOSE_NATIVE_SEGWIT, Wallet.COIN_TYPE_BITCOIN, 0, 3);
+        wallet.history(0);
+        wallet.history(1);
+        log.info(wallet.toString());
+        assertFalse(wallet.getUtxoList().isEmpty());
+
+        long utxoAmount = wallet.getUtxoAmount();
+        assertTrue(utxoAmount > 0);
+        var spendAmount = 10000;
+        // tested with p2pkh address 1JQwARc3U8GKwsiuV42VPCAATsCig7Lh15
+        // tested with p2sh address 3KeHaLZ6GFMYoZ37HpzixVqsn2FFxkNi3D
+        // tested with p2tr address bc1p36065kzufa0d6wm9ay59fz868rwaqauhffnhm0m4a3sdd4lqswlqs3dut6
+        var spendAddress = Address.parse("TODO");
+        var spendTxOut = new TxOut(Int.parse(spendAmount), spendAddress.scriptPubkey());
+        var changeAmount = utxoAmount - spendAmount;
+        var changeAddress = wallet.nextChangeAddress();
+        var changeTxOut = new TxOut(Int.parse(changeAmount), changeAddress.scriptPubkey());
+
+        var version = 2;
+        var electrum = new Electrum();
+        var heigth = electrum.height();
+        Map<String, String> cache = new HashMap<>();
+
+        List<TxIn> txInList = wallet.getTxInList();
+        var tx = new Tx(Int.parse(version), txInList, List.of(spendTxOut, changeTxOut), Int.parse(heigth), false, true);
+        wallet.txSignInput(tx, txInList, cache);
+        var satsVB = electrum.estimateFee(1);
+
+        var feeAmount = tx.sizeVirtualBytes() * satsVB;
+        changeAmount = utxoAmount - spendAmount - feeAmount;
+        changeTxOut = new TxOut(Int.parse(changeAmount), changeAddress.scriptPubkey());
+        tx = new Tx(Int.parse(version), txInList, List.of(spendTxOut, changeTxOut), Int.parse(heigth), false, true);
+        wallet.txSignInput(tx, txInList, cache);
+        log.info(tx.toString());
+
+        log.info(String.format("tx %svB", tx.sizeVirtualBytes()));
+        log.info(String.format("%s sats/vB", satsVB));
+        log.info(String.format("utxo %s", utxoAmount));
+        log.info(String.format("spend %s", spendAmount));
+        log.info(String.format("fee %s", feeAmount));
+        log.info(String.format("change %s", changeAmount));
+        log.info(String.format("broadcast transaction%n%s", tx.hexString()));
     }
 
     @Disabled(value = "manual")

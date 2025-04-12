@@ -26,14 +26,14 @@ public class Script {
      * https://learnmeabitcoin.com/technical/script/p2pkh/
      *
      * @param h160          an array of {@link byte} objects
-     * @param h160Pushbytes .
+     * @param pushbytes .
      * @return a {@link ch.bitagent.bitcoin.lib.script.Script} object
      */
-    public static Script p2pkhScript(byte[] h160, boolean... h160Pushbytes) {
+    public static Script p2pkhScript(byte[] h160, boolean... pushbytes) {
         List<ScriptCmd> cmds = new ArrayList<>();
         cmds.add(OpCodeNames.OP_118_DUP.toScriptCmd());
         cmds.add(OpCodeNames.OP_169_HASH160.toScriptCmd());
-        if (h160Pushbytes.length > 0 && h160Pushbytes[0]) {
+        if (pushbytes.length > 0 && pushbytes[0]) {
             cmds.add(new ScriptCmd(Int.parse(h160.length).toBytes(1)));
         }
         cmds.add(new ScriptCmd(h160));
@@ -47,13 +47,13 @@ public class Script {
      * https://learnmeabitcoin.com/technical/script/p2sh/
      *
      * @param h160          an array of {@link byte} objects
-     * @param h160Pushbytes .
+     * @param pushbytes .
      * @return a {@link ch.bitagent.bitcoin.lib.script.Script} object
      */
-    public static Script p2shScript(byte[] h160, boolean... h160Pushbytes) {
+    public static Script p2shScript(byte[] h160, boolean... pushbytes) {
         List<ScriptCmd> cmds = new ArrayList<>();
         cmds.add(OpCodeNames.OP_169_HASH160.toScriptCmd());
-        if (h160Pushbytes.length > 0 && h160Pushbytes[0]) {
+        if (pushbytes.length > 0 && pushbytes[0]) {
             cmds.add(new ScriptCmd(Int.parse(h160.length).toBytes(1)));
         }
         cmds.add(new ScriptCmd(h160));
@@ -66,16 +66,26 @@ public class Script {
      * https://learnmeabitcoin.com/technical/script/p2wpkh/
      *
      * @param h160          an array of {@link byte} objects
-     * @param h160Pushbytes .
+     * @param pushbytes .
      * @return a {@link ch.bitagent.bitcoin.lib.script.Script} object
      */
-    public static Script p2wpkhScript(byte[] h160, boolean... h160Pushbytes) {
+    public static Script p2wpkhScript(byte[] h160, boolean... pushbytes) {
         List<ScriptCmd> cmds = new ArrayList<>();
-        cmds.add(OpCodeNames.OP_0.toScriptCmd());
-        if (h160Pushbytes.length > 0 && h160Pushbytes[0]) {
+        cmds.add(OpCodeNames.OP_0_0.toScriptCmd());
+        if (pushbytes.length > 0 && pushbytes[0]) {
             cmds.add(new ScriptCmd(Int.parse(h160.length).toBytes(1)));
         }
         cmds.add(new ScriptCmd(h160));
+        return new Script(cmds);
+    }
+
+    public static Script p2trScript(byte[] tweakedPubkey, boolean... pushbytes) {
+        List<ScriptCmd> cmds = new ArrayList<>();
+        cmds.add(OpCodeNames.OP_81_1.toScriptCmd());
+        if (pushbytes.length > 0 && pushbytes[0]) {
+            cmds.add(new ScriptCmd(Int.parse(tweakedPubkey.length).toBytes(1)));
+        }
+        cmds.add(new ScriptCmd(tweakedPubkey));
         return new Script(cmds);
     }
 
@@ -337,7 +347,7 @@ public class Script {
      */
     public boolean isP2wpkhScriptPubkey() {
         return cmds.size() == 2
-                && OpCodeNames.OP_0.equals(cmds.get(0).getOpCode())
+                && OpCodeNames.OP_0_0.equals(cmds.get(0).getOpCode())
                 && cmds.get(1).isElement() && cmds.get(1).getElement().length == 20;
     }
 
@@ -353,7 +363,7 @@ public class Script {
             var stack0 = stack.pop();
             stack.push(stack0);
             stack.push(stack1);
-            if (OpCodeNames.OP_0.getCode().equals(Hex.parse(stack0)) && stack1.length == 20) {
+            if (OpCodeNames.OP_0_0.getCode().equals(Hex.parse(stack0)) && stack1.length == 20) {
                 return true;
             }
         }
@@ -367,7 +377,7 @@ public class Script {
      */
     public boolean isP2wshScriptPubkey() {
         return cmds.size() == 2
-                && OpCodeNames.OP_0.equals(cmds.get(0).getOpCode())
+                && OpCodeNames.OP_0_0.equals(cmds.get(0).getOpCode())
                 && cmds.get(1).isElement() && cmds.get(1).getElement().length == 32;
     }
 
@@ -383,7 +393,7 @@ public class Script {
             var stack0 = stack.pop();
             stack.push(stack0);
             stack.push(stack1);
-            if (OpCodeNames.OP_0.getCode().equals(Hex.parse(stack0)) && stack1.length == 32) {
+            if (OpCodeNames.OP_0_0.getCode().equals(Hex.parse(stack0)) && stack1.length == 32) {
                 return true;
             }
         }

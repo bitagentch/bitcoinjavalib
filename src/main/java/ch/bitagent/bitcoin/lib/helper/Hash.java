@@ -121,4 +121,10 @@ public class Hash {
             throw new IllegalStateException(e.getMessage());
         }
     }
+
+    public static byte[] taggedHash(String tag, byte[] msg) {
+        var tagHash = Hash.sha256(tag.getBytes());
+        var tagged = Bytes.add(new byte[][]{tagHash, tagHash, msg});
+        return Hash.sha256(tagged);
+    }
 }

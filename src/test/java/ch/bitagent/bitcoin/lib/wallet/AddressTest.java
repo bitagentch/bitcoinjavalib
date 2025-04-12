@@ -92,19 +92,24 @@ class AddressTest {
 
     @Test
     void scriptPubkey() {
+        // https://learnmeabitcoin.com/technical/script/p2pkh/
         var p2pkhAddress = Address.parse("18p3G8gQ3oKy4U9EqnWs7UZswdqAMhE3r8");
-        assertThrowsExactly(IllegalStateException.class, () -> p2pkhAddress.scriptPubkey().toHex());
+        assertEquals("76a955ae51684c43435da751ac8d2173b2652eb6410588ac", p2pkhAddress.scriptPubkey().toHex());
 
+        // https://learnmeabitcoin.com/technical/script/p2sh/
         var p2shAddress = Address.parse("3CK4fEwbMP7heJarmU4eqA3sMbVJyEnU3V");
-        assertThrowsExactly(IllegalStateException.class, () -> p2shAddress.scriptPubkey().toHex());
+        assertEquals("a9748284390f9e263a4b766a75d0633c50426eb87587", p2shAddress.scriptPubkey().toHex());
 
+        // https://learnmeabitcoin.com/technical/script/p2wsh/
         var p2wshAddress = Address.parse("bc1qvhu3557twysq2ldn6dut6rmaj3qk04p60h9l79wk4lzgy0ca8mfsnffz65");
         assertThrowsExactly(IllegalStateException.class, () -> p2wshAddress.scriptPubkey().toHex());
 
+        // https://learnmeabitcoin.com/technical/script/p2wpkh/
         var p2wpkhAddress = Address.parse("bc1qssdcp5kvwh6nghzg9tuk99xsflwkdv4hgvq58q");
         assertEquals("00841b80d2cc75f5345c482af96294d04fdd66b2b7", p2wpkhAddress.scriptPubkey().toHex());
 
+        // https://learnmeabitcoin.com/technical/script/p2tr/
         var p2trAddress = Address.parse("bc1ppuxgmd6n4j73wdp688p08a8rte97dkn5n70r2ym6kgsw0v3c5ensrytduf");
-        assertThrowsExactly(IllegalStateException.class, () -> p2trAddress.scriptPubkey().toHex());
+        assertEquals("510f0c8db753acbd17343a39c2f3f4e35e4be6da749f9e35137ab220e7b238a667", p2trAddress.scriptPubkey().toHex());
     }
 }

@@ -6,6 +6,7 @@ import ch.bitagent.bitcoin.lib.helper.Bytes;
 import ch.bitagent.bitcoin.lib.helper.Hash;
 import ch.bitagent.bitcoin.lib.script.Script;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -18,6 +19,7 @@ public class S256Point extends Point {
      * Constant <code>N</code>
      */
     public static final Int N = Hex.parse("fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141");
+    public static final Int P = Hex.parse("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F");
 
     private static final Int GX = Hex.parse("79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798");
     private static final Int GY = Hex.parse("483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8");
@@ -154,6 +156,11 @@ public class S256Point extends Point {
         return Bech32.encodeSegwit(testnet ? "tb" : "bc", script.toHex());
     }
 
+    public String addressBech32P2tr(boolean testnet) {
+        var script = Script.p2trScript(this.hash160(true), true);
+        return Bech32.encodeSegwit(testnet ? "tb" : "bc", script.toHex());
+    }
+
     /**
      * returns a Point object from a SEC binary (not hex)
      *
@@ -189,6 +196,24 @@ public class S256Point extends Point {
         } else {
             throw new IllegalArgumentException("Invalid pubkey");
         }
+    }
+
+    public static S256Point liftX(Int x) {
+        if (x.ge(P)) {
+            return null;
+        }
+        var ySq = x.powMod(Int.parse(3), P).add(Int.parse(7)).mod(P);
+        var y = ySq.powMod(P.add(Int.parse(1)).div(Int.parse(4)), P);
+        if (y.powMod(Int.parse(2), P).ne(ySq)) {
+            return null;
+        }
+        var xField = new S256Field(x);
+        var yField = y.bigInt().and(BigInteger.ONE).compareTo(BigInteger.ZERO) == 0 ? new S256Field(y) : new S256Field(P.sub(y));
+        return new S256Point(xField, yField);
+    }
+
+    public boolean hasEvenY() {
+        return Point.getNum(this.getY()).mod(Int.parse(2)).eq(Int.parse(0));
     }
 
     /**

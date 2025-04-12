@@ -2,6 +2,11 @@
 
 ## snapshot
 
+## 0.4.2
+- wallet legacy addresses
+- wallet taproot addresses
+- wallet improvements
+
 ## 0.4.1
 - docs
 - latest versions

@@ -4,6 +4,7 @@ import ch.bitagent.bitcoin.lib.helper.Base58;
 import ch.bitagent.bitcoin.lib.helper.Bech32;
 import ch.bitagent.bitcoin.lib.helper.Bytes;
 import ch.bitagent.bitcoin.lib.helper.Hash;
+import ch.bitagent.bitcoin.lib.script.OpCodeNames;
 import ch.bitagent.bitcoin.lib.script.Script;
 
 /**
@@ -142,12 +143,12 @@ public class Address {
 
     public Script scriptPubkey() {
         if (this.isP2pkhAddress()) {
-            throw new IllegalStateException();
+            return Script.p2pkhScript(hash160());
         } else if (this.isP2shAddress()) {
-            throw new IllegalStateException();
+            return Script.p2shScript(hash160());
         } else if (this.isBech32Address()) {
-            if (this.addressString.startsWith("bc1q")) {
-                var scriptPubkey = Bech32.decodeSegwit(this.addressString);
+            var scriptPubkey = Bech32.decodeSegwit(this.addressString);
+            if (scriptPubkey.startsWith(OpCodeNames.OP_0_0.getCode().toString())) {
                 if (scriptPubkey.startsWith("0014")) {
                     return Script.p2wpkhScript(hash160());
                 } else if (scriptPubkey.startsWith("0020")) {
@@ -155,8 +156,8 @@ public class Address {
                 } else {
                     throw new IllegalStateException();
                 }
-            } else if (this.addressString.startsWith("bc1p")) {
-                throw new IllegalStateException();
+            } else if (scriptPubkey.startsWith(OpCodeNames.OP_81_1.getCode().toString())) {
+                return Script.p2trScript(hash160());
             } else {
                 throw new IllegalStateException();
             }

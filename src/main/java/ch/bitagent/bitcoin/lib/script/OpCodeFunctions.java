@@ -49,16 +49,16 @@ public class OpCodeFunctions {
 
         var opResult = false;
         switch (opCode) {
-            case OP_0:
+            case OP_0_0:
                 opResult = Op.op0(stack);
                 break;
-            case OP_81:
+            case OP_81_1:
                 opResult = Op.op1(stack);
                 break;
-            case OP_82:
+            case OP_82_2:
                 opResult = Op.op2(stack);
                 break;
-            case OP_86:
+            case OP_86_6:
                 opResult = Op.op6(stack);
                 break;
             case OP_105_VERIFY:
