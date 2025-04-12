@@ -26,14 +26,14 @@ public class Script {
      * https://learnmeabitcoin.com/technical/script/p2pkh/
      *
      * @param h160          an array of {@link byte} objects
-     * @param h160Pushbytes .
+     * @param pushbytes .
      * @return a {@link ch.bitagent.bitcoin.lib.script.Script} object
      */
-    public static Script p2pkhScript(byte[] h160, boolean... h160Pushbytes) {
+    public static Script p2pkhScript(byte[] h160, boolean... pushbytes) {
         List<ScriptCmd> cmds = new ArrayList<>();
         cmds.add(OpCodeNames.OP_118_DUP.toScriptCmd());
         cmds.add(OpCodeNames.OP_169_HASH160.toScriptCmd());
-        if (h160Pushbytes.length > 0 && h160Pushbytes[0]) {
+        if (pushbytes.length > 0 && pushbytes[0]) {
             cmds.add(new ScriptCmd(Int.parse(h160.length).toBytes(1)));
         }
         cmds.add(new ScriptCmd(h160));
@@ -47,13 +47,13 @@ public class Script {
      * https://learnmeabitcoin.com/technical/script/p2sh/
      *
      * @param h160          an array of {@link byte} objects
-     * @param h160Pushbytes .
+     * @param pushbytes .
      * @return a {@link ch.bitagent.bitcoin.lib.script.Script} object
      */
-    public static Script p2shScript(byte[] h160, boolean... h160Pushbytes) {
+    public static Script p2shScript(byte[] h160, boolean... pushbytes) {
         List<ScriptCmd> cmds = new ArrayList<>();
         cmds.add(OpCodeNames.OP_169_HASH160.toScriptCmd());
-        if (h160Pushbytes.length > 0 && h160Pushbytes[0]) {
+        if (pushbytes.length > 0 && pushbytes[0]) {
             cmds.add(new ScriptCmd(Int.parse(h160.length).toBytes(1)));
         }
         cmds.add(new ScriptCmd(h160));
@@ -66,13 +66,13 @@ public class Script {
      * https://learnmeabitcoin.com/technical/script/p2wpkh/
      *
      * @param h160          an array of {@link byte} objects
-     * @param h160Pushbytes .
+     * @param pushbytes .
      * @return a {@link ch.bitagent.bitcoin.lib.script.Script} object
      */
-    public static Script p2wpkhScript(byte[] h160, boolean... h160Pushbytes) {
+    public static Script p2wpkhScript(byte[] h160, boolean... pushbytes) {
         List<ScriptCmd> cmds = new ArrayList<>();
         cmds.add(OpCodeNames.OP_0.toScriptCmd());
-        if (h160Pushbytes.length > 0 && h160Pushbytes[0]) {
+        if (pushbytes.length > 0 && pushbytes[0]) {
             cmds.add(new ScriptCmd(Int.parse(h160.length).toBytes(1)));
         }
         cmds.add(new ScriptCmd(h160));

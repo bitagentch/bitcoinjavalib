@@ -1,6 +1,7 @@
 # release notes
 
 ## snapshot
+- wallet legacy addresses
 
 ## 0.4.1
 - docs

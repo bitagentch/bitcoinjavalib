@@ -142,9 +142,9 @@ public class Address {
 
     public Script scriptPubkey() {
         if (this.isP2pkhAddress()) {
-            throw new IllegalStateException();
+            return Script.p2pkhScript(hash160());
         } else if (this.isP2shAddress()) {
-            throw new IllegalStateException();
+            return Script.p2shScript(hash160());
         } else if (this.isBech32Address()) {
             if (this.addressString.startsWith("bc1q")) {
                 var scriptPubkey = Bech32.decodeSegwit(this.addressString);
