@@ -171,7 +171,7 @@ public class Tx implements Message {
             for (int i = 0; i < numItems; i++) {
                 var itemLen = Varint.read(stream).intValue();
                 if (itemLen == 0) {
-                    items.add(OpCodeNames.OP_0.toScriptCmd());
+                    items.add(OpCodeNames.OP_0_0.toScriptCmd());
                 } else {
                     items.add(new ScriptCmd(Bytes.read(stream, itemLen)));
                 }

@@ -110,6 +110,6 @@ class AddressTest {
 
         // https://learnmeabitcoin.com/technical/script/p2tr/
         var p2trAddress = Address.parse("bc1ppuxgmd6n4j73wdp688p08a8rte97dkn5n70r2ym6kgsw0v3c5ensrytduf");
-        assertThrowsExactly(IllegalStateException.class, () -> p2trAddress.scriptPubkey().toHex());
+        assertEquals("510f0c8db753acbd17343a39c2f3f4e35e4be6da749f9e35137ab220e7b238a667", p2trAddress.scriptPubkey().toHex());
     }
 }

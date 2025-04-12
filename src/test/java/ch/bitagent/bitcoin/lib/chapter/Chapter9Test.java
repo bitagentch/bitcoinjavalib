@@ -44,7 +44,7 @@ class Chapter9Test {
         assertEquals(OpCodeNames.OP_103_ELSE, cmds.get(6).getOpCode());
         assertEquals(OpCodeNames.OP_142_8E, cmds.get(7).getOpCode());
         assertEquals("8c34afc36896e7d9402824ed38e856676ee94bfdb0c6c4bcd8b2e5666a0400000000000000c7270000a5e00e", cmds.get(8).getElementAsHexString());
-        assertEquals(OpCodeNames.OP_0, cmds.get(9).getOpCode());
+        assertEquals(OpCodeNames.OP_0_0, cmds.get(9).getOpCode());
     }
 
     @Test

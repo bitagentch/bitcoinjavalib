@@ -24,8 +24,8 @@ class Chapter6Test {
 
     @Test
     void exercise3() {
-        var scriptPubkey = new Script(List.of(OpCodeNames.OP_118_DUP.toScriptCmd(), OpCodeNames.OP_118_DUP.toScriptCmd(), OpCodeNames.OP_147_ADD.toScriptCmd(), OpCodeNames.OP_147_ADD.toScriptCmd(), OpCodeNames.OP_86.toScriptCmd(), OpCodeNames.OP_135_EQUAL.toScriptCmd()));
-        var scriptSig = new Script(List.of(OpCodeNames.OP_82.toScriptCmd()));
+        var scriptPubkey = new Script(List.of(OpCodeNames.OP_118_DUP.toScriptCmd(), OpCodeNames.OP_118_DUP.toScriptCmd(), OpCodeNames.OP_147_ADD.toScriptCmd(), OpCodeNames.OP_147_ADD.toScriptCmd(), OpCodeNames.OP_86_6.toScriptCmd(), OpCodeNames.OP_135_EQUAL.toScriptCmd()));
+        var scriptSig = new Script(List.of(OpCodeNames.OP_82_2.toScriptCmd()));
         var combinedScript = scriptSig.add(scriptPubkey);
         assertTrue(combinedScript.evaluate(Hex.parse("00"), null));
     }

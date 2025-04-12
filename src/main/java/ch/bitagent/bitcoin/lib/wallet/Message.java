@@ -138,7 +138,7 @@ public class Message {
         var n = S256Point.N;
         var i = Int.parse(recId / 2);
         var x = sig.getR().add(i.mul(n));
-        var prime = Schnorr.P;
+        var prime = S256Point.P;
         if (x.ge(prime)) {
             return null;
         }

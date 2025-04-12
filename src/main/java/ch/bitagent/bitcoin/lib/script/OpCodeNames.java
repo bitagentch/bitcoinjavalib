@@ -9,13 +9,13 @@ import ch.bitagent.bitcoin.lib.ecc.Int;
 public enum OpCodeNames {
 
     /** op 0 */
-    OP_0(Hex.parse("00"), "OP_0"),
+    OP_0_0(Hex.parse("00"), "OP_0"),
     /** op 81 */
-    OP_81(Hex.parse("51"), "OP_1"),
+    OP_81_1(Hex.parse("51"), "OP_1"),
     /** op 82 */
-    OP_82(Hex.parse("52"), "OP_2"),
+    OP_82_2(Hex.parse("52"), "OP_2"),
     /** op 86 */
-    OP_86(Hex.parse("56"), "OP_6"),
+    OP_86_6(Hex.parse("56"), "OP_6"),
     /** op 91 */
     OP_91_11(Hex.parse("5b"), "OP_11"),
     /** op 99 */

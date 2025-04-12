@@ -71,11 +71,21 @@ public class Script {
      */
     public static Script p2wpkhScript(byte[] h160, boolean... pushbytes) {
         List<ScriptCmd> cmds = new ArrayList<>();
-        cmds.add(OpCodeNames.OP_0.toScriptCmd());
+        cmds.add(OpCodeNames.OP_0_0.toScriptCmd());
         if (pushbytes.length > 0 && pushbytes[0]) {
             cmds.add(new ScriptCmd(Int.parse(h160.length).toBytes(1)));
         }
         cmds.add(new ScriptCmd(h160));
+        return new Script(cmds);
+    }
+
+    public static Script p2trScript(byte[] tweakedPubkey, boolean... pushbytes) {
+        List<ScriptCmd> cmds = new ArrayList<>();
+        cmds.add(OpCodeNames.OP_81_1.toScriptCmd());
+        if (pushbytes.length > 0 && pushbytes[0]) {
+            cmds.add(new ScriptCmd(Int.parse(tweakedPubkey.length).toBytes(1)));
+        }
+        cmds.add(new ScriptCmd(tweakedPubkey));
         return new Script(cmds);
     }
 
@@ -337,7 +347,7 @@ public class Script {
      */
     public boolean isP2wpkhScriptPubkey() {
         return cmds.size() == 2
-                && OpCodeNames.OP_0.equals(cmds.get(0).getOpCode())
+                && OpCodeNames.OP_0_0.equals(cmds.get(0).getOpCode())
                 && cmds.get(1).isElement() && cmds.get(1).getElement().length == 20;
     }
 
@@ -353,7 +363,7 @@ public class Script {
             var stack0 = stack.pop();
             stack.push(stack0);
             stack.push(stack1);
-            if (OpCodeNames.OP_0.getCode().equals(Hex.parse(stack0)) && stack1.length == 20) {
+            if (OpCodeNames.OP_0_0.getCode().equals(Hex.parse(stack0)) && stack1.length == 20) {
                 return true;
             }
         }
@@ -367,7 +377,7 @@ public class Script {
      */
     public boolean isP2wshScriptPubkey() {
         return cmds.size() == 2
-                && OpCodeNames.OP_0.equals(cmds.get(0).getOpCode())
+                && OpCodeNames.OP_0_0.equals(cmds.get(0).getOpCode())
                 && cmds.get(1).isElement() && cmds.get(1).getElement().length == 32;
     }
 
@@ -383,7 +393,7 @@ public class Script {
             var stack0 = stack.pop();
             stack.push(stack0);
             stack.push(stack1);
-            if (OpCodeNames.OP_0.getCode().equals(Hex.parse(stack0)) && stack1.length == 32) {
+            if (OpCodeNames.OP_0_0.getCode().equals(Hex.parse(stack0)) && stack1.length == 32) {
                 return true;
             }
         }

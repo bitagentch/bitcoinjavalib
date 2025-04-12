@@ -3,11 +3,14 @@ package ch.bitagent.bitcoin.lib.wallet;
 import ch.bitagent.bitcoin.lib.ecc.PrivateKey;
 import ch.bitagent.bitcoin.lib.ecc.S256Point;
 import ch.bitagent.bitcoin.lib.network.Electrum;
+import ch.bitagent.bitcoin.lib.tx.Tx;
+import ch.bitagent.bitcoin.lib.tx.TxIn;
 import ch.bitagent.bitcoin.lib.tx.Utxo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class Wallet {
@@ -201,6 +204,35 @@ public class Wallet {
 
     public List<Utxo> getUtxoList() {
         return utxoList;
+    }
+
+    public long getUtxoAmount() {
+        long utxoAmount = 0;
+        for (Utxo utxo : this.utxoList) {
+            if (utxo.getHeight() > 0) {
+                utxoAmount += utxo.getValue();
+            }
+        }
+        return utxoAmount;
+    }
+
+    public List<TxIn> getTxInList() {
+        List<TxIn> txInList = new ArrayList<>();
+        for (Utxo utxo : this.utxoList) {
+            if (utxo.getHeight() > 0) {
+                txInList.add(new TxIn(utxo));
+            }
+        }
+        return txInList;
+    }
+
+    public void txSignInput(Tx tx, List<TxIn> txInList, Map<String, String> cache) {
+        for (int i = 0; i < txInList.size(); i++) {
+            var verified =  tx.signInput(i, this.getPrivateKeyForChangeIndex(txInList.get(i).getUtxo().getChangeIndex()), cache);
+            if (!verified) {
+                throw new IllegalStateException();
+            }
+        }
     }
 
     @Override

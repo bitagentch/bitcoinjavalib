@@ -3,15 +3,12 @@ package ch.bitagent.bitcoin.lib.wallet;
 import ch.bitagent.bitcoin.lib.ecc.Int;
 import ch.bitagent.bitcoin.lib.helper.Properties;
 import ch.bitagent.bitcoin.lib.network.Electrum;
-import ch.bitagent.bitcoin.lib.script.Script;
 import ch.bitagent.bitcoin.lib.tx.Tx;
 import ch.bitagent.bitcoin.lib.tx.TxIn;
 import ch.bitagent.bitcoin.lib.tx.TxOut;
-import ch.bitagent.bitcoin.lib.tx.Utxo;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,29 +84,27 @@ class WalletTest {
         log.info(wallet.toString());
         assertFalse(wallet.getUtxoList().isEmpty());
 
-        List<TxIn> txInList = new ArrayList<>();
-        long utxoAmount = getUtxoAmount(wallet, txInList);
+        long utxoAmount = wallet.getUtxoAmount();
         assertTrue(utxoAmount > 0);
-
         var spendAmount = utxoAmount;
         var spendAddress = wallet.nextReceiveAddress();
         var spendTxOut = new TxOut(Int.parse(spendAmount), spendAddress.scriptPubkey());
-        var opReturnTxOut = new TxOut(Int.parse(0), Script.opReturn("bitcoinjavalib"));
 
         var version = 2;
         var electrum = new Electrum();
         var heigth = electrum.height();
         Map<String, String> cache = new HashMap<>();
 
-        var tx = new Tx(Int.parse(version), txInList, List.of(spendTxOut, opReturnTxOut), Int.parse(heigth), false, true);
-        txSignInput(wallet, tx, txInList, cache);
+        List<TxIn> txInList = wallet.getTxInList();
+        var tx = new Tx(Int.parse(version), txInList, List.of(spendTxOut), Int.parse(heigth), false, true);
+        wallet.txSignInput(tx, txInList, cache);
 
         var satsVB = electrum.estimateFee(1);
         var feeAmount = tx.sizeVirtualBytes() * satsVB;
         spendAmount = utxoAmount - feeAmount;
         spendTxOut = new TxOut(Int.parse(spendAmount), spendAddress.scriptPubkey());
-        tx = new Tx(Int.parse(version), txInList, List.of(spendTxOut, opReturnTxOut), Int.parse(heigth), false, true);
-        txSignInput(wallet, tx, txInList, cache);
+        tx = new Tx(Int.parse(version), txInList, List.of(spendTxOut), Int.parse(heigth), false, true);
+        wallet.txSignInput(tx, txInList, cache);
         assertTrue(feeAmount > 0);
         assertEquals(feeAmount, tx.fee(cache).intValue());
         log.info(tx.toString());
@@ -122,24 +117,6 @@ class WalletTest {
         log.info(String.format("broadcast transaction%n%s", tx.hexString()));
     }
 
-    private long getUtxoAmount(Wallet wallet, List<TxIn> txInList) {
-        long utxoAmount = 0;
-        for (Utxo utxo : wallet.getUtxoList()) {
-            log.info(utxo.toString());
-            if (utxo.getHeight() > 0) {
-                txInList.add(new TxIn(utxo));
-                utxoAmount += utxo.getValue();
-            }
-        }
-        return utxoAmount;
-    }
-
-    private void txSignInput(Wallet wallet, Tx tx, List<TxIn> txInList, Map<String, String> cache) {
-        for (int i = 0; i < txInList.size(); i++) {
-            assertTrue(tx.signInput(i, wallet.getPrivateKeyForChangeIndex(txInList.get(i).getUtxo().getChangeIndex()), cache));
-        }
-    }
-
     @Disabled(value = "manual")
     @Test
     void createChangeTx() {
@@ -150,15 +127,13 @@ class WalletTest {
         log.info(wallet.toString());
         assertFalse(wallet.getUtxoList().isEmpty());
 
-        List<TxIn> txInList = new ArrayList<>();
-        long utxoAmount = getUtxoAmount(wallet, txInList);
+        long utxoAmount = wallet.getUtxoAmount();
         assertTrue(utxoAmount > 0);
-
+        var spendAmount = 10000;
         // tested with p2pkh address 1JQwARc3U8GKwsiuV42VPCAATsCig7Lh15
         // tested with p2sh address 3KeHaLZ6GFMYoZ37HpzixVqsn2FFxkNi3D
-        // not tested yet with p2tr address bc1p36065kzufa0d6wm9ay59fz868rwaqauhffnhm0m4a3sdd4lqswlqs3dut6
-        var spendAmount = 10000;
-        var spendAddress = Address.parse("bc1p36065kzufa0d6wm9ay59fz868rwaqauhffnhm0m4a3sdd4lqswlqs3dut6");
+        // tested with p2tr address bc1p36065kzufa0d6wm9ay59fz868rwaqauhffnhm0m4a3sdd4lqswlqs3dut6
+        var spendAddress = Address.parse("TODO");
         var spendTxOut = new TxOut(Int.parse(spendAmount), spendAddress.scriptPubkey());
         var changeAmount = utxoAmount - spendAmount;
         var changeAddress = wallet.nextChangeAddress();
@@ -169,15 +144,16 @@ class WalletTest {
         var heigth = electrum.height();
         Map<String, String> cache = new HashMap<>();
 
+        List<TxIn> txInList = wallet.getTxInList();
         var tx = new Tx(Int.parse(version), txInList, List.of(spendTxOut, changeTxOut), Int.parse(heigth), false, true);
-        txSignInput(wallet, tx, txInList, cache);
+        wallet.txSignInput(tx, txInList, cache);
         var satsVB = electrum.estimateFee(1);
 
         var feeAmount = tx.sizeVirtualBytes() * satsVB;
         changeAmount = utxoAmount - spendAmount - feeAmount;
         changeTxOut = new TxOut(Int.parse(changeAmount), changeAddress.scriptPubkey());
         tx = new Tx(Int.parse(version), txInList, List.of(spendTxOut, changeTxOut), Int.parse(heigth), false, true);
-        txSignInput(wallet, tx, txInList, cache);
+        wallet.txSignInput(tx, txInList, cache);
         log.info(tx.toString());
 
         log.info(String.format("tx %svB", tx.sizeVirtualBytes()));
