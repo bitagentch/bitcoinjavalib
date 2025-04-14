@@ -2,6 +2,9 @@
 
 ## snapshot
 
+## 0.4.3
+- wallet tx sign input
+
 ## 0.4.2
 - wallet legacy addresses
 - wallet taproot addresses
