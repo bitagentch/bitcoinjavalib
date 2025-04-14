@@ -56,7 +56,7 @@ public class TxFetcher {
                     tx = Tx.parse(rawBytes, testnet);
                 }
                 if (!tx.id().equals(txId64)) {
-                    throw new IllegalStateException(String.format("not the same id: %s vs %s", tx.id(), txId));
+                    throw new IllegalStateException(String.format("not the same id: %s vs %s", tx.id(), txId64));
                 }
                 if (cache != null) {
                     cache.put(txId64, txRaw);
@@ -80,8 +80,8 @@ public class TxFetcher {
         } else {
             computed = Hex.parse(Bytes.changeOrder(Hash.hash256(txBytes))).toString();
         }
-        if (!computed.equals(txId)) {
-            throw new IllegalStateException(String.format("server lied: %s vs %s", computed, txId));
+        if (!computed.equals(txId64)) {
+            throw new IllegalStateException(String.format("server lied: %s vs %s, segwit %s", computed, txId64, tx.getSegwit()));
         }
         log.fine(String.format("tx %s", tx));
         return tx;

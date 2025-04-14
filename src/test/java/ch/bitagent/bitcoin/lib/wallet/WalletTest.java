@@ -173,4 +173,24 @@ class WalletTest {
         log.info(txId);
         assertNotNull(txId);
     }
+
+    @Disabled(value = "manual")
+    @Test
+    void txSignInput() {
+        var mnemonicSentence = Properties.getWalletMnemonic(WALLET_DEV_FILENAME, 1);
+        var passphrase = Properties.getWalletPassphrase(WALLET_DEV_FILENAME, 1);
+        var wallet = Wallet.parse(mnemonicSentence, passphrase, Wallet.PURPOSE_NATIVE_SEGWIT, Wallet.COIN_TYPE_BITCOIN, 0, 3);
+        wallet.history(0);
+        wallet.history(1);
+        log.info(wallet.toString());
+        var utxoAmount = wallet.getUtxoAmount();
+        assertTrue(utxoAmount > 0);
+        var txInList = wallet.getTxInList();
+        var txOut = new TxOut(Int.parse(utxoAmount), wallet.nextReceiveAddress().scriptPubkey());
+        var electrum = new Electrum();
+        var height = electrum.height();
+        var tx = new Tx(Int.parse(2), txInList, List.of(txOut), Int.parse(height), false, true);
+        wallet.txSignInput(tx, txInList, new HashMap<>());
+        log.info(tx.toString());
+    }
 }
