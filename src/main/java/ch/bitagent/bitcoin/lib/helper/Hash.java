@@ -48,6 +48,15 @@ public class Hash {
         }
     }
 
+    public static MessageDigest getDigestSha256() {
+        try {
+            return MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            log.severe(e.getMessage());
+            throw new IllegalStateException(e.getMessage());
+        }
+    }
+
     /**
      * <p>sha256.</p>
      *
@@ -55,13 +64,7 @@ public class Hash {
      * @return an array of {@link byte} objects
      */
     public static byte[] sha256(byte[] bytes) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            return digest.digest(bytes);
-        } catch (NoSuchAlgorithmException e) {
-            log.severe(e.getMessage());
-            throw new IllegalStateException(e.getMessage());
-        }
+        return getDigestSha256().digest(bytes);
     }
 
     /**
@@ -81,7 +84,12 @@ public class Hash {
      * @return an array of {@link byte} objects
      */
     public static byte[] hash256(byte[] bytes) {
-        return sha256(sha256(bytes));
+        var digest = getDigestSha256();
+        return digest.digest(digest.digest(bytes));
+    }
+
+    public static byte[] hash256(MessageDigest digest, byte[] bytes) {
+        return digest.digest(digest.digest(bytes));
     }
 
     /**

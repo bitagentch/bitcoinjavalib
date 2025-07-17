@@ -28,6 +28,8 @@ public class Bytes {
      */
     private static final Int MAX_TARGET = Hex.parse("ffff").mul(Int.parse(256).pow(Hex.parse("1d").sub(Int.parse(3))));
 
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
     private Bytes() {
     }
 
@@ -326,7 +328,7 @@ public class Bytes {
      */
     public static byte[] randomBytes(int length) {
         byte[] bytes = new byte[length];
-        new SecureRandom().nextBytes(bytes);
+        SECURE_RANDOM.nextBytes(bytes);
         return bytes;
     }
 

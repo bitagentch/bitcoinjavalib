@@ -1,6 +1,7 @@
 # release notes
 
 ## snapshot
+- stratum
 
 ## 0.4.3
 - wallet tx sign input
