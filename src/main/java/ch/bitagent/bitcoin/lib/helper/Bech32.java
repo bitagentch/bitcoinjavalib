@@ -147,7 +147,11 @@ public class Bech32 {
         try {
             var bech32Low = bech32.toLowerCase();
             if (bech32Low.length() > 90) {
-                throw new IllegalArgumentException(String.format("overall max length (90) exceeded %s", bech32.length()));
+                if (bech32Low.startsWith("lnurl")) {
+                    // OK
+                } else {
+                    throw new IllegalArgumentException(String.format("overall max length (90) exceeded %s", bech32.length()));
+                }
             }
             var lastIndex = bech32Low.lastIndexOf("1");
             if (lastIndex == -1) {
@@ -307,7 +311,7 @@ public class Bech32 {
             throw new IllegalArgumentException(String.format("invalid checksum (Bech32 instead of Bech32m) %s", bech32));
         }
         var program5 = Arrays.copyOfRange(decoded.getDataBytes(), 1, decoded.getDataBytes().length);
-        var program8 = Bech32.convertBits(program5, 5, 8, false);
+        var program8 = Bech32.five2eight(program5);
         if (program8.length < 2 || program8.length > 40) {
             throw new IllegalArgumentException(String.format("invalid program length %s", program8.length));
         }
@@ -336,7 +340,7 @@ public class Bech32 {
         var scriptPubkeyBytes = Bytes.hexStringToByteArray(scriptPubkey);
         var version = scriptPubkeyBytes[0];
         var program8 = Arrays.copyOfRange(scriptPubkeyBytes, 2, scriptPubkeyBytes.length);
-        var program5 = convertBits(program8, 8, 5, true);
+        var program5 = eight2five(program8);
         return encode(hrp, Bytes.add(new byte[]{version}, program5), version == 0 ? Encoding.BECH32 : Encoding.BECH32M);
     }
 
@@ -349,8 +353,14 @@ public class Bech32 {
      */
     public static String decodeNostr(String bech32) {
         var decoded = decode(bech32);
-        byte[] bytes8 = convertBits(decoded.getDataBytes(), 5, 8, false);
+        byte[] bytes8 = five2eight(decoded.dataBytes);
         return Bytes.byteArrayToHexString(bytes8);
+    }
+
+    public static String decodeLnurl(String bech32) {
+        var decoded = decode(bech32);
+        byte[] bytes8 = five2eight(decoded.dataBytes);
+        return Bytes.byteArrayToString(bytes8);
     }
 
     /**
@@ -362,8 +372,22 @@ public class Bech32 {
      */
     public static String encodeNostr(String hrp, String hexString) {
         var bytes8 = Bytes.hexStringToByteArray(hexString);
-        var bytes5 = convertBits(bytes8, 8, 5, true);
+        var bytes5 = eight2five(bytes8);
         return encode(hrp, bytes5, Encoding.BECH32);
+    }
+
+    public static String encodeLnurl(String hrp, String lnurl) {
+        var bytes8 = lnurl.getBytes();
+        var bytes5 = eight2five(bytes8);
+        return encode(hrp, bytes5, Encoding.BECH32);
+    }
+
+    public static byte[] five2eight(byte[] five) {
+        return convertBits(five, 5, 8, false);
+    }
+
+    public static byte[] eight2five(byte[] eight) {
+        return convertBits(eight, 8, 5, true);
     }
 
     /**
@@ -376,7 +400,7 @@ public class Bech32 {
      * @param pad .
      * @return .
      */
-    static byte[] convertBits(final byte[] bytes, final int fromBits, final int toBits, final boolean pad) {
+    private static byte[] convertBits(final byte[] bytes, final int fromBits, final int toBits, final boolean pad) {
         int acc = 0;
         int bits = 0;
         ByteArrayOutputStream out = new ByteArrayOutputStream(64);

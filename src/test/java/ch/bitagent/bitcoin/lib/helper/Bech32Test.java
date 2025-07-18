@@ -131,15 +131,29 @@ class Bech32Test {
         assertEquals("bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4", Bech32.encodeSegwit("bc", "0014751e76e8199196d454941c45d1b3a323f1433bd6"));
     }
 
+    // https://github.com/nostr-protocol/nips/blob/master/19.md
     @Test
     void decodeNostr() {
         assertEquals("7e7e9c42a91bfef19fa929e5fda1b72e0ebc1a4c1141673e2794234d86addf4e", Bech32.decodeNostr("npub10elfcs4fr0l0r8af98jlmgdh9c8tcxjvz9qkw038js35mp4dma8qzvjptg"));
         assertEquals("67dea2ed018072d675f5415ecfaed7d2597555e202d85b3d65ea4e58d2d92ffa", Bech32.decodeNostr("nsec1vl029mgpspedva04g90vltkh6fvh240zqtv9k0t9af8935ke9laqsnlfe5"));
     }
 
+    // https://github.com/nostr-protocol/nips/blob/master/19.md
     @Test
     void encodeNostr() {
         Assertions.assertEquals("npub10elfcs4fr0l0r8af98jlmgdh9c8tcxjvz9qkw038js35mp4dma8qzvjptg", Bech32.encodeNostr("npub", "7e7e9c42a91bfef19fa929e5fda1b72e0ebc1a4c1141673e2794234d86addf4e"));
         Assertions.assertEquals("nsec1vl029mgpspedva04g90vltkh6fvh240zqtv9k0t9af8935ke9laqsnlfe5", Bech32.encodeNostr("nsec", "67dea2ed018072d675f5415ecfaed7d2597555e202d85b3d65ea4e58d2d92ffa"));
+    }
+
+    // https://github.com/lnurl/luds/blob/luds/01.md
+    @Test
+    void decodeLnurl() {
+        assertEquals("https://service.com/api?q=3fc3645b439ce8e7f2553a69e5267081d96dcd340693afabe04be7b0ccd178df", Bech32.decodeLnurl("LNURL1DP68GURN8GHJ7UM9WFMXJCM99E3K7MF0V9CXJ0M385EKVCENXC6R2C35XVUKXEFCV5MKVV34X5EKZD3EV56NYD3HXQURZEPEXEJXXEPNXSCRVWFNV9NXZCN9XQ6XYEFHVGCXXCMYXYMNSERXFQ5FNS"));
+    }
+
+    // https://github.com/lnurl/luds/blob/luds/01.md
+    @Test
+    void encodeLnurl() {
+        assertEquals("LNURL1DP68GURN8GHJ7UM9WFMXJCM99E3K7MF0V9CXJ0M385EKVCENXC6R2C35XVUKXEFCV5MKVV34X5EKZD3EV56NYD3HXQURZEPEXEJXXEPNXSCRVWFNV9NXZCN9XQ6XYEFHVGCXXCMYXYMNSERXFQ5FNS", Bech32.encodeLnurl("lnurl", "https://service.com/api?q=3fc3645b439ce8e7f2553a69e5267081d96dcd340693afabe04be7b0ccd178df").toUpperCase());
     }
 }
