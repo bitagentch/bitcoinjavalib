@@ -1,8 +1,10 @@
 # release notes
 
 ## snapshot
+
+## 0.5.0
 - stratum
-- lnurl
+- lnurl encoding/decoding (lud-01)
 
 ## 0.4.3
 - wallet tx sign input
