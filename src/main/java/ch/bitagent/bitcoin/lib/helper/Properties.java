@@ -129,6 +129,10 @@ public class Properties {
         return getPropertyList(bitcoinjavalibProperties, FILENAME, "electrum.testnet.rpc.socket.");
     }
 
+    public static List<String> getStratumRpcSockets() {
+        return getPropertyList(bitcoinjavalibProperties, FILENAME, "stratum.rpc.socket.");
+    }
+
     public static List<String> getWallets(String filename) {
         return getPropertyList(walletProperties, filename, "wallet.");
     }
