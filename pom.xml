@@ -6,9 +6,10 @@
 
     <groupId>ch.bitagent</groupId>
     <artifactId>bitcoinjavalib</artifactId>
-    <version>0.4.3</version>
+    <version>0.5.0</version>
     <packaging>jar</packaging>
 
+    <name>bitcoinjavalib</name>
     <description>a bitcoin java library</description>
     <url>https://bitagent.ch</url>
     <developers>
