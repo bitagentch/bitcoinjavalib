@@ -39,7 +39,7 @@ public class TxFetcher {
                 if (Properties.getBitcoinRpcAuth() != null && Properties.getBitcoinRpcTestnet().equals(testnet)) {
                     txRaw = Http.postGetRawTransaction(txId64);
                 } else if (Boolean.TRUE.equals(testnet)) {
-                    txRaw = new Electrum(true).getTransaction(txId64);
+                    txRaw = new Electrum(true, false).getTransaction(txId64);
                 } else {
                     txRaw = new Electrum().getTransaction(txId64);
                 }

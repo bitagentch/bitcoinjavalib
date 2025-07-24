@@ -18,12 +18,19 @@ public class Electrum {
 
     private final List<String> sockets = new ArrayList<>();
     private String defaultSocket;
+    private boolean silent = false;
 
     public Electrum() {
         this.initSockets(false);
     }
 
-    public Electrum(boolean testnet) {
+    public Electrum(boolean silent) {
+        this.silent = silent;
+        this.initSockets(false);
+    }
+
+    public Electrum(boolean testnet, boolean silent) {
+        this.silent = silent;
         this.initSockets(testnet);
     }
 
@@ -91,7 +98,12 @@ public class Electrum {
                 responseLog = responseLog.substring(0, 80) + " ...";
             }
             log.fine(String.format("<< %s", responseLog));
-            log.info(String.format("%s %sms", socket, System.currentTimeMillis() - start));
+            var info = String.format("%s %sms", socket, System.currentTimeMillis() - start);
+            if (silent) {
+                log.fine(info);
+            } else {
+                log.info(info);
+            }
             return jsonResponse;
         } catch (Exception e) {
             log.severe(String.format("%s - %s %sms", e, socket, System.currentTimeMillis() - start));

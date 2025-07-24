@@ -1,6 +1,7 @@
 # release notes
 
 ## snapshot
+- electrum silent
 
 ## 0.5.0
 - stratum

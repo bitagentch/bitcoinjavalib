@@ -17,6 +17,11 @@ class ElectrumTest {
     }
 
     @Test
+    void pingDefaultSilent() {
+        assertNotNull(new Electrum(true));
+    }
+
+    @Test
     void pingAll() {
         var electrum = new Electrum();
         for (String socket : electrum.getSockets()) {
