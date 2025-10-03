@@ -1,6 +1,8 @@
 # release notes
 
 ## snapshot
+
+## 0.5.1
 - electrum silent
 
 ## 0.5.0
