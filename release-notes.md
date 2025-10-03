@@ -2,6 +2,9 @@
 
 ## snapshot
 
+## 0.5.1
+- electrum silent
+
 ## 0.5.0
 - stratum
 - lnurl encoding/decoding (lud-01)
