@@ -2,6 +2,9 @@
 
 ## snapshot
 
+## 0.5.2
+- electrum update
+
 ## 0.5.1
 - electrum silent
 

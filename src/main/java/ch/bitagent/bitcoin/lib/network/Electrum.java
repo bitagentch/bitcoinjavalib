@@ -125,8 +125,10 @@ public class Electrum {
         List<JSONObject> features = new ArrayList<>();
         for (String socket : sockets) {
             var jsonResponse = callSocket(socket, getJsonRequest("server.features", null));
-            var json = new JSONObject(jsonResponse);
-            features.add(json.getJSONObject("result"));
+            if (jsonResponse != null) {
+                var json = new JSONObject(jsonResponse);
+                features.add(json.getJSONObject("result"));
+            }
         }
         return features;
     }
@@ -135,20 +137,28 @@ public class Electrum {
         List<JSONArray> versions = new ArrayList<>();
         for (String socket : sockets) {
             var jsonResponse = callSocket(socket, getJsonRequest("server.version", List.of("", "1.4")));
-            var json = new JSONObject(jsonResponse);
-            versions.add(json.getJSONArray("result"));
+            if (jsonResponse != null) {
+                var json = new JSONObject(jsonResponse);
+                versions.add(json.getJSONArray("result"));
+            }
         }
         return versions;
     }
 
     public JSONArray peers() {
         var jsonResponse = callSocket(defaultSocket, getJsonRequest("server.peers.subscribe", null));
+        if (jsonResponse == null) {
+            return null;
+        }
         var json = new JSONObject(jsonResponse);
         return json.getJSONArray("result");
     }
 
     public Integer height() {
         var jsonResponse = callSocket(defaultSocket, getJsonRequest("blockchain.headers.subscribe", null));
+        if (jsonResponse == null) {
+            return null;
+        }
         var json = new JSONObject(jsonResponse);
         return json.getJSONObject("result").getInt("height");
     }
