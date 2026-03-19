@@ -3,6 +3,7 @@
 ```
 export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 mvn clean install
+vi ~/.m2/settings.xml
 
 mvn clean deploy -Pcentral
 ```
