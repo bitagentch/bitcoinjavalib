@@ -1,6 +1,7 @@
 # release notes
 
 ## snapshot
+- electrum estimate fee test
 
 ## 0.5.2
 - electrum update

@@ -80,7 +80,17 @@ class ElectrumTest {
         var electrum = new Electrum();
         var fee = electrum.estimateFee(0);
         assertNull(fee);
-        fee = electrum.estimateFee(1);
+        estimateFeeForNumber(electrum, 1);
+        estimateFeeForNumber(electrum, 2);
+        estimateFeeForNumber(electrum, 3);
+        estimateFeeForNumber(electrum, 4);
+        estimateFeeForNumber(electrum, 5);
+        estimateFeeForNumber(electrum, 6);
+    }
+
+    private static void estimateFeeForNumber(Electrum electrum, int number) {
+        Long fee = electrum.estimateFee(number);
+        log.info(String.format("fee number %s -> %s sats/vB", number, fee));
         assertTrue(fee > 0);
     }
 
