@@ -69,6 +69,14 @@ public class Electrum {
         return sockets;
     }
 
+    public String getDefaultSocket() {
+        return defaultSocket;
+    }
+
+    public void setDefaultSocket(String defaultSocket) {
+        this.defaultSocket = defaultSocket;
+    }
+
     public String callSocket(String socket, String jsonRequest) {
         var start = System.currentTimeMillis();
         try {
@@ -127,7 +135,11 @@ public class Electrum {
             var jsonResponse = callSocket(socket, getJsonRequest("server.features", null));
             if (jsonResponse != null) {
                 var json = new JSONObject(jsonResponse);
-                features.add(json.getJSONObject("result"));
+                var result = json.getJSONObject("result");
+                var feature = new JSONObject();
+                feature.put("0socket", socket);
+                feature.put("1result", result);
+                features.add(feature);
             }
         }
         return features;

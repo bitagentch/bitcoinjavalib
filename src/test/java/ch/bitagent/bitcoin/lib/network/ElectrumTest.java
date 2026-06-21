@@ -24,7 +24,10 @@ class ElectrumTest {
     @Test
     void pingAll() {
         var electrum = new Electrum();
-        for (String socket : electrum.getSockets()) {
+        var sockets = electrum.getSockets();
+        var electrumTestnet = new Electrum(true, false);
+        sockets.addAll(electrumTestnet.getSockets());
+        for (String socket : sockets) {
             assertTrue(electrum.ping(socket));
         }
     }
@@ -34,11 +37,19 @@ class ElectrumTest {
         var electrum = new Electrum();
         var features = electrum.features();
         assertEquals(electrum.getSockets().size(), features.size());
+        var electrumTestnet = new Electrum(true, false);
+        var featuresTestnet = electrumTestnet.features();
+        assertEquals(electrumTestnet.getSockets().size(), featuresTestnet.size());
+        features.addAll(featuresTestnet);
         for (JSONObject feature : features) {
-            assertEquals("000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f", feature.getString("genesis_hash"));
-            assertEquals("sha256", feature.getString("hash_function"));
-            assertEquals("1.4", feature.getString("protocol_min"));
-            assertTrue(feature.isNull("pruning"));
+            log.info(feature.toString(2));
+            var result = feature.getJSONObject("1result");
+            var genesisHash = result.getString("genesis_hash");
+            assertTrue("000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f".equals(genesisHash)
+                    || "000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943".equals(genesisHash));
+            assertEquals("sha256", result.getString("hash_function"));
+            assertEquals("1.4", result.getString("protocol_min"));
+            assertTrue(result.isNull("pruning"));
         }
     }
 

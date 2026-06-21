@@ -35,8 +35,9 @@ class WalletTest {
         var wallet = Wallet.parse(extendedPrivkey, 3);
         assertEquals(3, wallet.getAddressList0().size());
         assertEquals(3, wallet.getAddressList1().size());
-        wallet.history(0);
-        wallet.history(1);
+        String defaultSocket = null;
+        wallet.history(0, defaultSocket);
+        wallet.history(1, defaultSocket);
         log.info(wallet.toString());
     }
 

@@ -2,6 +2,7 @@
 
 ## snapshot
 - electrum estimate fee test
+- electrum tests
 
 ## 0.5.2
 - electrum update
