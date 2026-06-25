@@ -3,6 +3,7 @@
 ## snapshot
 - electrum estimate fee test
 - electrum tests
+- electrum block headers
 
 ## 0.5.2
 - electrum update

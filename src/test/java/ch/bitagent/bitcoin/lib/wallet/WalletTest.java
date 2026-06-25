@@ -93,7 +93,7 @@ class WalletTest {
 
         var version = 2;
         var electrum = new Electrum();
-        var heigth = electrum.height();
+        var heigth = electrum.headers().getInt("height");
         Map<String, String> cache = new HashMap<>();
 
         List<TxIn> txInList = wallet.getTxInList();
@@ -142,7 +142,7 @@ class WalletTest {
 
         var version = 2;
         var electrum = new Electrum();
-        var heigth = electrum.height();
+        var heigth = electrum.headers().getInt("height");
         Map<String, String> cache = new HashMap<>();
 
         List<TxIn> txInList = wallet.getTxInList();
@@ -189,7 +189,7 @@ class WalletTest {
         var txInList = wallet.getTxInList();
         var txOut = new TxOut(Int.parse(utxoAmount), wallet.nextReceiveAddress().scriptPubkey());
         var electrum = new Electrum();
-        var height = electrum.height();
+        var height = electrum.headers().getInt("height");
         var tx = new Tx(Int.parse(2), txInList, List.of(txOut), Int.parse(height), false, true);
         wallet.txSignInput(tx, txInList, new HashMap<>());
         log.info(tx.toString());

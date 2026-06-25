@@ -71,10 +71,13 @@ class ElectrumTest {
     }
 
     @Test
-    void height() {
+    void headers() {
         var electrum = new Electrum();
-        var height = electrum.height();
-        assertNotNull(height);
+        var headers = electrum.headers();
+        var height = headers.getInt("height");
+        assertTrue(height > 0);
+        var timestamp = headers.getInt("timestamp");
+        assertTrue(timestamp > 0);
     }
 
     @Test
