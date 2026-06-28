@@ -89,7 +89,14 @@ public class Wallet {
     }
 
     public void history(int change) {
+        this.history(change, null);
+    }
+
+    public void history(int change, String defaultSocket) {
         var electrum = new Electrum();
+        if (defaultSocket != null) {
+            electrum.setDefaultSocket(defaultSocket);
+        }
         int gap = 0;
         var addressList = getAddressList0();
         if (change == 0) {

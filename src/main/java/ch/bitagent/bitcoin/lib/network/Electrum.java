@@ -1,10 +1,13 @@
 package ch.bitagent.bitcoin.lib.network;
 
+import ch.bitagent.bitcoin.lib.block.Block;
+import ch.bitagent.bitcoin.lib.ecc.Hex;
 import ch.bitagent.bitcoin.lib.helper.Helper;
 import ch.bitagent.bitcoin.lib.helper.Properties;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -69,6 +72,14 @@ public class Electrum {
         return sockets;
     }
 
+    public String getDefaultSocket() {
+        return defaultSocket;
+    }
+
+    public void setDefaultSocket(String defaultSocket) {
+        this.defaultSocket = defaultSocket;
+    }
+
     public String callSocket(String socket, String jsonRequest) {
         var start = System.currentTimeMillis();
         try {
@@ -127,7 +138,11 @@ public class Electrum {
             var jsonResponse = callSocket(socket, getJsonRequest("server.features", null));
             if (jsonResponse != null) {
                 var json = new JSONObject(jsonResponse);
-                features.add(json.getJSONObject("result"));
+                var result = json.getJSONObject("result");
+                var feature = new JSONObject();
+                feature.put("0socket", socket);
+                feature.put("1result", result);
+                features.add(feature);
             }
         }
         return features;
@@ -154,13 +169,26 @@ public class Electrum {
         return json.getJSONArray("result");
     }
 
-    public Integer height() {
+    public JSONObject headers() {
         var jsonResponse = callSocket(defaultSocket, getJsonRequest("blockchain.headers.subscribe", null));
         if (jsonResponse == null) {
             return null;
         }
         var json = new JSONObject(jsonResponse);
-        return json.getJSONObject("result").getInt("height");
+        var result = json.getJSONObject("result");
+
+        var height = result.getInt("height");
+
+        var header = result.getString("hex");
+        var hex = Hex.parse(header);
+        var stream = new ByteArrayInputStream(hex.toBytes());
+        var block = Block.parse(stream);
+        int timestamp = block.getTimestamp().intValue();
+
+        var jsonResult = new JSONObject();
+        jsonResult.put("height", height);
+        jsonResult.put("timestamp", timestamp);
+        return jsonResult;
     }
 
     public JSONArray getHistory(String scripthash) {

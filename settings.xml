@@ -1,0 +1,14 @@
+<settings>
+    <servers>
+        <server>
+            <id>central</id>
+            <username></username>
+            <password></password>
+        </server>
+        <server>
+            <id>github</id>
+            <username></username>
+            <password></password>
+        </server>
+    </servers>
+</settings>
