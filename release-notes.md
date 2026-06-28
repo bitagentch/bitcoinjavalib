@@ -1,6 +1,8 @@
 # release notes
 
 ## snapshot
+
+## 0.6.0
 - electrum estimate fee test
 - electrum tests
 - electrum block headers
