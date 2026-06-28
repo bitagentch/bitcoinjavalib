@@ -179,8 +179,8 @@ public class Electrum {
 
         var height = result.getInt("height");
 
-        var hexString = result.getString("hex");
-        var hex = Hex.parse(hexString);
+        var header = result.getString("hex");
+        var hex = Hex.parse(header);
         var stream = new ByteArrayInputStream(hex.toBytes());
         var block = Block.parse(stream);
         int timestamp = block.getTimestamp().intValue();
