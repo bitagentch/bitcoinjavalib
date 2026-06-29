@@ -2,6 +2,9 @@
 
 ## snapshot
 
+## 0.7.0
+- electrum block height
+
 ## 0.6.0
 - electrum estimate fee test
 - electrum tests

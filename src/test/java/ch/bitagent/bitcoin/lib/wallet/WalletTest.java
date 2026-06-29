@@ -93,18 +93,18 @@ class WalletTest {
 
         var version = 2;
         var electrum = new Electrum();
-        var heigth = electrum.headers().getInt("height");
+        var height = electrum.latestBlock().getHeight();
         Map<String, String> cache = new HashMap<>();
 
         List<TxIn> txInList = wallet.getTxInList();
-        var tx = new Tx(Int.parse(version), txInList, List.of(spendTxOut), Int.parse(heigth), false, true);
+        var tx = new Tx(Int.parse(version), txInList, List.of(spendTxOut), height, false, true);
         wallet.txSignInput(tx, txInList, cache);
 
         var satsVB = electrum.estimateFee(1);
         var feeAmount = tx.sizeVirtualBytes() * satsVB;
         spendAmount = utxoAmount - feeAmount;
         spendTxOut = new TxOut(Int.parse(spendAmount), spendAddress.scriptPubkey());
-        tx = new Tx(Int.parse(version), txInList, List.of(spendTxOut), Int.parse(heigth), false, true);
+        tx = new Tx(Int.parse(version), txInList, List.of(spendTxOut), height, false, true);
         wallet.txSignInput(tx, txInList, cache);
         assertTrue(feeAmount > 0);
         assertEquals(feeAmount, tx.fee(cache).intValue());
@@ -142,18 +142,18 @@ class WalletTest {
 
         var version = 2;
         var electrum = new Electrum();
-        var heigth = electrum.headers().getInt("height");
+        var height = electrum.latestBlock().getHeight();
         Map<String, String> cache = new HashMap<>();
 
         List<TxIn> txInList = wallet.getTxInList();
-        var tx = new Tx(Int.parse(version), txInList, List.of(spendTxOut, changeTxOut), Int.parse(heigth), false, true);
+        var tx = new Tx(Int.parse(version), txInList, List.of(spendTxOut, changeTxOut), height, false, true);
         wallet.txSignInput(tx, txInList, cache);
         var satsVB = electrum.estimateFee(1);
 
         var feeAmount = tx.sizeVirtualBytes() * satsVB;
         changeAmount = utxoAmount - spendAmount - feeAmount;
         changeTxOut = new TxOut(Int.parse(changeAmount), changeAddress.scriptPubkey());
-        tx = new Tx(Int.parse(version), txInList, List.of(spendTxOut, changeTxOut), Int.parse(heigth), false, true);
+        tx = new Tx(Int.parse(version), txInList, List.of(spendTxOut, changeTxOut), height, false, true);
         wallet.txSignInput(tx, txInList, cache);
         log.info(tx.toString());
 
@@ -189,8 +189,8 @@ class WalletTest {
         var txInList = wallet.getTxInList();
         var txOut = new TxOut(Int.parse(utxoAmount), wallet.nextReceiveAddress().scriptPubkey());
         var electrum = new Electrum();
-        var height = electrum.headers().getInt("height");
-        var tx = new Tx(Int.parse(2), txInList, List.of(txOut), Int.parse(height), false, true);
+        var height = electrum.latestBlock().getHeight();
+        var tx = new Tx(Int.parse(2), txInList, List.of(txOut), height, false, true);
         wallet.txSignInput(tx, txInList, new HashMap<>());
         log.info(tx.toString());
     }

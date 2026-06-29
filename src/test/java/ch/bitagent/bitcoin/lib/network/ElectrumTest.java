@@ -1,5 +1,6 @@
 package ch.bitagent.bitcoin.lib.network;
 
+import ch.bitagent.bitcoin.lib.ecc.Int;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
@@ -71,13 +72,27 @@ class ElectrumTest {
     }
 
     @Test
-    void headers() {
+    void block0() {
         var electrum = new Electrum();
-        var headers = electrum.headers();
-        var height = headers.getInt("height");
-        assertTrue(height > 0);
-        var timestamp = headers.getInt("timestamp");
-        assertTrue(timestamp > 0);
+        var block = electrum.block(Int.parse(0));
+        assertEquals(0, block.getHeight().intValue());
+        assertEquals(1231006505, block.getTimestamp().intValue());
+    }
+
+    @Test
+    void block1() {
+        var electrum = new Electrum();
+        var block = electrum.block(Int.parse(1));
+        assertEquals(1, block.getHeight().intValue());
+        assertEquals(1231469665, block.getTimestamp().intValue());
+    }
+
+    @Test
+    void latestBlock() {
+        var electrum = new Electrum();
+        var block = electrum.latestBlock();
+        assertTrue(block.getHeight().intValue() > 0);
+        assertTrue(block.getTimestamp().intValue() > 0);
     }
 
     @Test

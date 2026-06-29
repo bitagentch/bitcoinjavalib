@@ -1,7 +1,9 @@
 package ch.bitagent.bitcoin.lib.network;
 
 import ch.bitagent.bitcoin.lib.block.Block;
+import ch.bitagent.bitcoin.lib.block.BlockHeight;
 import ch.bitagent.bitcoin.lib.ecc.Hex;
+import ch.bitagent.bitcoin.lib.ecc.Int;
 import ch.bitagent.bitcoin.lib.helper.Helper;
 import ch.bitagent.bitcoin.lib.helper.Properties;
 import org.json.JSONArray;
@@ -169,7 +171,18 @@ public class Electrum {
         return json.getJSONArray("result");
     }
 
-    public JSONObject headers() {
+    public BlockHeight block(Int height) {
+        var jsonResponse = callSocket(defaultSocket, getJsonRequest("blockchain.block.header", List.of(height)));
+        if (jsonResponse == null) {
+            return null;
+        }
+        var json = new JSONObject(jsonResponse);
+        var header = json.getString("result");
+        var block = getBlock(header);
+        return new BlockHeight(block, height);
+    }
+
+    public BlockHeight latestBlock() {
         var jsonResponse = callSocket(defaultSocket, getJsonRequest("blockchain.headers.subscribe", null));
         if (jsonResponse == null) {
             return null;
@@ -178,17 +191,15 @@ public class Electrum {
         var result = json.getJSONObject("result");
 
         var height = result.getInt("height");
-
         var header = result.getString("hex");
+        var block = getBlock(header);
+        return new BlockHeight(block, Int.parse(height));
+    }
+
+    private Block getBlock(String header) {
         var hex = Hex.parse(header);
         var stream = new ByteArrayInputStream(hex.toBytes());
-        var block = Block.parse(stream);
-        int timestamp = block.getTimestamp().intValue();
-
-        var jsonResult = new JSONObject();
-        jsonResult.put("height", height);
-        jsonResult.put("timestamp", timestamp);
-        return jsonResult;
+        return Block.parse(stream);
     }
 
     public JSONArray getHistory(String scripthash) {
